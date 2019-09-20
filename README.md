@@ -3,7 +3,9 @@ A job portal website.
 
 # Team Details
 Haozhang Yuan
+
 Rishabh Gajra
+
 Shubhangi Shrivastava
 
 
