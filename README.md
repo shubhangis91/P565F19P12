@@ -10,4 +10,4 @@ Shubhangi Shrivastava
 
 
 ## NOTE
-Do not make any changes to the *master* branch
+Kindly do not make any changes to the *master* branch
