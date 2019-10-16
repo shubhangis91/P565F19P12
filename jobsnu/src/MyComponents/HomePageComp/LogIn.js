@@ -2,6 +2,7 @@ import React from "react"
 import Form from "react-bootstrap/Form"
 import Button from "react-bootstrap/Button"
 import axios from "axios"
+import OTPbox from "./OTPbox"
 
 class LogIn extends React.Component {
     constructor(){
@@ -9,10 +10,11 @@ class LogIn extends React.Component {
         this.state = {
             email:  "",
             password: "",
+            otp:Math.floor(100000 + Math.random() * 900000),
+            showOTPbox: false,
         }
         this.handleChange=this.handleChange.bind(this)
         this.handleSubmit=this.handleSubmit.bind(this)
-
     } 
     handleChange(event){
         this.setState({
@@ -20,10 +22,14 @@ class LogIn extends React.Component {
         })
     }
     handleSubmit(event){
+        this.setState({
+            showOTPbox:true, 
+        })
         event.preventDefault();
         const user = {
             email: this.state.email,
             password: this.state.password,
+            otp: this.state.otp,
         };
         console.log(user)
         axios
@@ -36,6 +42,7 @@ class LogIn extends React.Component {
 
     render()    {
         return(
+
             <div className="col-5" style={{background: "linear-gradient(to bottom right,#e7717d, #f0a9b1)"}}>  
                 <Form className='mb-6' style={{marginTop: "25%", marginLeft: "10%",marginRight:"10%", marginBottom: "45%"}}>
                     <Form.Group controlId="formBasicEmail">
@@ -63,11 +70,12 @@ class LogIn extends React.Component {
                     <Button onClick= {this.props.hideLogin} style={{marginLeft: "1%",backgroundColor:"#AFD275",borderColor:"#7E685A", color:"#7E685A"}} >
                         I am new, Register Me!
                     </Button>
-                    <div style={{marginTop:"1%"}}>
+                    <div style={{marginTop:"2.5%"}}>
                         <img src="https://icon-library.net/images/forgot-icon/forgot-icon-11.jpg" style={{width:"20px"}}/>
-                        <a>     I forgot my password, Help!</a>
+                        <a style={{color:"#7E685A" }} href="/forgotPassword">     I forgot my password, Help!</a>
                     </div>
                 </Form>
+                {(this.state.showOTPbox)&& < OTPbox fade= {this.state.showOTPbox} otp={this.state.otp}/>}
             </div>
         )
     }
