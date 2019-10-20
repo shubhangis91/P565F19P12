@@ -12,23 +12,39 @@ class Register extends React.Component {
             email:  "",
             password: "",
             rePassword:"",
-            passwordValid:true,
+            passwordValid:false,
+            emailValid: false,
 
         }
         this.handleChange=this.handleChange.bind(this)
         this.validatePassword=this.validatePassword.bind(this)
         this.handleSubmit=this.handleSubmit.bind(this)
+        this.validateEmail=this.validateEmail.bind(this)
     } 
     handleChange(event){
         this.setState({
             [event.target.name]: event.target.value 
-        })
-        this.validatePassword();
+        }, () => {this.validateEmail(event) });
+    
     }
+
+    validateEmail(event){
+        var check = this.state.email.includes("@");
+        this.setState({
+            emailValid:check, 
+        })
+        console.log(this.state.validateEmail,check)
+        this.validatePassword(event)
+    }
+
     validatePassword(){
+        var check = this.state.password.length >= 8;
+        var check1 = this.state.password.match(/[A-Z]/g)
+        var check2 = this.state.password.match(/[a-z]/g)
+        var check3 = this.state.password.match(/[0-9]/g)
         if (this.state.password==this.state.rePassword) {
             this.setState({
-              passwordValid : true
+              passwordValid : true&&check1&&check&&check2&&check3
             })
         }
         else{
@@ -46,7 +62,7 @@ class Register extends React.Component {
         };
         console.log(user)
         axios
-            .post("url", {user})
+            .post("/verify", {user})
             .then(res => {
                 console.log(res) 
                 console.log(res.data)
@@ -59,16 +75,21 @@ class Register extends React.Component {
 
             <div className="col-5" style={{background: "linear-gradient(to bottom right,#e7717d, #f0a9b1)"}}>  
                 <Form className='mb-6' style={{marginTop: "25%", marginLeft: "10%",marginRight:"10%", marginBottom: "45%"}}>
-                    <Form.Group controlId="formBasicEmail">
+                <Form.Group controlId="formBasicEmail">
                         <Form.Label>Email address</Form.Label>
-                        <Form.Control type="email" name="email" placeholder="Enter email" onChange={this.handleChange} required/>
-                        <Form.Text className="text-muted" >
-                        We'll never share your email with anyone else.{this.state.email}
-                        </Form.Text>
+                        <input className="form-control"type="email" name="email" placeholder="Enter email" onChange={this.handleChange} required/>
+                        {!this.state.emailValid&&<Form.Text className="text-muted" >
+                             Please enter a valid email
+                        </Form.Text>}
+                        {this.state.emailValid&&<br/>}
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword" >
                         <Form.Label>Password{this.state.password}</Form.Label>
-                        <Form.Control type="password" placeholder="Password" name="password" onChange={this.handleChange} required/>
+                        <Form.Control type="password" placeholder="Password" name="password" onChange={this.handleChange} required />
+                        {!this.state.passwordValid&&<Form.Text className="text-muted" >
+                                 Your password must be 8-15 characters, contain one of:upper case, lower case and special character
+                            </Form.Text>}
+                        {this.state.passwordValid&&<br/>}
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword" >
                         <Form.Label>Re-type Password{this.state.rePassword}</Form.Label>
@@ -77,13 +98,13 @@ class Register extends React.Component {
                     <Form.Group controlId="formBasicCheckbox">
                         <Form.Check type="checkbox" label="Remember Me" />
                     </Form.Group>
-                    <Button disabled={this.state.passwordValid} onClick={this.handleSubmit}style={{backgroundColor:"#AFD275",borderColor:"#7E685A", color:"#7E685A"}}>
+                    <Button variant="green" disabled={!((this.state.emailValid)&&(this.state.passwordValid))} onClick={this.handleSubmit}s>
                         Register
                     </Button>
-                    <Button onClick={this.props.hideLogin} style={{marginLeft: "1%", backgroundColor:"#AFD275",borderColor:"#7E685A", color:"#7E685A" } }>
+                    <Button variant="green" onClick={this.props.hideLogin} style={{marginLeft: "1%"}}>
                         I already have a LogIn! 
                     </Button>
-                    {(this.state.passwordValid) && <Form.Text className="text-muted">
+                    {!(this.state.passwordValid) && <Form.Text className="text-muted">
                         Your password and Retype password fields should be matching.
                     </Form.Text>}
                 </Form>
