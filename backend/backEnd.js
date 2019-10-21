@@ -98,7 +98,7 @@ app.post('/mfaLogin', function (req,res) {
                             "</div>" +
                             "<div style=\" text-align: center; margin:0 auto;  width:600px; height:200px; background-color:#C2CAD0 \">" +
                             "<img src=\"https://cdn.pixabay.com/photo/2015/01/08/18/26/write-593333_1280.jpg\" " +
-                                "height = "250px"  width=\"600px text-align: center\">" +
+                                "height = \"250px\"  width=\"600px text-align: center\">" +
                             "</div>" +
                             "<div style=\"margin:0 auto; width:600px; height:370px; text-align: center;background-color:#C2CAD0 \">" +
                             "</div>" +
@@ -161,7 +161,7 @@ function logInUser(userEmail)
         else
         {
             console.log("Login successful. Logging in user " + selectResult[0].id);
-            return selectResult;
+            return (JSON.stringify(selectResult));
         }
         return null;
     });
@@ -170,9 +170,9 @@ function logInUser(userEmail)
 app.post('/login', function(request, response){
 
     // console.log("SESSION VARIABLE DETAILS - Logged In? " + request.session.loggedIn);
-
-    var loginResult = logInUser(request.body.user.email);
-
+    console.log("IN /login\n", request);
+    let loginResult = logInUser(request.body.user.email);
+    console.log(loginResult)
     if(loginResult === -1)
     {
         console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
