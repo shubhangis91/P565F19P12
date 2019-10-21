@@ -160,47 +160,70 @@ function logInUser(userEmail)
         }
         else
         {
-            console.log("Login successful. Logging in user " + selectResult[0].id);
-            return (JSON.stringify(selectResult));
+
+            console.log("Login successful. Logging in user " + selectResult[0].first_name);
+            // console.log("selectResult in logInUser: \n"+ JSON.stringify(selectResult[0]));
+            return next(null, JSON.stringify(selectResult[0]));
+
         }
         return null;
     });
 }
 
 app.post('/login', function(request, response){
+    let userEmail = request.body.user.email;
+    // console.log("SESSION VARIABLE DETAILS - Logged In? " + JSON.stringify(request.session));
+    // // let loginResult = {};
+    // // loginResult = logInUser(request.body.user.email);
+    // // console.log("loginResult in /login: \n"+ JSON.stringify(loginResult));
+    selectSql = "select * from user_profile where email = '" + userEmail +"'";
+    connection.query(selectSql, function (selectErr, selectResult) {
+        if (selectErr) {
+            var loginResponse = {
+                "dbError" : 0,
+                "invalid": 0,
+                "verified": 1,
+                "userId": null,
+                "username": null
+            }
 
-    // console.log("SESSION VARIABLE DETAILS - Logged In? " + request.session.loggedIn);
-    console.log("IN /login\n", request);
-    let loginResult = logInUser(request.body.user.email);
-    console.log(loginResult)
-    if(loginResult === -1)
-    {
-        console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
-    }
-    else if (loginResult === 0){
-        console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n");
-    }
-    else if(loginResult === null) {
-        console.log("-----UNKNOWN ERROR-----\nContact ADMIN to escalate to DEV team.\n");
-    }
-    else {
-        // Set session variables
-        request.session.loggedIn = true;
-        request.session.id = loginResult[0].id;
-        request.session.username = loginResult[0].first_name;
-
-        console.log("-----------SESSION DETAILS-----------\n"+request.session.loggedIn+"\n"+request.session.id+"\n"+request.session.username);
-
-        var response = {
-            "invalid": 0,
-            "verified": 1,
-            "userId": loginResult[0].id,
-            "username": loginResult[0].username
+            console.log("Error fetching user details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(loginResponse));
         }
-    }
+        else if (selectResult === '') {
+            // return 0;
+            var loginResponse = {
+                "dbError" : 0,
+                "invalid": 0,
+                "verified": 1,
+                "userId": null,
+                "username": null
+            }
 
-    console.log("***************\nLOGIN RESPONSE\n***************\n"+response);
-    res.send(JSON.stringify(response));
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(loginResponse));
+        }
+        else {
+            // Set session variables
+            request.session.loggedIn = true;
+            request.session.id = selectResult[0].id;
+            request.session.username = selectResult[0].first_name;
+
+            console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
+
+            var loginResponse = {
+                "invalid": 0,
+                "verified": 1,
+                "userId": selectResult[0].id,
+                "username": selectResult[0].first_name
+            }
+
+            console.log("-----------Login successful!------------\nLogging in user " + selectResult[0].first_name);
+            response.send(JSON.stringify(loginResponse));
+        }
+    });
+    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/logout', function(req,res){
