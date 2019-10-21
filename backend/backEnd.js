@@ -36,11 +36,7 @@ app.use(session({
 }));
 app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
-/*
-app.get('/', function (req, res) {
-   res.sendFile( __dirname + "/" + "test_login.html" );
-})
-*/
+
 app.post('/mfaLogin', function (req,res) {
    console.log(req.body.user)
     let email = req.body.user.email;
@@ -76,13 +72,6 @@ app.post('/mfaLogin', function (req,res) {
         else {
             if (result[0].mfa_enabled) {
                 // User E-mail ID Verification
-
-                // let htmlMessageString = '<html>' +
-                //     '<body>' +
-                //     '<p>Kindly use the OTP below to log in to Jobsnu.</p>' +
-                //     '<p style="font-weight: bold">' + otp + '</p>' +
-                //     '</body>' +
-                //     '</html>';
 
                 let htmlMessageString =
                     "<html>" +
@@ -145,31 +134,6 @@ app.post('/mfaLogin', function (req,res) {
     });
 });
 
-function logInUser(userEmail)
-{
-    selectSql = "select * from user_profile where email = '" + userEmail +"'";
-    connection.query(selectSql, function (selectErr, selectResult) {
-        if(selectErr){
-            console.log("Error fetching user details. See below for detailed error information.\n" + selectErr.message)
-            // res.send("Error fetching user details.\n" + selectErr.message);
-            return -1;
-        }
-        else if(selectResult === '')
-        {
-            return 0;
-        }
-        else
-        {
-
-            console.log("Login successful. Logging in user " + selectResult[0].first_name);
-            // console.log("selectResult in logInUser: \n"+ JSON.stringify(selectResult[0]));
-            return next(null, JSON.stringify(selectResult[0]));
-
-        }
-        return null;
-    });
-}
-
 app.post('/login', function(request, response){
     let userEmail = request.body.user.email;
     // console.log("SESSION VARIABLE DETAILS - Logged In? " + JSON.stringify(request.session));
@@ -180,7 +144,7 @@ app.post('/login', function(request, response){
     connection.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
             var loginResponse = {
-                "dbError" : 0,
+                "dbError" : 1,
                 "invalid": 0,
                 "verified": 1,
                 "userId": null,
@@ -213,6 +177,7 @@ app.post('/login', function(request, response){
             console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
 
             var loginResponse = {
+                "dbError" : 0,
                 "invalid": 0,
                 "verified": 1,
                 "userId": selectResult[0].id,
@@ -223,6 +188,7 @@ app.post('/login', function(request, response){
             response.send(JSON.stringify(loginResponse));
         }
     });
+
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
@@ -237,9 +203,6 @@ app.get('/logout', function(req,res){
     });
 });
 
-app.get('/register', function (req, res) {
-   res.sendFile( __dirname + "/" + "test_verify.html" );
-})
 
 app.post('/verify', function (req, res) {
     let email = req.body.user.email;
@@ -252,7 +215,7 @@ app.post('/verify', function (req, res) {
 
     connection.query(addSql,addSqlParams,function (err, result) {
         if(err){
-            console.log('[INSERT ERROR] - ',err.message);
+            console.log('[INSERT ERROR] - VERIFY',err.message);
             res.end("0");
             return;
         }
@@ -293,7 +256,7 @@ app.post('/verify', function (req, res) {
 
         // Output JSON format
         var response = {
-            "emailid": email,
+            "email": email,
             "password": password,
             "verified": 0,        // 0: Not verified, 1: Verified; becomes 1 after verification
             "otp": otp
@@ -406,11 +369,61 @@ app.post('/register', function (req, res) {
         "dob": dob,
         "gender": gender,
         "primaryContact": primaryContact,
-        "secondaryContact": secondaryContact,
+        "secondaryContact": secondaryContact
     };
     // should show profile saved message/saved profile details
     console.log(response);
     res.end(JSON.stringify(response));
+});
+
+app.get('/userDetails', function (request,response) {
+    let userId = request.body.user.userId;
+    // let userId = request.session.id;
+
+    selectSql = "select * from user_profile where id = " + userId;
+    connection.query(selectSql, function (selectErr, selectResult) {
+        if (selectErr) {
+            var loginResponse = {
+                "dbError" : 1,
+                "userId": null
+            }
+
+            console.log("Error fetching user details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(loginResponse));
+        }
+        else if (selectResult === '') {
+            // return 0;
+            var loginResponse = {
+                "dbError" : 0,
+                "userId": null
+            }
+
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(loginResponse));
+        }
+        else {
+            console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
+
+            var loginResponse = {
+                "dbError" : 0,
+                "userId": selectResult[0].id,
+                "firstName": selectResult[0].first_name,
+                "lastName": selectResult[0].last_name,
+                "dob": selectResult[0].dob,
+                "gender": selectResult[0].gender,
+                "primaryContact": selectResult[0].primary_contact,
+                "secondaryContact": selectResult[0].secondary_contact
+            }
+
+            console.log("-----------Login successful!------------\nLogging in user " + selectResult[0].first_name);
+            response.send(JSON.stringify(loginResponse));
+        }
+    })
+
+    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
+
+
 });
 
 app.get('/test_home', function(request, response) {
@@ -421,6 +434,8 @@ app.get('/test_home', function(request, response) {
 	}
 	response.end();
 });
+
+
 
 var server = app.listen(3500, function () {
   
