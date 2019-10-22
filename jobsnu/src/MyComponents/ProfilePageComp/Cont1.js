@@ -67,8 +67,8 @@ function Cont1() {
         aria-label="Vertical tabs example"
         className={classes.tabs}
       >
-        <Tab label="Item One" {...a11yProps(0)} />
-        <Tab label="Item Two" {...a11yProps(1)} />
+        <Tab label="DashBoard" {...a11yProps(0)} />
+        <Tab label="Profile Details" {...a11yProps(1)} />
         <Tab label="Item Three" {...a11yProps(2)} />
         <Tab label="Item Four" {...a11yProps(3)} />
         <Tab label="Item Five" {...a11yProps(4)} />
@@ -76,12 +76,10 @@ function Cont1() {
         <Tab label="Item Seven" {...a11yProps(6)} />
       </Tabs>
       <TabPanel value={value} index={0}>
-      
-        <ProfileDetails/>
-        <h1>yo</h1>
+        DashBoard
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        <ProfileDetails/>
       </TabPanel>
       <TabPanel value={value} index={2}>
         Item Three

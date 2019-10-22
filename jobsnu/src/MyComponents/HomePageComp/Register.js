@@ -2,7 +2,9 @@ import React from "react"
 import Form from "react-bootstrap/Form"
 import Button from "react-bootstrap/Button"
 import axios from "axios"
+import OTPbox from "./OTPbox"
 var classNames = require('classnames');
+
 
  
 class Register extends React.Component {
@@ -14,6 +16,8 @@ class Register extends React.Component {
             rePassword:"",
             passwordValid:false,
             emailValid: false,
+            otp:Math.floor(100000 + Math.random() * 900000),
+            showOTPbox: false,
 
         }
         this.handleChange=this.handleChange.bind(this)
@@ -54,7 +58,9 @@ class Register extends React.Component {
         }
     }
     handleSubmit(event){
-
+        this.setState({
+            showOTPbox:true, 
+        })
         event.preventDefault();
         const user = {
             email: this.state.email,
@@ -98,7 +104,7 @@ class Register extends React.Component {
                     <Form.Group controlId="formBasicCheckbox">
                         <Form.Check type="checkbox" label="Remember Me" />
                     </Form.Group>
-                    <Button variant="green" disabled={!((this.state.emailValid)&&(this.state.passwordValid))} onClick={this.handleSubmit}s>
+                    <Button variant="green" disabled={!((this.state.emailValid)&&(this.state.passwordValid))} onClick={this.handleSubmit}>
                         Register
                     </Button>
                     <Button variant="green" onClick={this.props.hideLogin} style={{marginLeft: "1%"}}>
@@ -108,6 +114,7 @@ class Register extends React.Component {
                         Your password and Retype password fields should be matching.
                     </Form.Text>}
                 </Form>
+                {(this.state.showOTPbox) &&< OTPbox fade= {this.state.showOTPbox} otp={this.state.otp}/>}
             </div>
         )
     }
