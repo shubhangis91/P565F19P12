@@ -37,7 +37,7 @@ class OTPbox extends React.Component {
                     console.log(res) 
                     console.log(res.data)
                 })
-                this.props.history.push("/profile");
+                this.props.history.push("/home");
         }
         else {
             this.setState({

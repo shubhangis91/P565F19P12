@@ -65,6 +65,7 @@ class Register extends React.Component {
         const user = {
             email: this.state.email,
             password: this.state.password,
+            otp: this.state.otp,
         };
         console.log(user)
         axios
