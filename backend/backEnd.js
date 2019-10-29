@@ -426,7 +426,7 @@ app.get('/userDetails', function (request,response) {
 
 });
 
-app.get('/profile', function (request,response) {
+app.get('/jobPosts', function (request,response) {
 
     // let userId = request.body.user.userId;
 
