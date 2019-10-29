@@ -136,10 +136,7 @@ app.post('/mfaLogin', function (req,res) {
 
 app.post('/login', function(request, response){
     let userEmail = request.body.user.email;
-    // console.log("SESSION VARIABLE DETAILS - Logged In? " + JSON.stringify(request.session));
-    // // let loginResult = {};
-    // // loginResult = logInUser(request.body.user.email);
-    // // console.log("loginResult in /login: \n"+ JSON.stringify(loginResult));
+
     selectSql = "select * from user_profile where email = '" + userEmail +"'";
     connection.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
@@ -202,7 +199,6 @@ app.get('/logout', function(req,res){
         }
     });
 });
-
 
 app.post('/verify', function (req, res) {
     let email = req.body.user.email;
@@ -378,8 +374,12 @@ app.post('/register', function (req, res) {
 
 app.get('/userDetails', function (request,response) {
     let userId = request.body.user.userId;
-    // let userId = request.session.id;
-
+    // let userID = request.session.userId;
+    // console.log("--------------\n" +
+    //     "SESSION DETAILS\n" +
+    //     "-------------\n" +
+    //     "LOGGED-IN USER ID: "+ userId);
+    //
     selectSql = "select * from user_profile where id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
@@ -423,6 +423,74 @@ app.get('/userDetails', function (request,response) {
 
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 
+
+});
+
+app.get('/profile', function (request,response) {
+
+    // let userId = request.body.user.userId;
+
+    selectSql = "select * from job_post";
+    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+        if (selectErr) {
+            var jobPostsResponse = {
+                "dbError" : 1,
+                "jobId": null
+            }
+
+            console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(loginResponse));
+        }
+        else if (selectResult === '') {
+            var jobPostsResponse = {
+                "dbError" : 0,
+                "jobId": null
+            }
+
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(loginResponse));
+        }
+        else {
+            console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
+
+            /*var array = [];
+            calendars.forEach(function(item) {
+                array.push(item.id);
+            });
+
+            console.log(array);*/
+
+            var jobPostsArr = []
+            for(i = 0; i < selectResult.length; i++)
+            {
+                var jsonObj = {}
+                jsonObj = {
+                    "jobId": selectResult[i].id,
+                    "postedById": selectResult[i].posted_by_id,
+                    "location": selectResult[i].location,
+                    "domain": selectResult[i].domain,
+                    "industry": selectResult[i].industry,
+                    "function": selectResult[i].function,
+                    "description": selectResult[i].description,
+                    "companyId": selectResult[i].company_id,
+                    "jobType": selectResult[i].job_type,
+                    "isActive": selectResult[i].is_active
+                }
+                jobPostsArr.push(jsonObj);
+            }
+
+            var jobPostsResponse = {
+                "dbError" : 0,
+                "jobPosts" : jobPostsArr
+            }
+
+            console.log("-----------Returning job posts------------\n");
+            response.send(JSON.stringify(jobPostsResponse));
+        }
+    })
+
+    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 
 });
 
