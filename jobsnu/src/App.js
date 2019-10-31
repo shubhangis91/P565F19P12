@@ -13,7 +13,7 @@ function App() {
   return (
     <Router>
     <Route path="/" exact component={MyHomePage}/>
-    <Route path="/profile" exact component={MyProfilePage}/>
+    <Route path="/home" exact component={MyProfilePage}/>
     <Route path="/forgotPassword" exact component={forgotPassword}/>
 
     </Router>
