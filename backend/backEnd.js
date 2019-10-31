@@ -74,27 +74,26 @@ app.post('/applyJob', function (request,response) {
     connection.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var postResponse = {
-                "dbError" : 1,
+                "dbError": 1,
                 "jobApplied": 0
             }
 
             console.log("Error in applying for job. See below for detailed error information.\n" + selectErr.message)
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
             response.send(JSON.stringify(postResponse));
-        }
-        else
-        {
+        } else {
             var postResponse = {
-                "dbError" : 0,
-                "jobApplied": 1
-                "jobId" : jobId;
+                "dbError": 0,
+                "jobApplied": 1,
+                "jobId": jobId
             }
 
-        console.log("-----------User " + userId +
-            " applied to job " + jobId +
-            " successfully------------\n");
-        response.send(JSON.stringify(postResponse));
-    })
+            console.log("-----------User " + userId +
+                " applied to job " + jobId +
+                " successfully------------\n");
+            response.send(JSON.stringify(postResponse));
+        }
+    });
 
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
     response.redirect("error.html");
@@ -124,6 +123,8 @@ app.post('/createJob', function (req, res) {
                 "jobAdded": 0,
                 "jobId": null
             };
+
+            console.log("----------Error while creating job.\n-----------\n");
             console.log(response);
             res.send(JSON.stringify(response));
         }
@@ -133,7 +134,8 @@ app.post('/createJob', function (req, res) {
                 "jobAdded": 1,
                 "jobId": result.insertId
             };
-            // shows profile saved message/saved profile details
+
+            console.log("----------Job created successfully-----------\n");
             console.log(response);
             res.send(JSON.stringify(response));
         }
@@ -349,7 +351,7 @@ app.post('/setMfa', function (request,response) {
             response.send(JSON.stringify(setMfaResponse));
         }
         else {
-            var var setMfaResponse = {
+            var setMfaResponse = {
                 "dbError" : 0,
                 "mfaSet": 1
             }
