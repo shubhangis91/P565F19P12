@@ -100,6 +100,47 @@ app.post('/applyJob', function (request,response) {
     response.redirect("error.html");
 });
 
+app.post('/createJob', function (req, res) {
+    let jobName = req.body.user.jobName;
+    let postedByUserId = req.body.user.userId;
+    let companyId = req.body.user.companyId;
+    let jobDomain = req.body.user.jobDomain;
+    let companyIndustry = req.body.user.companyIndustry;
+    let jobFunction = req.body.user.jobFunction;
+    let jobDescription = req.body.user.jobDescription;
+    let city = req.body.user.city;
+    let state =  req.body.user.state;
+    let country =  req.body.user.country;
+    let jobType = req.body.user.jobType;
+    let isActive = req.body.user.isActive;
+
+    let insertSql = 'INSERT INTO job_post(INSERT INTO job_post(job_name, posted_by_id, company_id, domain, industry, function, description, city, state, country, job_type) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+    let insertSqlParams = [jobName, postedByUserId, companyId, jobDomain, companyIndustry, jobFunction, jobDescription, city, state, country, jobType];
+    connection.query(insertSql,insertSqlParams, function (err, result)
+    {
+        if(err) {
+            console.log('[INSERT ERROR] - ',err.message);
+            var response = {
+                "jobAdded": 0,
+                "jobId": null
+            };
+            console.log(response);
+            res.send(JSON.stringify(response));
+        }
+        else
+        {
+            var response = {
+                "jobAdded": 1,
+                "jobId": result.insertId
+            };
+            // shows profile saved message/saved profile details
+            console.log(response);
+            res.send(JSON.stringify(response));
+        }
+    });
+    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
+});
+
 app.post('/login', function(request, response){
     let userEmail = request.body.user.email;
 
@@ -466,16 +507,18 @@ app.get('/jobPosts', function (request,response) {
             var jobPostsArr = []
             for(i = 0; i < selectResult.length; i++)
             {
-                var jsonObj = {}
-                jsonObj = {
+                var jsonObj = {
                     "jobId": selectResult[i].id,
+                    "jobName" : selectResult[i].jobName,
                     "postedById": selectResult[i].posted_by_id,
-                    "location": selectResult[i].location,
+                    "companyId": selectResult[i].company_id,
+                    "city": selectResult[i].city,
+                    "state" : selectResult[i].state,
+                    "country" : selectResult[i].country,
                     "domain": selectResult[i].domain,
                     "industry": selectResult[i].industry,
                     "function": selectResult[i].function,
                     "description": selectResult[i].description,
-                    "companyId": selectResult[i].company_id,
                     "jobType": selectResult[i].job_type,
                     "isActive": selectResult[i].is_active
                 }
@@ -493,7 +536,6 @@ app.get('/jobPosts', function (request,response) {
     })
 
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
-
 });
 
 app.get('/logout', function(req,res){
