@@ -6,6 +6,8 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import ProfileDetails from './ProfileDetails'
+import DashBoard from './Dashboard'
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -76,7 +78,7 @@ function Cont1() {
         <Tab label="Item Seven" {...a11yProps(6)} />
       </Tabs>
       <TabPanel value={value} index={0}>
-        DashBoard
+        <DashBoard/>
       </TabPanel>
       <TabPanel value={value} index={1}>
         <ProfileDetails/>
