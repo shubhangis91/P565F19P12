@@ -112,9 +112,11 @@ app.post('/createJob', function (req, res) {
     let country =  req.body.user.country;
     let jobType = req.body.user.jobType;
     let isActive = req.body.user.isActive;
+    let skills = req.body.user.skills;
+    let skillLevel = req.body.user.skillLevel;
 
-    let insertSql = 'INSERT INTO job_post(INSERT INTO job_post(job_name, posted_by_id, company_id, domain, industry, function, description, city, state, country, job_type) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
-    let insertSqlParams = [jobName, postedByUserId, companyId, jobDomain, companyIndustry, jobFunction, jobDescription, city, state, country, jobType];
+    var insertSql = 'INSERT INTO job_post(INSERT INTO job_post(job_name, posted_by_id, company_id, domain, industry, function, description, city, state, country, job_type) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+    var insertSqlParams = [jobName, postedByUserId, companyId, jobDomain, companyIndustry, jobFunction, jobDescription, city, state, country, jobType];
     connection.query(insertSql,insertSqlParams, function (err, result)
     {
         if(err) {
@@ -130,9 +132,12 @@ app.post('/createJob', function (req, res) {
         }
         else
         {
+            let jobId = result.insertId;
+            insertSql = "INSERT INTO jp_skill_set(job_post_id, skill_level) VALUES (?,?)";
+            insertSqlParams = [jobId, skillLevel];
             var response = {
                 "jobAdded": 1,
-                "jobId": result.insertId
+                "jobId": jobId
             };
 
             console.log("----------Job created successfully-----------\n");
@@ -474,7 +479,7 @@ app.post('/verify', function (req, res) {
     });
 
     // console.log(response);
-})
+});
 
 // GET ROUTER FUNCTIONS
 
@@ -482,7 +487,13 @@ app.get('/jobPosts', function (request,response) {
 
     // let userId = request.body.user.userId;
 
-    selectSql = "select * from job_post";
+    // selectSql = "select * from job_post";
+    selectSql = "SELECT jp.*, jp_ss.skill_level, e.user_name, ss.skill_name " +
+        "FROM job_post as jp " +
+        "INNER JOIN jp_skill_set as jp_ss " +
+        "ON jp.id=jp_ss.job_post_id INNER JOIN employer as e " +
+        "ON jp.company_id = e.id INNER JOIN skill_set as ss " +
+        "ON jp_ss.skill_id = ss.id"
     connection.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var jobPostsResponse = {
@@ -509,11 +520,24 @@ app.get('/jobPosts', function (request,response) {
             var jobPostsArr = []
             for(i = 0; i < selectResult.length; i++)
             {
+                var jobId = selectResult[i].id;
+                var jobType = (selectResult[i].job_type='F')? "Full-Time":"Internship";
+                var postedByUserId = selectResult[i].posted_by_id;
+                var selectQuery2 = "select CONCAT(first_name, last_name) from user_profile where id = "+ postedByUserId;
+                let postedByName;
+                connection.query(selectQuery2, function (selectError2, selectResult2) {
+                    if(selectError2)
+                    {   console.log("----------DB ERROR---------\n"+selectError2.message);
+                        return;
+                    }
+                    postedByName = selectResult2[0].first_name + " " + electResult2[0].last_name;
+                });
                 var jsonObj = {
-                    "jobId": selectResult[i].id,
-                    "jobName" : selectResult[i].jobName,
-                    "postedById": selectResult[i].posted_by_id,
-                    "companyId": selectResult[i].company_id,
+                    "jobId": jobId,
+                    "jobName" : selectResult[i].job_name,
+                    "postedById": postedByUserId,
+                    "postedByName" : postedByName,
+                    "companyName" : selectResult[i].user_name,
                     "city": selectResult[i].city,
                     "state" : selectResult[i].state,
                     "country" : selectResult[i].country,
@@ -521,8 +545,10 @@ app.get('/jobPosts', function (request,response) {
                     "industry": selectResult[i].industry,
                     "function": selectResult[i].function,
                     "description": selectResult[i].description,
-                    "jobType": selectResult[i].job_type,
-                    "isActive": selectResult[i].is_active
+                    "jobType": jobType,
+                    "isActive": selectResult[i].is_active,
+                    "skillName" : selectResult[i].skill_name,
+                    "skillLevel": selectResult[i].skill_level
                 }
                 jobPostsArr.push(jsonObj);
             }
@@ -615,12 +641,11 @@ app.get('/test_home', function(request, response) {
 });
 
 
-
 var server = app.listen(3500, function () {
   
     var host = server.address().address
     var port = server.address().port
     
-    console.log("www.jobs-nu.com/login.html", host, port)
+    console.log("www.jobs-nu.com/login.html", host, port);
     
   });
