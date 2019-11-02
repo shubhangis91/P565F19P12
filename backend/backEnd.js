@@ -58,7 +58,7 @@ function sendMessage(message)
             console.log(err)
         } else {
             console.log("SUCCESSFULLY SENT MAIL.");
-            console.log(info);
+            console.log("MAIL INFO\n"+info);
         }
     });
 }
@@ -150,6 +150,8 @@ app.post('/createJob', function (req, res) {
 
 app.post('/login', function(request, response){
     let userEmail = request.body.user.email;
+    console.log("REQUEST.BODY\n"+ request.body);
+    console.log("REQUEST - Email: "+userEmail);
 
     selectSql = "select * from user_profile where email = '" + userEmail +"'";
     connection.query(selectSql, function (selectErr, selectResult) {
@@ -182,16 +184,16 @@ app.post('/login', function(request, response){
         else {
             // Set session variables
             request.session.loggedIn = true;
-            request.session.id = selectResult[0].id;
+            request.session.userId = selectResult[0].id;
             request.session.username = selectResult[0].first_name;
 
-            console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
+            console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.userId + "\n" + request.session.username);
 
             var loginResponse = {
                 "dbError" : 0,
                 "invalid": 0,
                 "verified": 1,
-                "userId": selectResult[0].id,
+                "userId": selectResult[0].userId,
                 "username": selectResult[0].first_name
             }
 
@@ -209,7 +211,7 @@ app.post('/mfaLogin', function (req,res) {
     let password = req.body.user.password;
     let otp = req.body.user.otp;
 
-    // console.log("In LOGIN");
+    console.log("In LOGIN");
     var selectSQL = "select email, password, verified, mfa_enabled from login where email = '" + email + "' and password = '" + password + "'";
     // var  addSqlParams = [req.query.emailid,req.query.password];
     connection.query(selectSQL, function (err, result) {
@@ -227,6 +229,7 @@ app.post('/mfaLogin', function (req,res) {
         }
         else if(!result[0].verified)    // User has not yet verified their email account
         {
+            // User E-mail ID Verification
             let response = {
                 "invalid" : 0,
                 "verified" : 0,
@@ -237,7 +240,8 @@ app.post('/mfaLogin', function (req,res) {
         }
         else {
             if (result[0].mfa_enabled) {
-                // User E-mail ID Verification
+
+                console.log("IN VERIFIED & MFA_ENABLED");
 
                 let htmlMessageString =
                     "<html>" +
@@ -280,7 +284,7 @@ app.post('/mfaLogin', function (req,res) {
                     "email": result[0].email
                 }
 
-                console.log("***************\nMFA RESPONSE\n***************\n" + response);
+                console.log("***************\nMFA RESPONSE\n***************\n" + JSON.stringify(response));
                 res.send(JSON.stringify(response));
             }
             else
@@ -291,8 +295,8 @@ app.post('/mfaLogin', function (req,res) {
                     "otp": -1,
                     "email": result[0].email
                 }
-
-                console.log("***************\nMFA RESPONSE\n***************\n" + response);
+                console.log("IN VERIFIED & !MFA_ENABLED");
+                console.log("***************\nLOGIN WITHOUT MFA RESPONSE\n***************\n" + JSON.stringify(response));
                 // res.send(JSON.stringify(response));
                 res.redirect(307, '/login');
             }
@@ -336,6 +340,42 @@ app.post('/register', function (req, res) {
     // should show profile saved message/saved profile details
     console.log(response);
     res.end(JSON.stringify(response));
+});
+
+app.post('/setEducationDetails', function (req, res) {
+    let userId = req.body.user.userId;
+    let eduLevel = req.body.user.eduLevel;
+    let institute = req.body.user.institute;
+    let startDate = req.body.user.startDate;
+    let endDate = req.body.user.endDate;
+    let percentage = req.body.user.percentage;
+
+    let insertSql = 'INSERT INTO education(user_profile_id, education_level, institute, ' +
+        'start_date, end_date, percentage) VALUES (?,?,?,?,?,?)';
+    let insertSqlParams = [userId, eduLevel, institute, startDate, endDate, percentage];
+
+    connection.query(insertSql,insertSqlParams, function (insertError, insertResult)
+    {
+        if(insertError) {
+            console.log('[INSERT ERROR] - EDUCATION DETAILS', insertError.message);
+            // res.end("0");
+            return;
+        }
+
+        console.log("Education details added successfully.\n", insertResult);
+
+        var responseJson = {
+            "userId": req.body.user.userId,
+            "eduLevel" : req.body.user.eduLevel,
+            "institute" : req.body.user.institute,
+            "startDate" : req.body.user.startDate,
+            "endDate" : req.body.user.endDate,
+            "percentage" : req.body.user.percentage
+        };
+        // should show profile saved message/saved profile details
+        console.log("------------EDUCATION DETAILS RESPONSE----------\n"+responseJson);
+        res.end(JSON.stringify(responseJson));
+    });
 });
 
 app.post('/setMfa', function (request,response) {
@@ -412,7 +452,46 @@ app.post('/set_verification_status', function (req, res) {
     // console.log(response);
 });
 
+app.post('/setWorkExperienceDetails', function (req, res) {
+    let userId = req.body.user.userId;
+    let startDate = req.body.user.startDate;
+    let endDate = req.body.user.endDate;
+    let company = req.body.user.company;
+    let description = req.body.user.description;
+    let designation = req.body.user.designation;
+    let location = req.body.user.location;
+
+    let insertSql = 'INSERT INTO work_experience(user_profile_id, start_date, end_date, ' +
+        'company, description, designation, location) VALUES (?,?,?,?,?,?,?)';
+    let insertSqlParams = [userId, startDate, endDate, company, description, designation, location];
+
+    connection.query(insertSql,insertSqlParams, function (insertError, insertResult)
+    {
+        if(insertError) {
+            console.log('[INSERT ERROR] - WORK EXPERIENCE DETAILS', insertError.message);
+            // res.end("0");
+            return;
+        }
+
+        console.log("Work experience details added successfully.\n", insertResult);
+
+        var responseJson = {
+            "userId" : userId,
+            "startDate" : startDate,
+            "endDate" : endDate,
+            "company" : company,
+            "description" : description,
+            "designation" : designation,
+            "location" : location
+        };
+        // should show profile saved message/saved profile details
+        console.log("------------WORK EXPERIENCE RESPONSE----------\n"+responseJson);
+        res.end(JSON.stringify(responseJson));
+    });
+});
+
 app.post('/verify', function (req, res) {
+    console.log(req.body);
     let email = req.body.user.email;
     let password = req.body.user.password;
     let otp = req.body.user.otp;
@@ -515,7 +594,8 @@ app.get('/jobPosts', function (request,response) {
             response.send(JSON.stringify(loginResponse));
         }
         else {
-            console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
+            console.log("IN JOB POSTS\n");
+            console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.userId + "\n" + request.session.username);
 
             var jobPostsArr = []
             for(i = 0; i < selectResult.length; i++)
@@ -530,7 +610,7 @@ app.get('/jobPosts', function (request,response) {
                     {   console.log("----------DB ERROR---------\n"+selectError2.message);
                         return;
                     }
-                    postedByName = selectResult2[0].first_name + " " + electResult2[0].last_name;
+                    postedByName = selectResult2[0].first_name + " " + selectResult2[0].last_name;
                 });
                 var jsonObj = {
                     "jobId": jobId,
@@ -558,10 +638,10 @@ app.get('/jobPosts', function (request,response) {
                 "jobPosts" : jobPostsArr
             }
 
-            console.log("-----------Returning job posts------------\n");
+            console.log("-----------Returning job posts------------\n"+jobPostsResponse);
             response.send(JSON.stringify(jobPostsResponse));
         }
-    })
+    });
 
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
@@ -577,6 +657,134 @@ app.get('/logout', function(req,res){
     });
 });
 
+app.get('/profile', function (request,response) {
+    let userId = 1;//request.body.user.userId;
+
+    // let userID = request.session.userId;
+    // console.log("--------------\n" +
+    //             "SESSION DETAILS\n" +
+    //             "-------------\n" +
+    //             "LOGGED-IN USER ID: "+ userId);
+    //
+
+    selectSql = "select * from work_experience where user_profile_id = " + userId;
+    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+        if (selectErr) {
+            var responseJson = {
+                "dbError" : 1,
+                "jobId": null
+            }
+
+            console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(responseJson));
+        }
+        else if (selectResult === '') {
+            var responseJson = {
+                "dbError" : 0,
+                "jobId": null
+            }
+
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(responseJson));
+        }
+        else {
+            // console.log("IN JOB POSTS\n");
+            // console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.userId + "\n" + request.session.username);
+
+            var workExperienceArr = []
+            for(i = 0; i < selectResult.length; i++)
+            {
+                // var jobId = selectResult[i].id;
+                // var jobType = (selectResult[i].job_type='F')? "Full-Time":"Internship";
+                // var postedByUserId = selectResult[i].posted_by_id;
+                // var selectQuery2 = "select CONCAT(first_name, last_name) from user_profile where id = "+ postedByUserId;
+                // let postedByName;
+                // connection.query(selectQuery2, function (selectError2, selectResult2) {
+                //     if(selectError2)
+                //     {   console.log("----------DB ERROR---------\n"+selectError2.message);
+                //         return;
+                //     }
+                //     postedByName = selectResult2[0].first_name + " " + selectResult2[0].last_name;
+                // });
+                var jsonObj = {
+                    "userId" : selectResult[i].user_profile_id,
+                    "startDate" : selectResult[i].start_date,
+                    "endDate" : selectResult[i].end_date,
+                    "company" : selectResult[i].company,
+                    "description" : selectResult[i].description,
+                    "designation" : selectResult[i].designation,
+                    "location" : selectResult[i].location
+                }
+                workExperienceArr.push(jsonObj);
+            }
+
+            var responseJson = {
+                "dbError" : 0,
+                "workExperiences" : workExperienceArr
+            }
+
+            console.log("-----------Returning job posts------------\n"+responseJson);
+            response.send(JSON.stringify(responseJson));
+        }
+    });
+
+    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
+});
+
+app.get('/showEducationDetails', function (request,response) {
+    let userId = request.body.user.userId;
+    let eduLevel = request.body.user.eduLevel;
+    // let userID = request.session.userId;
+    // console.log("--------------\n" +
+    //             "SESSION DETAILS\n" +
+    //             "-------------\n" +
+    //             "LOGGED-IN USER ID: "+ userId);
+    //
+
+    selectSql = "select * from education_details where user_profile_id = " + userId +
+        " AND education_level = " + eduLevel + ";";
+    connection.query(selectSql, function (selectErr, selectResult) {
+        if (selectErr) {
+            var responseJson = {
+                "dbError" : 1,
+                "userId": null
+            }
+
+            console.log("[SELECT ERROR] - EDUCATION DETAILS\n", selectResult.message);
+            console.log("Error fetching user details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(responseJson));
+        }
+        else if (selectResult === '') {
+            var responseJson = {
+                "dbError" : 0,
+                "userId": null
+            }
+
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(responseJson));
+        }
+        else {
+            // console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
+            var responseJson = {
+                "userId": userId,
+                "eduLevel" : eduLevel,
+                "institute" : selectResult[0].institute,
+                "startDate" : selectResult[0].start_date,
+                "endDate" : selectResult[0].end_date,
+                "percentage" : selectResult[0].percentage
+            };
+
+            console.log("-----------EDUCATION DETAILS------------\nUSER ID:  ", selectResult[0].first_name);
+            console.log(JSON.stringify(responseJson));
+            response.send(JSON.stringify(responseJson));
+        }
+    })
+
+    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
+});
+
 app.get('/userDetails', function (request,response) {
     let userId = request.body.user.userId;
     // let userID = request.session.userId;
@@ -585,6 +793,7 @@ app.get('/userDetails', function (request,response) {
     //             "-------------\n" +
     //             "LOGGED-IN USER ID: "+ userId);
     //
+
     selectSql = "select * from user_profile where id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
@@ -627,9 +836,9 @@ app.get('/userDetails', function (request,response) {
     })
 
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
-
-
 });
+
+// TEST ROUTER FUNCTION
 
 app.get('/test_home', function(request, response) {
 	if (request) {
