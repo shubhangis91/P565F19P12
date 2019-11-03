@@ -22,7 +22,9 @@ import Button from "react-bootstrap/Button"
 import PersonalData from "./PersonalData"
 import { useCookies } from 'react-cookie';
 import Portal from '@material-ui/core/Portal';
+import NewEducationPostComponent from './NewEducationPostComponent';
 import EducationPostComponent from './EducationPostComponent';
+
 const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
@@ -89,6 +91,7 @@ const [user, setValues] = React.useState({
   gender:'',
   userId:1,
 });
+const [education,setEducation]=useState([])
 
 
 
@@ -111,10 +114,12 @@ const loadValues = (event) => {
           setValues(res.data);
           //console.log(user)
         })
-//         .get(getEducation)
-//         .then(res => {
-//           console.log(res.data)
-//         })
+        .get(getEducation)
+        .then(res => {
+          console.log(res.data)
+          setEducation(res.data)
+          console.log(education)
+        })
  };
 useEffect(() => {loadValues()},[])
 const [newEducationComponent, setNewEducationComponent] = React.useState(false)
@@ -224,11 +229,21 @@ const handleAddEducation = (event) => {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Typography>
-          <Button variant = "green" type="button" onClick={handleAddEducation}>Add education</Button>
+          {education.map((edu,i) => <EducationPostComponent 
+                        userId= {edu.userId}
+                        eduLevel = {edu.eduLevel}
+                        institute = {edu.institute}
+                        startDate = {edu.startDate}
+                        endDate = {edu.endDate}
+                        percentage = {edu.percentage}
+    
+                    />)}
+          {!newEducationComponent&&<Button variant = "green" type="button" onClick={handleAddEducation}>Add education</Button>}
+          {newEducationComponent&&<Button variant = "green" type="button" onClick={handleAddEducation}>Undo    </Button>}
           <p>
 
           </p>
-            {newEducationComponent&&<EducationPostComponent/>}
+            {newEducationComponent&&<NewEducationPostComponent/>}
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
