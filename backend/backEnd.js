@@ -13,11 +13,11 @@ let transporter = nodemailer.createTransport({
     }
 });
 
-var connection = mysql.createConnection({    
-  host     : 'db.soic.indiana.edu',      
-  user     : 'p565f19_sshriva',             
-  password : 'ShubhangiP565F19',      
-  port: '3306',                  
+var connection = mysql.createConnection({
+  host     : 'db.soic.indiana.edu',
+  user     : 'p565f19_sshriva',
+  password : 'ShubhangiP565F19',
+  port: '3306',
   database: 'p565f19_sshriva'
 });
 
@@ -342,7 +342,7 @@ app.post('/register', function (req, res) {
     res.end(JSON.stringify(response));
 });
 
-app.post('/setEducationDetails', function (req, res) {
+app.post('/setEducation', function (req, res) {
     let userId = req.body.user.userId;
     let eduLevel = req.body.user.eduLevel;
     let institute = req.body.user.institute;
@@ -452,7 +452,7 @@ app.post('/set_verification_status', function (req, res) {
     // console.log(response);
 });
 
-app.post('/setWorkExperienceDetails', function (req, res) {
+app.post('/setWorkExperience', function (req, res) {
     let userId = req.body.user.userId;
     let startDate = req.body.user.startDate;
     let endDate = req.body.user.endDate;
@@ -575,23 +575,23 @@ app.get('/jobPosts', function (request,response) {
         "ON jp_ss.skill_id = ss.id"
     connection.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
-            var jobPostsResponse = {
+            var responseJson = {
                 "dbError" : 1,
                 "jobId": null
             }
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
-            response.send(JSON.stringify(loginResponse));
+            response.send(JSON.stringify(responseJson));
         }
         else if (selectResult === '') {
-            var jobPostsResponse = {
+            var responseJson = {
                 "dbError" : 0,
                 "jobId": null
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
-            response.send(JSON.stringify(loginResponse));
+            response.send(JSON.stringify(responseJson));
         }
         else {
             console.log("IN JOB POSTS\n");
@@ -633,13 +633,13 @@ app.get('/jobPosts', function (request,response) {
                 jobPostsArr.push(jsonObj);
             }
 
-            var jobPostsResponse = {
+            var responseJson = {
                 "dbError" : 0,
                 "jobPosts" : jobPostsArr
             }
 
-            console.log("-----------Returning job posts------------\n"+jobPostsResponse);
-            response.send(JSON.stringify(jobPostsResponse));
+            console.log("-----------Returning job posts------------\n"+responseJson);
+            response.send(JSON.stringify(responseJson));
         }
     });
 
@@ -657,8 +657,8 @@ app.get('/logout', function(req,res){
     });
 });
 
-app.get('/profile', function (request,response) {
-    let userId = 1;//request.body.user.userId;
+app.get('/showWorkExperience', function (request,response) {
+    let userId = request.query.userId;
 
     // let userID = request.session.userId;
     // console.log("--------------\n" +
@@ -695,18 +695,6 @@ app.get('/profile', function (request,response) {
             var workExperienceArr = []
             for(i = 0; i < selectResult.length; i++)
             {
-                // var jobId = selectResult[i].id;
-                // var jobType = (selectResult[i].job_type='F')? "Full-Time":"Internship";
-                // var postedByUserId = selectResult[i].posted_by_id;
-                // var selectQuery2 = "select CONCAT(first_name, last_name) from user_profile where id = "+ postedByUserId;
-                // let postedByName;
-                // connection.query(selectQuery2, function (selectError2, selectResult2) {
-                //     if(selectError2)
-                //     {   console.log("----------DB ERROR---------\n"+selectError2.message);
-                //         return;
-                //     }
-                //     postedByName = selectResult2[0].first_name + " " + selectResult2[0].last_name;
-                // });
                 var jsonObj = {
                     "userId" : selectResult[i].user_profile_id,
                     "startDate" : selectResult[i].start_date,
@@ -732,9 +720,9 @@ app.get('/profile', function (request,response) {
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
-app.get('/showEducationDetails', function (request,response) {
-    let userId = request.body.user.userId;
-    let eduLevel = request.body.user.eduLevel;
+app.get('/showEducation', function (request,response) {
+    let userId = request.query.userId;
+    let eduLevel = request.query.eduLevel;
     // let userID = request.session.userId;
     // console.log("--------------\n" +
     //             "SESSION DETAILS\n" +
@@ -786,7 +774,7 @@ app.get('/showEducationDetails', function (request,response) {
 });
 
 app.get('/userDetails', function (request,response) {
-    let userId = request.body.user.userId;
+    let userId = request.query.userId;
     // let userID = request.session.userId;
     // console.log("--------------\n" +
     //             "SESSION DETAILS\n" +
