@@ -343,12 +343,12 @@ app.post('/register', function (req, res) {
 });
 
 app.post('/setEducation', function (req, res) {
-    let userId = req.body.user.userId;
-    let eduLevel = req.body.user.eduLevel;
-    let institute = req.body.user.institute;
-    let startDate = req.body.user.startDate;
-    let endDate = req.body.user.endDate;
-    let percentage = req.body.user.percentage;
+    let userId = req.body.education.userId;
+    let eduLevel = req.body.education.eduLevel;
+    let institute = req.body.education.institute;
+    let startDate = req.body.education.startDate;
+    let endDate = req.body.education.endDate;
+    let percentage = req.body.education.percentage;
 
     let insertSql = 'INSERT INTO education(user_profile_id, education_level, institute, ' +
         'start_date, end_date, percentage) VALUES (?,?,?,?,?,?)';
@@ -365,12 +365,12 @@ app.post('/setEducation', function (req, res) {
         console.log("Education details added successfully.\n", insertResult);
 
         var responseJson = {
-            "userId": req.body.user.userId,
-            "eduLevel" : req.body.user.eduLevel,
-            "institute" : req.body.user.institute,
-            "startDate" : req.body.user.startDate,
-            "endDate" : req.body.user.endDate,
-            "percentage" : req.body.user.percentage
+            "userId": req.body.education.userId,
+            "eduLevel" : req.body.education.eduLevel,
+            "institute" : req.body.education.institute,
+            "startDate" : req.body.education.startDate,
+            "endDate" : req.body.education.endDate,
+            "percentage" : req.body.education.percentage
         };
         // should show profile saved message/saved profile details
         console.log("------------EDUCATION DETAILS RESPONSE----------\n"+responseJson);

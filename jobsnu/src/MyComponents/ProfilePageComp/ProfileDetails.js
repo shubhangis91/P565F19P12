@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -21,7 +21,8 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Button from "react-bootstrap/Button"
 import PersonalData from "./PersonalData"
 import { useCookies } from 'react-cookie';
-
+import Portal from '@material-ui/core/Portal';
+import EducationPostComponent from './EducationPostComponent';
 const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
@@ -65,7 +66,6 @@ export default function ProfileDetails(props) {
 
   const handleExpand = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
-    loadValues()
   };
 
   const handleSubmit = (event) => {
@@ -89,25 +89,38 @@ const [user, setValues] = React.useState({
   gender:'',
   userId:1,
 });
-const handleChange = name => event => {
-  setValues({ ...user, [name]: event.target.value });
+
+
+
+const handleChange = (object,name) => event => {
+  setValues({ ...[object], [name]: event.target.value });
   console.log(user)
 };
 const loadValues = (event) => {
-  console.log(user)
-  var str1 = "/userDetails";
+  //console.log(user)
+  var strUser = "/userDetails";
+  var strEdu = "/showEducation";
   var str2 = "?userId="
   var str3 = user.userId;
-  var getReq = str1.concat(str2, str3);
+  var getUserdetails = strUser.concat(str2, str3);
+  var getEducation = strEdu.concat(str2,str3);
   axios
-        .get(getReq)
+        .get(getUserdetails)
         .then(res => {
-          console.log(res.data)
-          setValues({ ...user, firstName : res.data.firstName })
-          setValues({ ...user, lastName : res.data.lastName })
-          setValues({ ...user, dob : res.data.dob.substring(0,10) })
-          console.log(user)
+          //console.log(res.data)
+          setValues(res.data);
+          //console.log(user)
         })
+//         .get(getEducation)
+//         .then(res => {
+//           console.log(res.data)
+//         })
+ };
+useEffect(() => {loadValues()},[])
+const [newEducationComponent, setNewEducationComponent] = React.useState(false)
+
+const handleAddEducation = (event) => {
+  setNewEducationComponent(!newEducationComponent)
 };
 
   return (
@@ -132,7 +145,7 @@ const loadValues = (event) => {
               label="First Name"
               className={classes.textField}
               value={user.firstName}
-              onChange={handleChange('firstName')}
+              onChange={handleChange('user','firstName')}
               margin="normal"
             />
             <TextField
@@ -140,7 +153,28 @@ const loadValues = (event) => {
               label="Last Name"
               className={classes.textField}
               value={user.lastName}
-              onChange={handleChange('lastName')}
+              onChange={handleChange('user','lastName')}
+              margin="normal"
+            />
+            </Grid>
+            </Grid>
+            <Grid >
+            <Grid item>
+            <TextField
+              id="standard-name"
+              label="Primary Contact"
+              className={classes.textField}
+              value={user.primaryContact}
+              onChange={handleChange('user','primaryContact')}
+              margin="normal"
+         
+            />
+            <TextField
+              id="outlined-name"
+              label="Secondary Contact"
+              className={classes.textField}
+              value={user.secondaryContact}
+              onChange={handleChange('user','secondaryContact')}
               margin="normal"
             />
             </Grid>
@@ -150,32 +184,11 @@ const loadValues = (event) => {
               type="date"
               defaultValue={user.dob}
               className={classes.textField}
-              onChange={handleChange('dob')}
+              onChange={handleChange('user','dob')}
               InputLabelProps={{
                 shrink: true,
               }}
             />
-            </Grid>
-            <Grid >
-            <Grid item>
-            <TextField
-              id="standard-name"
-              label="Primary Contact"
-              className={classes.textField}
-              value={user.primaryContact}
-              onChange={handleChange('primaryContact')}
-              margin="normal"
-         
-            />
-            <TextField
-              id="outlined-name"
-              label="Secondary Contact"
-              className={classes.textField}
-              value={user.secondaryContact}
-              onChange={handleChange('secondaryContact')}
-              margin="normal"
-            />
-            </Grid>
             <Grid item>
             <FormControl component="fieldset" className={classes.formControl} style={{marginTop:"2%",marginLeft:"3.5%"}}>
               <FormLabel component="legend">Gender</FormLabel>
@@ -187,7 +200,7 @@ const loadValues = (event) => {
             </FormControl>
             </Grid>
             <Grid>
-              <Button variant="green" onClick={handleSubmit} style={{marginLeft:"100%"}}>
+              <Button variant="green" onClick={handleSubmit} style={{marginLeft:"90%"}}>
                Sumbit
               </Button>
               </Grid>
@@ -204,14 +217,18 @@ const loadValues = (event) => {
           id="panel2bh-header"
         >
           <Typography className={classes.heading}>Education Details</Typography>
+              
           <Typography className={classes.secondaryHeading}>
-            Tell us about your qualifications!
+              Tell us about your degrees, diplomas, qualificaitons!
           </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Typography>
-            Donec placerat, lectus sed mattis semper, neque lectus feugiat lectus, varius pulvinar
-            diam eros in elit. Pellentesque convallis laoreet laoreet.
+          <Button variant = "green" type="button" onClick={handleAddEducation}>Add education</Button>
+          <p>
+
+          </p>
+            {newEducationComponent&&<EducationPostComponent/>}
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
