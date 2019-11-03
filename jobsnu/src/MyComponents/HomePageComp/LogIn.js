@@ -3,10 +3,21 @@ import Form from "react-bootstrap/Form"
 import Button from "react-bootstrap/Button"
 import axios from "axios"
 import OTPbox from "./OTPbox"
+import { withCookies, Cookies } from 'react-cookie';
+import { instanceOf } from 'prop-types';
+import { withRouter } from 'react-router-dom';
+
 
 class LogIn extends React.Component {
-    constructor()   {
-        super()
+    static propTypes = {
+        cookies: instanceOf(Cookies).isRequired
+      };
+
+    constructor(props)   {
+        super(props);
+
+        const { cookies } = props;
+        this.checkIsActive(cookies)
         this.state = {
             email:  "",
             password: "",
@@ -15,14 +26,17 @@ class LogIn extends React.Component {
             passwordValid: false,
             emailValid: false,
             credentials: "",
+            userIdCookies: cookies.get('userId'),
+            userEmailCookies: cookies.get('userEmail'),
+            isNotActive: cookies.get('isNotActive'),
         }
         this.handleChange=this.handleChange.bind(this)
         this.handleSubmit=this.handleSubmit.bind(this)
         this.validateEmail=this.validateEmail.bind(this)
         this.validatePassword=this.validatePassword.bind(this)
+        this.checkIsActive=this.checkIsActive.bind(this)
+        
     } 
-
-    
 
     handleChange = (event) => {
         this.setState({
@@ -48,8 +62,26 @@ class LogIn extends React.Component {
             passwordValid:check1&&check&&check2&&check3, 
         })
     }
-
+    checkIsActive(cookies){
+        // const { cookies } = this.props;
+        if((cookies.get('userEmail')) && (cookies.get('isNotActive')))    {
+            console.log((cookies.get('userEmail'))&&(cookies.get('isNotActive')))
+            console.log(cookies.get('userEmail'))
+            console.log(cookies.get('isNotActive'))
+            this.props.history.push("/home");
+            }
+        else{
+            console.log((cookies.get('userEmail'))&&(cookies.get('isNotActive')))
+            console.log(cookies.get('userEmail'))
+            console.log(cookies.get('isNotActive'))
+            console.log("user session is active")
+            cookies.set('userId', undefined, { path: '/' })
+            cookies.set('userEmail', undefined, { path: '/' })
+            cookies.set('isNotActive', false, { path: '/' })
+        }
+    }
     handleSubmit(event){
+        const { cookies } = this.props;
         this.setState({
             showOTPbox:true, 
         })
@@ -118,7 +150,7 @@ class LogIn extends React.Component {
                                                     Invalid credentials
                                                 </Form.Text>}
                 </Form>
-                {(this.state.showOTPbox)&& this.state.credentials&& < OTPbox fade= {this.state.showOTPbox} otp={this.state.otp}/>}
+                {(this.state.showOTPbox)&& this.state.credentials&& < OTPbox fade= {this.state.showOTPbox} email= {this.state.email} otp={this.state.otp}/>}
     
             </div>
         )
@@ -126,4 +158,4 @@ class LogIn extends React.Component {
 
 }
 
-export default LogIn 
+export default withRouter(withCookies(LogIn))

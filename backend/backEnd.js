@@ -503,7 +503,7 @@ app.get('/jobPosts', function (request,response) {
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
-            response.send(JSON.stringify(loginResponse));
+            response.send(JSON.stringify(jobPostsResponse));
         }
         else if (selectResult === '') {
             var jobPostsResponse = {
@@ -512,7 +512,7 @@ app.get('/jobPosts', function (request,response) {
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
-            response.send(JSON.stringify(loginResponse));
+            response.send(JSON.stringify(jobPostsResponse));
         }
         else {
             console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
@@ -530,7 +530,7 @@ app.get('/jobPosts', function (request,response) {
                     {   console.log("----------DB ERROR---------\n"+selectError2.message);
                         return;
                     }
-                    postedByName = selectResult2[0].first_name + " " + electResult2[0].last_name;
+                    postedByName = selectResult2[0].first_name + " " + selectResult2[0].last_name;
                 });
                 var jsonObj = {
                     "jobId": jobId,
@@ -578,13 +578,15 @@ app.get('/logout', function(req,res){
 });
 
 app.get('/userDetails', function (request,response) {
-    let userId = request.body.user.userId;
+    //console.log("USER DETAILS: ", request.body.user);
+  //  let userId = request.body.user.userId;
     // let userID = request.session.userId;
     // console.log("--------------\n" +
     //             "SESSION DETAILS\n" +
     //             "-------------\n" +
     //             "LOGGED-IN USER ID: "+ userId);
     //
+    let userId = request.query.userId;
     selectSql = "select * from user_profile where id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {

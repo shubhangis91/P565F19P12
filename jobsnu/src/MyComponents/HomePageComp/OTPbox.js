@@ -5,10 +5,15 @@ import Modal from "react-bootstrap/Modal"
 import { withRouter } from 'react-router-dom';
 import Alert from 'react-bootstrap/Alert';
 import axios from "axios"
-
+import { withCookies, Cookies } from 'react-cookie';
+import { instanceOf } from 'prop-types';
 class OTPbox extends React.Component {
-    constructor(){
-        super()
+    static propTypes = {
+        cookies: instanceOf(Cookies).isRequired
+      };
+    constructor(props){
+        super(props);
+        const { cookies } = props;
         this.state={
             otpvalue: "",
             otpvalid: true,
@@ -22,10 +27,12 @@ class OTPbox extends React.Component {
         })
     }
     handleSubmit(event){
+        const { cookies } = this.props;
         if(this.state.otpvalue==this.props.otp) {
+            cookies.set('isNotActive', false, { path: '/' })
+            cookies.set('userEmail', this.props.email, { path: '/' })
             this.setState({
                 otpvalid:true,
-                
             })
             const user = {
                 valid: this.state.otpvalid,
@@ -70,4 +77,4 @@ class OTPbox extends React.Component {
             </Modal>
         )}
 }
-export default withRouter (OTPbox);
+export default withCookies(withRouter(OTPbox));

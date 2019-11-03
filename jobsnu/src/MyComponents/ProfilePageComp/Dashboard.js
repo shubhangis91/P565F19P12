@@ -11,7 +11,6 @@ function Dashboard() {
                 console.log(res.data) 
                 console.log(res.data.jobPosts)
                 setJobs(res.data.jobPosts)
-                console.log(jobs)
             })
     }
 useEffect(() => {handleLoad()},[])
@@ -19,9 +18,8 @@ useEffect(() => {handleLoad()},[])
             <React.Fragment>
             <div>
                     {jobs.map((job,i) => <JobPostComponent 
-                        description={job.description}
                         city={job.city}
-                        companyId={job.companyId}
+                        companyId={job.companyName}
                         country={job.country}
                         description={job.description}
                         domain={job.domain}
@@ -32,7 +30,11 @@ useEffect(() => {handleLoad()},[])
                         jobType={job.jobType}
                         postedById={job.postedById}
                         state={job.state}
-
+                        jobName={job.jobName}
+                        postedById={job.postedById}
+                        skillLevel={job.skillLevel}
+                        skillName={job.skillName}
+    
                     />)}
             </div>
             </React.Fragment>

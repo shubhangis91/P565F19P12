@@ -7,10 +7,11 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-
+import LocationOnIcon from '@material-ui/icons/LocationOn';
 const useStyles = makeStyles({
     card: {
         display:'flex',
+        marginTop:'5%',
     },
     media: {
         height: '15%',
@@ -33,16 +34,16 @@ export default function JobPostComponent(props) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-            jobName {props.jobName}
+             {props.jobName}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            joblocation:  {props.state} {props.country}
+             <LocationOnIcon/> {props.state} {props.country}
           </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions>
         <Button size="small" color="primary">
-          Share
+          Apply
         </Button>
         <Button size="small" color="primary">
           Learn More

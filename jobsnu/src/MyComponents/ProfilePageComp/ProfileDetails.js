@@ -20,6 +20,7 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import Button from "react-bootstrap/Button"
 import PersonalData from "./PersonalData"
+import { useCookies } from 'react-cookie';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -59,10 +60,12 @@ const useStyles = makeStyles(theme => ({
 export default function ProfileDetails(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
+  const [cookies, setCookie] = useCookies(['userEmail']);
+
 
   const handleExpand = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
-    console.log(user.firstName)
+    loadValues()
   };
 
   const handleSubmit = (event) => {
@@ -75,18 +78,38 @@ export default function ProfileDetails(props) {
             console.log(res.data)
         })
 }
+
 const [user, setValues] = React.useState({
+  email: cookies['userEmail'],
   firstName: '',
   lastName: '',
   dob: '',
   secondaryContact: '',
   primaryContact: '',
   gender:'',
+  userId:1,
 });
 const handleChange = name => event => {
   setValues({ ...user, [name]: event.target.value });
   console.log(user)
 };
+const loadValues = (event) => {
+  console.log(user)
+  var str1 = "/userDetails";
+  var str2 = "?userId="
+  var str3 = user.userId;
+  var getReq = str1.concat(str2, str3);
+  axios
+        .get(getReq)
+        .then(res => {
+          console.log(res.data)
+          setValues({ ...user, firstName : res.data.firstName })
+          setValues({ ...user, lastName : res.data.lastName })
+          setValues({ ...user, dob : res.data.dob.substring(0,10) })
+          console.log(user)
+        })
+};
+
   return (
     <div className={classes.root}>
       <ExpansionPanel expanded={expanded === 'panel1'} onChange={handleExpand('panel1')}>
@@ -116,7 +139,7 @@ const handleChange = name => event => {
               id="outlined-name"
               label="Last Name"
               className={classes.textField}
-              value={user.lasttName}
+              value={user.lastName}
               onChange={handleChange('lastName')}
               margin="normal"
             />
@@ -125,7 +148,7 @@ const handleChange = name => event => {
               id="date"
               label="dob"
               type="date"
-              defaultValue="2000-01-01"
+              defaultValue={user.dob}
               className={classes.textField}
               onChange={handleChange('dob')}
               InputLabelProps={{
