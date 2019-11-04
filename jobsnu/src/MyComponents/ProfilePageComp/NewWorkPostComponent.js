@@ -46,7 +46,10 @@ export default function WorkPostComponent(props) {
             .then(res => {
                 console.log(res) 
                 console.log(res.data)
+                props.loadValues()
             })
+           
+
     }
     const classes = useStyles();
     return(

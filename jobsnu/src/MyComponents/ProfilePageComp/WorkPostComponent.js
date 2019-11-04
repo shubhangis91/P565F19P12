@@ -36,18 +36,18 @@ export default function WorkPostComponent(props) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-             {props.eduLevel}
+             {props.designation}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-             <LocationCityIcon/> {props.institute}
+             <LocationCityIcon/> {props.company},{props.location}
           </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Typography gutterBottom variant="h5" component="h2">
+        <Typography gutterBottom variant="h5" component="h5">
                 {props.startDate} - {props.endDate}
         </Typography>
-        <Typography gutterBottom variant="h5" component="h2">
+        <Typography gutterBottom variant="h5" component="h4">
             {props.percentage}
         </Typography>
         <Button size="small" color="primary">

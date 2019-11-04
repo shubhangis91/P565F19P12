@@ -80,6 +80,8 @@ export default function ProfileDetails(props) {
             console.log(res) 
             console.log(res.data)
         })
+        loadValues()
+
 }
 
 const [user, setValues] = React.useState({
@@ -102,7 +104,7 @@ const handleChange = (object,name) => event => {
   setValues({ ...[object], [name]: event.target.value });
   console.log(user)
 };
-const loadValues = (event) => {
+const loadValues = () => {
   //console.log(user)
   var strUser = "/userDetails";
   var strEdu = "/showEducation";
@@ -115,16 +117,17 @@ const loadValues = (event) => {
   axios
         .get(getUserdetails)
         .then(res => {
-          //console.log(res.data)
+          console.log(res.data)
           setValues(res.data);
           //console.log(user)
         })
-        // .get(getEducation)
-        // .then(res => {
-        //   console.log(res.data)
-        //   setEducation(res.data)
-        //   console.log(education)
-        // }) 
+  // axios
+  //       .get(getEducation)
+  //       .then(res => {
+  //         console.log(res.data.workExperiences)
+  //         setEducation(res.data.workExperiences)
+  //         console.log(education)
+  //       }) 
   axios
         .get(getWork)
         .then(res => {
@@ -250,20 +253,23 @@ const handleAddWork = (event) => {
         <ExpansionPanelDetails>
           <Typography>
           {education.map((edu,i) => <EducationPostComponent 
+                        key={i}
                         userId= {edu.userId}
                         eduLevel = {edu.eduLevel}
                         institute = {edu.institute}
                         startDate = {edu.startDate}
                         endDate = {edu.endDate}
                         percentage = {edu.percentage}
+                        
+
     
                     />)}
-          {!newEducationComponent&&<Button variant = "green" type="button" onClick={handleAddEducation}>Add education</Button>}
-          {newEducationComponent&&<Button variant = "green" type="button" onClick={handleAddEducation}>Undo    </Button>}
+          {!newEducationComponent&&<Button variant = "green" type="button" style={{marginTop:"5%"}} onClick={handleAddEducation}>Add education</Button>}
+          {newEducationComponent&&<Button variant = "green" type="button" style={{marginTop:"5%"}} onClick={handleAddEducation}>Undo    </Button>}
           <p>
 
           </p>
-            {newEducationComponent&&<NewEducationPostComponent/>}
+            {newEducationComponent&&<NewEducationPostComponent loadValues={loadValues}/>}
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
@@ -281,6 +287,7 @@ const handleAddWork = (event) => {
         <ExpansionPanelDetails>
         <Typography>
           {workExp.map((work,i) => <WorkPostComponent 
+                        key={i}
                         userId= {work.userId}
                         company = {work.company}
                         startDate = {work.startDate}
@@ -288,13 +295,14 @@ const handleAddWork = (event) => {
                         description = {work.description}
                         designation = {work.designation}
                         location = {work.location}
+                        loadValues={loadValues}
                     />)}
-          {!newWorkComponent&&<Button variant = "green" type="button" onClick={handleAddWork}>Add Work Experience</Button>}
-          {newWorkComponent&&<Button variant = "green" type="button" onClick={handleAddWork}>Undo    </Button>}
+          {!newWorkComponent&&<Button variant = "green" type="button" style={{marginTop:"5%"}} onClick={handleAddWork}>Add Work Experience</Button>}
+          {newWorkComponent&&<Button variant = "green" type="button" style={{marginTop:"5%"}} onClick={handleAddWork}>Undo    </Button>}
           <p>
 
           </p>
-            {newWorkComponent&&<NewWorkPostComponent/>}
+            {newWorkComponent&&<NewWorkPostComponent loadValues={loadValues}/>}
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
