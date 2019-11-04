@@ -5,32 +5,39 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
 
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'jobsnu.se@gmail.com',
-        pass: 'otvdiffsgnowsugd'
-    }
-});
+const dotenv = require('dotenv');
+dotenv.config();
+console.log(`Your port is ${process.env.PORT}`); // 8626
+
+const port = process.env.PORT || 3500;
 
 var connection = mysql.createConnection({
-  host     : 'db.soic.indiana.edu',
-  user     : 'p565f19_sshriva',
-  password : 'ShubhangiP565F19',
-  port: '3306',
-  database: 'p565f19_sshriva'
+    host     : process.env.DB_HOST,
+    user     : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    port: process.env.DB_PORT,
+    database: process.env.DB
 });
 
-connection.connect();
+let transporter = nodemailer.createTransport({
+    service: process.env.MAIL_SERV,
+    auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS
+    }
+});
 
 var app = express();
 var jobsnuEmail = 'jobsnu.se@gmail.com';
 var verificationEmailSubject =  'JOBSNU - E-mail Verification';
 var otpEmailSubject =  'JOBSNU - OTP for Login'
 
-app.use(express.static('../jobsnu/build'));
+connection.connect();
+
+// app.use(express.static('./jobsnu/build'));
+app.use(express.static(path.join(__dirname, "jobsnu", "build")));
 app.use(session({
-    secret: 'jobsnuSE12.',
+    secret: process.env.SESS_SECRET,
     resave: true,
     saveUninitialized: true
 }));
@@ -716,13 +723,6 @@ app.get('/showEducation', function (request,response) {
 app.get('/showWorkExperience', function (request,response) {
     let userId = request.query.userId;
 
-    // let userID = request.session.userId;
-    // console.log("--------------\n" +
-    //             "SESSION DETAILS\n" +
-    //             "-------------\n" +
-    //             "LOGGED-IN USER ID: "+ userId);
-    //
-
     selectSql = "select * from work_experience where user_profile_id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
@@ -775,12 +775,6 @@ app.get('/showWorkExperience', function (request,response) {
 
 app.get('/userDetails', function (request,response) {
     let userId = request.query.userId;
-    // let userID = request.session.userId;
-    // console.log("--------------\n" +
-    //             "SESSION DETAILS\n" +
-    //             "-------------\n" +
-    //             "LOGGED-IN USER ID: "+ userId);
-    //
 
     selectSql = "select * from user_profile where id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult) {
@@ -837,8 +831,11 @@ app.get('/test_home', function(request, response) {
 	response.end();
 });
 
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "jobsnu", "build", "index.html"));
+});
 
-var server = app.listen(3500, function () {
+var server = app.listen(port, function () {
   
     var host = server.address().address
     var port = server.address().port
