@@ -345,12 +345,13 @@ app.post('/register', function (req, res) {
 app.post('/setEducation', function (req, res) {
     let userId = req.body.education.userId;
     let eduLevel = req.body.education.eduLevel;
+    let eduField = req.body.education.eduField;
     let institute = req.body.education.institute;
     let startDate = req.body.education.startDate;
     let endDate = req.body.education.endDate;
     let percentage = req.body.education.percentage;
 
-    let insertSql = 'INSERT INTO education(user_profile_id, education_level, institute, ' +
+    let insertSql = 'INSERT INTO education(user_profile_id, education_level, field, institute, ' +
         'start_date, end_date, percentage) VALUES (?,?,?,?,?,?)';
     let insertSqlParams = [userId, eduLevel, institute, startDate, endDate, percentage];
 
@@ -358,7 +359,6 @@ app.post('/setEducation', function (req, res) {
     {
         if(insertError) {
             console.log('[INSERT ERROR] - EDUCATION DETAILS', insertError.message);
-            // res.end("0");
             return;
         }
 
@@ -367,6 +367,7 @@ app.post('/setEducation', function (req, res) {
         var responseJson = {
             "userId": req.body.education.userId,
             "eduLevel" : req.body.education.eduLevel,
+            "eduField" : req.body.education.eduField,
             "institute" : req.body.education.institute,
             "startDate" : req.body.education.startDate,
             "endDate" : req.body.education.endDate,
@@ -453,13 +454,13 @@ app.post('/set_verification_status', function (req, res) {
 });
 
 app.post('/setWorkExperience', function (req, res) {
-    let userId = req.body.user.userId;
-    let startDate = req.body.user.startDate;
-    let endDate = req.body.user.endDate;
-    let company = req.body.user.company;
-    let description = req.body.user.description;
-    let designation = req.body.user.designation;
-    let location = req.body.user.location;
+    let userId = req.body.work.userId;
+    let startDate = req.body.work.startDate;
+    let endDate = req.body.work.endDate;
+    let company = req.body.work.company;
+    let description = req.body.work.description;
+    let designation = req.body.work.designation;
+    let location = req.body.work.location;
 
     let insertSql = 'INSERT INTO work_experience(user_profile_id, start_date, end_date, ' +
         'company, description, designation, location) VALUES (?,?,?,?,?,?,?)';
@@ -659,7 +660,6 @@ app.get('/logout', function(req,res){
 
 app.get('/showEducation', function (request,response) {
     let userId = request.query.userId;
-    let eduLevel = request.query.eduLevel;
 
     selectSql = "select * from education_details where user_profile_id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult) {
@@ -690,10 +690,10 @@ app.get('/showEducation', function (request,response) {
                 var jsonObj = {
                     "eduLevel" : selectResult[i].education_level,
                     "eduField" : selectResult[i].field,
-                    "institute" : selectResult[0].institute,
-                    "startDate" : selectResult[0].start_date,
-                    "endDate" : selectResult[0].end_date,
-                    "percentage" : selectResult[0].percentage
+                    "institute" : selectResult[i].institute,
+                    "startDate" : selectResult[i].start_date,
+                    "endDate" : selectResult[i].end_date,
+                    "percentage" : selectResult[i].percentage
                 }
                 educationArr.push(jsonObj);
             }
@@ -715,6 +715,13 @@ app.get('/showEducation', function (request,response) {
 
 app.get('/showWorkExperience', function (request,response) {
     let userId = request.query.userId;
+
+    // let userID = request.session.userId;
+    // console.log("--------------\n" +
+    //             "SESSION DETAILS\n" +
+    //             "-------------\n" +
+    //             "LOGGED-IN USER ID: "+ userId);
+    //
 
     selectSql = "select * from work_experience where user_profile_id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult, selectFields) {
@@ -768,6 +775,12 @@ app.get('/showWorkExperience', function (request,response) {
 
 app.get('/userDetails', function (request,response) {
     let userId = request.query.userId;
+    // let userID = request.session.userId;
+    // console.log("--------------\n" +
+    //             "SESSION DETAILS\n" +
+    //             "-------------\n" +
+    //             "LOGGED-IN USER ID: "+ userId);
+    //
 
     selectSql = "select * from user_profile where id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult) {
