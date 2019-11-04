@@ -21,9 +21,10 @@ import FormLabel from '@material-ui/core/FormLabel';
 import Button from "react-bootstrap/Button"
 import PersonalData from "./PersonalData"
 import { useCookies } from 'react-cookie';
-import Portal from '@material-ui/core/Portal';
 import NewEducationPostComponent from './NewEducationPostComponent';
 import EducationPostComponent from './EducationPostComponent';
+import NewWorkPostComponent from './NewWorkPostComponent';
+import WorkPostComponent from './WorkPostComponent';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -92,6 +93,8 @@ const [user, setValues] = React.useState({
   userId:1,
 });
 const [education,setEducation]=useState([])
+const [workExp,setWork]=useState([])
+
 
 
 
@@ -103,10 +106,12 @@ const loadValues = (event) => {
   //console.log(user)
   var strUser = "/userDetails";
   var strEdu = "/showEducation";
+  var strWork = "showWorkExperience";
   var str2 = "?userId="
   var str3 = user.userId;
   var getUserdetails = strUser.concat(str2, str3);
   var getEducation = strEdu.concat(str2,str3);
+  var getWork = strWork.concat(str2,str3);
   axios
         .get(getUserdetails)
         .then(res => {
@@ -114,12 +119,20 @@ const loadValues = (event) => {
           setValues(res.data);
           //console.log(user)
         })
-        .get(getEducation)
+        // .get(getEducation)
+        // .then(res => {
+        //   console.log(res.data)
+        //   setEducation(res.data)
+        //   console.log(education)
+        // }) 
+  axios
+        .get(getWork)
         .then(res => {
-          console.log(res.data)
-          setEducation(res.data)
-          console.log(education)
+          console.log(res.data.workExperiences)
+          setWork(res.data.workExperiences)
+          console.log(workExp)
         })
+        
  };
 useEffect(() => {loadValues()},[])
 const [newEducationComponent, setNewEducationComponent] = React.useState(false)
@@ -127,6 +140,13 @@ const [newEducationComponent, setNewEducationComponent] = React.useState(false)
 const handleAddEducation = (event) => {
   setNewEducationComponent(!newEducationComponent)
 };
+
+const [newWorkComponent, setNewWorkComponent] = React.useState(false)
+
+const handleAddWork = (event) => {
+  setNewWorkComponent(!newWorkComponent)
+};
+
 
   return (
     <div className={classes.root}>
@@ -259,9 +279,22 @@ const handleAddEducation = (event) => {
           </Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <Typography>
-            Nunc vitae orci ultricies, auctor nunc in, volutpat nisl. Integer sit amet egestas eros,
-            vitae egestas augue. Duis vel est augue.
+        <Typography>
+          {workExp.map((work,i) => <WorkPostComponent 
+                        userId= {work.userId}
+                        company = {work.company}
+                        startDate = {work.startDate}
+                        endDate = {work.endDate}
+                        description = {work.description}
+                        designation = {work.designation}
+                        location = {work.location}
+                    />)}
+          {!newWorkComponent&&<Button variant = "green" type="button" onClick={handleAddWork}>Add Work Experience</Button>}
+          {newWorkComponent&&<Button variant = "green" type="button" onClick={handleAddWork}>Undo    </Button>}
+          <p>
+
+          </p>
+            {newWorkComponent&&<NewWorkPostComponent/>}
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
