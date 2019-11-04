@@ -60,7 +60,7 @@ function Cont1() {
   };
 
   return (
-    <div className={classes.root} style={{marginTop:"10%"}}>
+    <div className={classes.root} style={{marginTop:"6.5%"}}>
       <Tabs
         orientation="vertical"
         variant="scrollable"

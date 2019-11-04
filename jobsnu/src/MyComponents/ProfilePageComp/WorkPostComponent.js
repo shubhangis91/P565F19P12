@@ -44,10 +44,10 @@ export default function WorkPostComponent(props) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Typography gutterBottom variant="h5" component="h5">
-                {props.startDate} - {props.endDate}
+        <Typography gutterBottom >
+                {props.startDate.substring(0,7)} - {props.endDate.substring(0,7)}
         </Typography>
-        <Typography gutterBottom variant="h5" component="h4">
+        <Typography gutterBottom>
             {props.percentage}
         </Typography>
         <Button size="small" color="primary">
