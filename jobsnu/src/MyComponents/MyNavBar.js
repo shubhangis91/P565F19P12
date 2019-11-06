@@ -1,15 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
 import { Route, Link, BrowserRouter as Router,withRouter } from "react-router-dom";
-import MyLogIn from "./MyLogIn";
 import logo from '../img/logo2.png';
-import {useCookies,removeCookie,withCookies } from 'react-cookie';
+import {useCookies, setCookie,withCookies } from 'react-cookie';
 
 
 const useStyles = makeStyles(theme => ({
@@ -25,21 +19,38 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function MyNavBar(props) {
-  // const [cookies, setCookie] = useCookies(['userEmail'],['userId'],['isActive']);
+   const [cookies, setCookie, removeCookie] = useCookies(['userEmail','userId','isActive']);
 
   const classes = useStyles();
-   const logOut = (event) => {
-  //   // remove('isActive',{ path: '/' })
-  //   // remove('userEmail',{ path: '/' })
-  //   // removeCookie('userId',{ path: '/' })
-  //   this.props.history.push("/");
+   const logOut = () => {
+    console.log("Logging out and removing cookies")
+    console.log(cookies['userEmail'])
+    console.log(cookies['userId'])
+    console.log(cookies['isNotActive'])
+    setCookie('isNotActive',false, { path: '/' })
+    setCookie('userEmail',false, { path: '/' })
+    setCookie('userId',undefined, { path: '/' })
+    console.log(cookies['userEmail'])
+    console.log(cookies['userId'])
+    console.log(cookies['isNotActive'])
+    pushToLogin()
+  }
+  const pushToLogin = () => {
+    props.history.push("/");
+
+  }
+  useEffect(() => {checkLogin()},[])
+  const checkLogin = () => {
+    if(cookies['isNotActive']==false)    {
+      pushToLogin()
+    }
   }
   return (
     <div data-spy="scroll" data-target=".navbar" data-offset="50">
        <nav className="navbar navbar-expand-sm fixed-top navnav"style={{backgroundColor:"white",}}>
          <div style={{backgroundColor:"#AFD275",width:"100%"}}>
           <img src={logo}alt="mylogo" style={{width:"6%",marginLeft:"2.5%"}}/>
-          <Button onClick={logOut()} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><strong>Log Out</strong></Button>
+          <button onClick={logOut} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><strong>Log Out</strong></button>
         </div>
       </nav>
     </div>

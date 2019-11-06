@@ -8,7 +8,8 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
-
+import axios from "axios"
+import { useCookies } from 'react-cookie';
 
 const useStyles = makeStyles({
     card: {
@@ -23,7 +24,23 @@ const useStyles = makeStyles({
   });
   
 export default function JobPostComponent(props) {
-    const classes = useStyles();
+  const [cookies, setCookie] = useCookies(['userId']);
+
+  const classes = useStyles();
+  const applyJob = (event) => {
+    const user = {
+      userId:parseInt(cookies['userId']),
+      jobId:props.jobId,
+  };
+  console.log(user)
+    axios
+        .post('/applyJob',{user})
+        .then(res => {
+          console.log(res) 
+          console.log(res.data)
+
+          })
+    }
     return(
         <Card className={classes.card}>
       <CardActionArea>
@@ -44,9 +61,9 @@ export default function JobPostComponent(props) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary">
+        {props.apply&&<Button onClick={applyJob} size="small" color="primary">
           Apply
-        </Button>
+        </Button>}
         <Button size="small" color="primary">
           Learn More
         </Button>

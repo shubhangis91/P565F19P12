@@ -100,12 +100,12 @@ const [workExp,setWork]=useState([])
 
 
 
-const handleChange = (object,name) => event => {
-  setValues({ ...[object], [name]: event.target.value });
+const handleChange = (name) => event => {
+  setValues({ ...user, [name]: event.target.value });
   console.log(user)
 };
 const loadValues = () => {
-  //console.log(user)
+  console.log(user)
   var strUser = "/userDetails";
   var strEdu = "/showEducation";
   var strWork = "showWorkExperience";
@@ -119,7 +119,7 @@ const loadValues = () => {
         .then(res => {
           console.log(res.data)
           setValues(res.data);
-          //console.log(user)
+          console.log(user)
         })
   // axios
   //       .get(getEducation)
@@ -173,7 +173,7 @@ const handleAddWork = (event) => {
               label="First Name"
               className={classes.textField}
               value={user.firstName}
-              onChange={handleChange('user','firstName')}
+              onChange={handleChange('firstName')}
               margin="normal"
             />
             <TextField
@@ -181,7 +181,7 @@ const handleAddWork = (event) => {
               label="Last Name"
               className={classes.textField}
               value={user.lastName}
-              onChange={handleChange('user','lastName')}
+              onChange={handleChange('lastName')}
               margin="normal"
             />
             </Grid>
@@ -193,7 +193,7 @@ const handleAddWork = (event) => {
               label="Primary Contact"
               className={classes.textField}
               value={user.primaryContact}
-              onChange={handleChange('user','primaryContact')}
+              onChange={handleChange('primaryContact')}
               margin="normal"
          
             />
@@ -202,7 +202,7 @@ const handleAddWork = (event) => {
               label="Secondary Contact"
               className={classes.textField}
               value={user.secondaryContact}
-              onChange={handleChange('user','secondaryContact')}
+              onChange={handleChange('secondaryContact')}
               margin="normal"
             />
             </Grid>
@@ -212,7 +212,7 @@ const handleAddWork = (event) => {
               type="date"
               defaultValue={user.dob}
               className={classes.textField}
-              onChange={handleChange('user','dob')}
+              onChange={handleChange('dob')}
               InputLabelProps={{
                 shrink: true,
               }}

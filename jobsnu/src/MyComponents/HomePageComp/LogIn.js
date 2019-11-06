@@ -64,20 +64,23 @@ class LogIn extends React.Component {
     }
     checkIsActive(cookies){
         // const { cookies } = this.props;
-        if((cookies.get('userEmail')) && (cookies.get('isNotActive')))    {
-            console.log((cookies.get('userEmail'))&&(cookies.get('isNotActive')))
+        if(cookies.get('isNotActive')=='true')    {
+            console.log("user is logged in")
+            console.log((cookies.get('isNotActive')==true))
             console.log(cookies.get('userEmail'))
             console.log(cookies.get('isNotActive'))
             this.props.history.push("/home");
             }
         else{
-            console.log((cookies.get('userEmail'))&&(cookies.get('isNotActive')))
+            console.log("No cookie or login")
+            console.log((cookies.get('isNotActive')=='true'))
             console.log(cookies.get('userEmail'))
             console.log(cookies.get('isNotActive'))
-            console.log("user session is active")
             cookies.set('userId', undefined, { path: '/' })
-            cookies.set('userEmail', undefined, { path: '/' })
+            cookies.set('userEmail', false, { path: '/' })
             cookies.set('isNotActive', false, { path: '/' })
+            console.log(cookies.get('userEmail'))
+            console.log(cookies.get('isNotActive'))
         }
     }
     handleSubmit(event){

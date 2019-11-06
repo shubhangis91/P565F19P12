@@ -5,39 +5,32 @@ var session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
 
-const dotenv = require('dotenv');
-dotenv.config();
-console.log(`Your port is ${process.env.PORT}`); // 8626
-
-const port = process.env.PORT || 3500;
-
-var connection = mysql.createConnection({
-    host     : process.env.DB_HOST,
-    user     : process.env.DB_USER,
-    password : process.env.DB_PASS,
-    port: process.env.DB_PORT,
-    database: process.env.DB
-});
-
 let transporter = nodemailer.createTransport({
-    service: process.env.MAIL_SERV,
+    service: 'gmail',
     auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
+        user: 'jobsnu.se@gmail.com',
+        pass: 'otvdiffsgnowsugd'
     }
 });
+
+var connection = mysql.createConnection({
+  host     : 'db.soic.indiana.edu',
+  user     : 'p565f19_sshriva',
+  password : 'ShubhangiP565F19',
+  port: '3306',
+  database: 'p565f19_sshriva'
+});
+
+connection.connect();
 
 var app = express();
 var jobsnuEmail = 'jobsnu.se@gmail.com';
 var verificationEmailSubject =  'JOBSNU - E-mail Verification';
 var otpEmailSubject =  'JOBSNU - OTP for Login'
 
-connection.connect();
-
-// app.use(express.static('./jobsnu/build'));
-app.use(express.static(path.join(__dirname, "jobsnu", "build")));
+app.use(express.static('../jobsnu/build'));
 app.use(session({
-    secret: process.env.SESS_SECRET,
+    secret: 'jobsnuSE12.',
     resave: true,
     saveUninitialized: true
 }));
@@ -76,7 +69,7 @@ app.post('/applyJob', function (request,response) {
     let userId = request.body.user.userId;
     let jobId = request.body.user.jobId;
 
-    selectSql = "insert into job_application(user_profile_id, job_post_id, application_date) VALUES (?,?,CURDATE())";
+    selectSql = "insert into job_application VALUES (?, ?, CURDATE())";
     selectSqlParams = [userId, jobId];
     connection.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
@@ -103,7 +96,7 @@ app.post('/applyJob', function (request,response) {
     });
 
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
-    response.redirect("error.html");
+    
 });
 
 app.post('/createJob', function (req, res) {
@@ -288,7 +281,9 @@ app.post('/mfaLogin', function (req,res) {
                     "invalid": 0,
                     "verified": 1,
                     "otp": otp,
-                    "email": result[0].email
+                    "email": result[0].email,
+                    "userId": result[0].userId,
+                    "username": result[0].first_name,
                 }
 
                 console.log("***************\nMFA RESPONSE\n***************\n" + JSON.stringify(response));
@@ -300,7 +295,9 @@ app.post('/mfaLogin', function (req,res) {
                     "invalid": 0,
                     "verified": 1,
                     "otp": -1,
-                    "email": result[0].email
+                    "email": result[0].email,
+                    "userId": result[0].userId,
+                    "username": result[0].first_name,
                 }
                 console.log("IN VERIFIED & !MFA_ENABLED");
                 console.log("***************\nLOGIN WITHOUT MFA RESPONSE\n***************\n" + JSON.stringify(response));
@@ -723,6 +720,13 @@ app.get('/showEducation', function (request,response) {
 app.get('/showWorkExperience', function (request,response) {
     let userId = request.query.userId;
 
+    // let userID = request.session.userId;
+    // console.log("--------------\n" +
+    //             "SESSION DETAILS\n" +
+    //             "-------------\n" +
+    //             "LOGGED-IN USER ID: "+ userId);
+    //
+
     selectSql = "select * from work_experience where user_profile_id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
@@ -775,6 +779,12 @@ app.get('/showWorkExperience', function (request,response) {
 
 app.get('/userDetails', function (request,response) {
     let userId = request.query.userId;
+    // let userID = request.session.userId;
+    // console.log("--------------\n" +
+    //             "SESSION DETAILS\n" +
+    //             "-------------\n" +
+    //             "LOGGED-IN USER ID: "+ userId);
+    //
 
     selectSql = "select * from user_profile where id = " + userId;
     connection.query(selectSql, function (selectErr, selectResult) {
@@ -831,11 +841,8 @@ app.get('/test_home', function(request, response) {
 	response.end();
 });
 
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "jobsnu", "build", "index.html"));
-});
 
-var server = app.listen(port, function () {
+var server = app.listen(3500, function () {
   
     var host = server.address().address
     var port = server.address().port

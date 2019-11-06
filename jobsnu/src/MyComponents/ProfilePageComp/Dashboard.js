@@ -34,7 +34,7 @@ useEffect(() => {handleLoad()},[])
                         postedById={job.postedById}
                         skillLevel={job.skillLevel}
                         skillName={job.skillName}
-    
+                        apply={true}
                     />)}
             </div>
             </React.Fragment>
