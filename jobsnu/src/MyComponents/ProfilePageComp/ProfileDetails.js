@@ -131,9 +131,9 @@ const loadValues = () => {
   axios
         .get(getWork)
         .then(res => {
-          console.log(res.data.workExperiences)
+          //console.log(res.data.workExperiences)
           setWork(res.data.workExperiences)
-          console.log(workExp)
+          //console.log(workExp)
         })
         
  };

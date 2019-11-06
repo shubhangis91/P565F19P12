@@ -69,9 +69,9 @@ app.post('/applyJob', function (request,response) {
     let userId = request.body.user.userId;
     let jobId = request.body.user.jobId;
 
-    selectSql = "insert into job_application VALUES (?, ?, CURDATE())";
-    selectSqlParams = [userId, jobId];
-    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+    insertSql = "insert into job_application(user_profile_id, job_post_id, application_date) VALUES (?,?,CURDATE())";
+    insertSqlParams = [userId, jobId];
+    connection.query(insertSql, insertSqlParams, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var postResponse = {
                 "dbError": 1,
@@ -85,7 +85,8 @@ app.post('/applyJob', function (request,response) {
             var postResponse = {
                 "dbError": 0,
                 "jobApplied": 1,
-                "jobId": jobId
+                "jobId": jobId,
+                "userId": userId
             }
 
             console.log("-----------User " + userId +

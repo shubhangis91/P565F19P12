@@ -8,8 +8,8 @@ function Dashboard() {
         axios
             .get("/jobPosts")
             .then(res => {
-                console.log(res.data) 
-                console.log(res.data.jobPosts)
+                //console.log(res.data) 
+                //console.log(res.data.jobPosts)
                 setJobs(res.data.jobPosts)
             })
     }
