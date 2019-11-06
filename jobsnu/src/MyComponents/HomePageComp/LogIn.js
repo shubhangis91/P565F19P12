@@ -129,7 +129,7 @@ class LogIn extends React.Component {
                         {this.state.emailValid&&<br/>}
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword" >
-                        <Form.Label>Password{this.state.password}</Form.Label>
+                        <Form.Label>Password</Form.Label>
                         <Form.Control type="password" placeholder="Password" name="password" onChange={this.handleChange} required />
                         {!this.state.passwordValid&&<Form.Text className="text-muted" >
                                  Your password must be 8-15 characters, contain one of:upper case, lower case and special character
@@ -153,7 +153,7 @@ class LogIn extends React.Component {
                                                     Invalid credentials
                                                 </Form.Text>}
                 </Form>
-                {(this.state.showOTPbox)&& this.state.credentials&& < OTPbox fade= {this.state.showOTPbox} email= {this.state.email} otp={this.state.otp}/>}
+                {(this.state.showOTPbox)&& this.state.credentials&& < OTPbox fade= {this.state.showOTPbox} email= {this.state.email} otp={this.state.otp} login={1}/>}
     
             </div>
         )

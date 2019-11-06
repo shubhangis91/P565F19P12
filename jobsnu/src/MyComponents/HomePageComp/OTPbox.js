@@ -30,15 +30,20 @@ class OTPbox extends React.Component {
         const { cookies } = this.props;
         if(this.state.otpvalue==this.props.otp) {
             console.log("logging user In")
-            console.log(cookies.get('userEmail'))
-            console.log(cookies.get('userId'))
+            //console.log(cookies.get('userEmail'))
+            //console.log(cookies.get('userId'))
             console.log(cookies.get('isNotAtive'))
+            if(this.props.login==1) {
+                cookies.set('userId', 1, { path: '/' })
+            }
+            else{  
+                cookies.set('userId', 3, { path: '/' })
+            }
             cookies.set('isNotActive', true, { path: '/' })
             cookies.set('userEmail', this.props.email, { path: '/' })
-            cookies.set('userId', 1, { path: '/' })
-            console.log(cookies.get('userEmail'))
+            //console.log(cookies.get('userEmail'))
             console.log(cookies.get('userId'))
-            console.log(cookies.get('isNotActive'))
+            //console.log(cookies.get('isNotActive'))
             this.setState({
                 otpvalid:true,
             })
@@ -66,7 +71,7 @@ class OTPbox extends React.Component {
         return(
             <Modal show={this.props.fade}>
                 <Modal.Header closeButton>
-                    Please enter the 6 digit OTP emailed to you below {this.props.otp}
+                    Please enter the 6 digit OTP emailed to you below 
                 </Modal.Header>
                 <Modal.Body>
                     <Form>

@@ -300,7 +300,6 @@ const handleAddWork = (event) => {
           {!newWorkComponent&&<Button variant = "green" type="button" style={{marginTop:"5%"}} onClick={handleAddWork}>Add Work Experience</Button>}
           {newWorkComponent&&<Button variant = "green" type="button" style={{marginTop:"5%"}} onClick={handleAddWork}>Undo    </Button>}
           <p>
-
           </p>
             {newWorkComponent&&<NewWorkPostComponent loadValues={loadValues}/>}
           </Typography>

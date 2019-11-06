@@ -91,7 +91,7 @@ class Register extends React.Component {
                         {this.state.emailValid&&<br/>}
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword" >
-                        <Form.Label>Password{this.state.password}</Form.Label>
+                        <Form.Label>Password</Form.Label>
                         <Form.Control type="password" placeholder="Password" name="password" onChange={this.handleChange} required />
                         {!this.state.passwordValid&&<Form.Text className="text-muted" >
                                  Your password must be 8-15 characters, contain one of:upper case, lower case and special character
@@ -99,7 +99,7 @@ class Register extends React.Component {
                         {this.state.passwordValid&&<br/>}
                     </Form.Group>
                     <Form.Group controlId="formBasicPassword" >
-                        <Form.Label>Re-type Password{this.state.rePassword}</Form.Label>
+                        <Form.Label>Re-type Password</Form.Label>
                         <Form.Control type="password" placeholder="Same Password" name="rePassword" onChange={this.handleChange} required/>
                     </Form.Group>
                     <Form.Group controlId="formBasicCheckbox">
