@@ -17,7 +17,8 @@ var connection = mysql.createConnection({
     user     : process.env.DB_USER,
     password : process.env.DB_PASS,
     port: process.env.DB_PORT,
-    database: process.env.DB
+    database: process.env.DB,
+    multipleStatements: true
 });
 
 let transporter = nodemailer.createTransport({
@@ -31,7 +32,9 @@ let transporter = nodemailer.createTransport({
 var app = express();
 var jobsnuEmail = 'jobsnu.se@gmail.com';
 var verificationEmailSubject =  'JOBSNU - E-mail Verification';
-var otpEmailSubject = 'JOBSNU - One-Time Password for Login'
+var otpEmailSubject = 'JOBSNU - One-Time Password for Login';
+var applicationEmailJsSubject = 'JOBSNU - Job Application Submitted';
+var applicationEmailRecSubject = "JOBSNU - New Application Received"
 
 connection.connect();
 
@@ -47,6 +50,104 @@ app.use(bodyParser.json());
 
 // HELPER FUNCTIONS
 
+function calculateWorkEx(noOfMonths)
+{
+    let workExNoOfYears = parseInt(noOfMonths/12);
+    let workExNoOfMonths = noOfMonths%12;
+
+    return workExNoOfYears+ " years, "+ workExNoOfMonths+" months";
+}
+
+function createEmailHtmlJs(messageJson)
+{
+    let htmlMessage = '<!DOCTYPE html>'+
+        '<html lang="en">'+
+        '<head>'+
+        '    <meta charset="UTF-8">'+
+        '    <title>Job Application Information</title>'+
+        '    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">'+
+        '    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>'+
+        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>'+
+        '    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>'+
+        '</head>'+
+        '<body>'+
+        '   <h4>Job application successfully submitted.</h4>'+
+        '   <p>Please find below the details of your job application</p>'+
+        '   <div class="row">'+
+        '       <div class="col-sm-8">'+
+        '           <div class="container">'+
+        '                <h2>'+messageJson.jobName+'</h2>'+
+        '                <table class="table">'+
+        '                    <tr>'+
+        '                       <td>Company</td>'+
+        '                       <td>'+messageJson.company+'</td>'+
+        '                    </tr>'+
+        '                    <tr>'+
+        '                       <td>Job Description</td>'+
+        '                       <td>'+messageJson.jobFunction+'</td>'+
+        '                    </tr>'+
+        '                    </tr>'+
+        '                    <tr>'+
+        '                       <td>Location</td>'+
+        '                       <td>'+messageJson.location+'</td>'+
+        '                    </tr>'+
+        '                </table>'+
+        '               </div>'+
+        '           </div>'+
+        '           <div class="col-sm-4">'+
+        '               <img src="url(url_for_company_logo)">'+
+        '           </div>'+
+        '    </div>'+
+        '</body>'+
+        '</html>';
+
+    sendMessage(createMessage(htmlMessage, jobsnuEmail, messageJson.jobSeekerEmail, applicationEmailJsSubject));
+    return;
+}
+
+function createEmailHtmlRec(messageJson)
+{
+    let htmlMessage = '<!DOCTYPE html>'+
+        '<html lang="en">'+
+        '<head>'+
+        '    <meta charset="UTF-8">'+
+        '    <title>Applicant Information for Your Job Post</title>'+
+        '</head>'+
+        '<body>'+
+        '   <h4>A user recently applied to your job '+messageJson.jobName +'</h4>'+
+        '   <p>Please find below their application details.</p>'+
+        '   <div class="row">'+
+        '       <div class="col-sm-8">'+
+        '           <div class="container">'+
+        '                <h2>'+messageJson.applicantName+'</h2>'+
+        '                <table class="table">'+
+        '                    <tr>'+
+        '                       <td>Email</td>'+
+        '                       <td>'+messageJson.applicantEmail+'</td>'+
+        '                    </tr>'+
+        '                    <tr>'+
+        '                       <td>Skill Set</td>'+
+        '                       <td>'+messageJson.applicantSkills+'</td>'+
+        '                    </tr>'+
+        '                    </tr>'+
+        '                    <tr>'+
+        '                       <td>Work Experience</td>'+
+        '                       <td>'+messageJson.workEx+'</td>'+
+        '                    </tr>'+
+        '                </table>'+
+        '               </div>'+
+        '           </div>'+
+        '           <div class="col-sm-4">'+
+        '               <img src="url(url_for_company_logo)">'+
+        '           </div>'+
+        '    </div>'+
+        '</body>'+
+        '</html>';
+
+    sendMessage(createMessage(htmlMessage, jobsnuEmail, messageJson.recruiterEmail, applicationEmailRecSubject));
+    return;
+}
+
 function createMessage(htmlMessage, fromId, toId, subject)
 {
     let message = {
@@ -56,6 +157,129 @@ function createMessage(htmlMessage, fromId, toId, subject)
         html: htmlMessage
     };
     return message;
+}
+
+function sendEmailNotifJS(jobSeekerId, jobAppliedId) {
+    console.log("Sending email notification to user " + jobSeekerId);
+    selectSql1 = "SELECT email from user_profile WHERE id ="+ jobSeekerId;
+    connection.query(selectSql1, function (selectErr1, selectResult1) {
+        if (selectErr1) {
+            console.log("Error fetching user details. See below for detailed error information.\n" + selectErr1.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            return;
+        } else if (selectResult1 == '') {
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n" + JSON.stringify(responseJson));
+            return;
+        } else {
+            let jobSeekerEmail = selectResult1[0].email;
+
+            let selectSql2 = "SELECT job_post.job_name, employer.user_name, " +
+                "job_post.function, job_post.city, job_post.state," +
+                " job_post.country FROM job_post " +
+                "INNER JOIN employer ON employer.id = job_post.company_id " +
+                "INNER JOIN job_application ON job_application.job_post_id = job_post.id " +
+                "WHERE job_application.user_profile_id = "+jobSeekerId+ " AND job_application.job_post_id = "+jobAppliedId;
+
+            connection.query(selectSql2, function (selectErr2, selectResult2) {
+                if (selectErr2) {
+                    console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
+                    console.log("Error in query " + selectErr2.message);
+                    return;
+                }
+
+                let htmlMessageJson = {
+                    "jobSeekerEmail" : jobSeekerEmail,
+                    "jobName": selectResult2[0].job_name,
+                    "company": selectResult2[0].user_name,
+                    "jobFunction" : selectResult2[0].function,
+                    "location": selectResult2[0].city+", "+selectResult2[0].state+", "+selectResult2[0].country
+                }
+
+                createEmailHtmlJs(htmlMessageJson);
+
+                var responseJson = {
+                    "dbError": 0,
+                    "userId": jobSeekerId,
+                    "jobId": jobAppliedId,
+                    "notificationSent": 1
+                }
+
+                console.log("-----------Email Notification Sent------------\n" + JSON.stringify(responseJson));
+                return;
+            });
+        }
+    });
+}
+
+function sendEmailNotifRec(applicantId, jobId) {
+    let selectSql1 = "SELECT email from user_profile where id = (SELECT posted_by_id " +
+        "from job_post WHERE id = "+jobId+");SELECT job_name, posted_by_id from job_post where id ="+jobId;
+    connection.query(selectSql1, function (selectErr1, selectResult1) {
+        // let selectSql1 = "SELECT job_post.posted_by_id, job_post.job_name, user_profile.email from job_post " +
+            // "JOIN user_profile ON user_profile.id = job_post.posted_by_id WHERE job_post.id = "+jobId;
+        if (selectErr1) {
+            console.log("Error fetching recruiter details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            return;
+        } else {
+            // console.log("selectResult1: "+ JSON.stringify(selectResult1));
+            let recruiterEmail = selectResult1[0][0].email;
+            let jobName = selectResult1[1][0].job_name;
+            // console.log("RECRUITER EMAIL: "+recruiterEmail);
+            let selectSqls = "SELECT js_skill_set.user_profile_id, js_skill_set.skill_id, " +
+                "skill_set.skill_name, user_profile.email, user_profile.first_name, " +
+                "user_profile.last_name FROM js_skill_set " +
+                "JOIN skill_set ON skill_set.id = js_skill_set.skill_id " +
+                "JOIN user_profile ON user_profile.id = js_skill_set.user_profile_id " +
+                "where js_skill_set.user_profile_id = "+applicantId+";" +
+                "SELECT PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM end_date), EXTRACT(YEAR_MONTH FROM start_date)) + " +
+                "(CASE WHEN ABS((DAY(end_date)-DAY(start_date)) > 15) THEN 1 ELSE 0 END) as num_of_months " +
+                "from work_experience where user_profile_id = "+applicantId;
+
+            connection.query(selectSqls, function (selectErrs, selectResults) {
+                if (selectErrs) {
+                    console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
+                    console.log("Error in query " + selectErrs.message);
+                    return;
+                }
+
+                let applicantSkills = "";
+                for(i in selectResults[0]){
+                    let skill = JSON.stringify(selectResults[0][i].skill_name).split('"').join('');
+                    applicantSkills += skill +", ";
+                }
+
+                let numOfMonths = 0;
+                for (i in selectResults[1]){
+                    numOfMonths += parseInt(selectResults[1][i].num_of_months);
+                }
+                let workEx = calculateWorkEx(numOfMonths);
+                let htmlMessageJson = {
+                    "recruiterEmail" : recruiterEmail,
+                    "jobName": jobName,
+                    "applicantId" : applicantId,
+                    "applicantEmail" : selectResults[0][0].email,
+                    "applicantName": selectResults[0][0].first_name + " "+ selectResults[0][0].last_name,
+                    "applicantSkills" : applicantSkills.substring(0, applicantSkills.length - 2).trim('"'),
+                    "workEx" : workEx
+                }
+                // console.log("htmlMessageJson "+JSON.stringify(htmlMessageJson));
+                createEmailHtmlRec(htmlMessageJson);
+
+                var responseJson = {
+                    "dbError": 0,
+                    "jobId": jobId,
+                    "applicantId" : applicantId,
+                    "applicantName": selectResults[0][0].first_name + " "+ selectResults[0][0].last_name,
+                    "recruiterEmail" : recruiterEmail,
+                    "notificationSent": 1
+                }
+
+                console.log("-----------Email Notification Sent------------\n" + JSON.stringify(responseJson));
+                return;
+            });
+        }
+    });
 }
 
 function sendMessage(message)
@@ -83,18 +307,23 @@ app.post('/applyJob', function (request,response) {
         if (selectErr) {
             var postResponse = {
                 "dbError": 1,
-                "jobApplied": 0
+                "jobApplied": 0,
+                "emailSent" : false
             }
 
             console.log("Error in applying for job. See below for detailed error information.\n" + selectErr.message)
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
             response.send(JSON.stringify(postResponse));
         } else {
+            sendEmailNotifJS(userId, jobId);
+            sendEmailNotifRec(userId, jobId);
+
             var postResponse = {
                 "dbError": 0,
                 "jobApplied": 1,
                 "jobId": jobId,
-                "userId": userId
+                "userId": userId,
+                "emailsSent" : true
             }
 
             console.log("-----------User " + userId +
@@ -105,7 +334,6 @@ app.post('/applyJob', function (request,response) {
     });
 
     console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
-    response.redirect("error.html");
 });
 
 app.post('/createJob', function (req, res) {
@@ -120,12 +348,21 @@ app.post('/createJob', function (req, res) {
     let state =  req.body.user.state;
     let country =  req.body.user.country;
     let jobType = req.body.user.jobType;
-    let isActive = req.body.user.isActive;
+    // let isActive = req.body.user.isActive;
     let skills = req.body.user.skills;
     let skillLevel = req.body.user.skillLevel;
+    let jobTypeVal;
+    if(jobType == "Intern" || jobType == "I")
+        jobTypeVal = "I";
+    else if(jobType == "Full-Time" || jobType == "F")
+        jobTypeVal = "F";
+    else if(jobType == "Part-Time" || jobType == "P")
+        jobTypeVal = "P";
 
-    var insertSql = 'INSERT INTO job_post(job_name, posted_by_id, company_id, domain, industry, function, description, city, state, country, job_type) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
-    var insertSqlParams = [jobName, postedByUserId, companyId, jobDomain, companyIndustry, jobFunction, jobDescription, city, state, country, jobType];
+    var insertSql = 'INSERT INTO job_post(job_name, posted_by_id, company_id, domain, industry, function,' +
+        ' description, city, state, country, job_type) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+    var insertSqlParams = [jobName, postedByUserId, companyId, jobDomain,
+        companyIndustry, jobFunction, jobDescription, city, state, country, jobTypeVal];
     connection.query(insertSql,insertSqlParams, function (err, result)
     {
         if(err) {
@@ -431,7 +668,7 @@ app.post('/set_verification_status', function (req, res) {
     let email = req.body.user.email;
     let password = req.body.user.password;
 
-    if(isVerified) {    // if user is verified (OTP entered was correct)
+    if(isVerified) {    // if user is verified (Verification OTP entered was correct)
         // Change verification status of user in login table
         let  sqlQuery = 'UPDATE login SET verified = ? where email = ? and password = ?' ;
         let  sqlQueryParams = [isVerified, email, password];
@@ -576,6 +813,41 @@ app.post('/verify', function (req, res) {
 });
 
 // GET ROUTER FUNCTIONS
+
+app.get('/profile', function (request,response) {
+
+    let selectSqls = "SELECT job_post.job_name, employer.user_name, " +
+        "job_post.function, job_post.city, job_post.state, " +
+        "job_post.country FROM job_post " +
+        "INNER JOIN employer ON employer.id = job_post.company_id " +
+        "INNER JOIN job_application ON job_application.job_post_id = job_post.id " +
+        "WHERE job_application.user_profile_id = 1;" +
+        "SELECT PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM end_date), " +
+        "EXTRACT(YEAR_MONTH FROM start_date)) as num_of_months, " +
+        "(CASE WHEN (DAY(end_date)-DAY(start_date) > 15) " +
+        " THEN" +
+        " 1" +
+        " ELSE" +
+        " 0" +
+        " END)" +
+        " as plus_num_of_months" +
+        " from work_experience";
+
+    connection.query(selectSqls, function (selectErrs, selectResults) {
+        if (selectErrs) {
+            console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
+            console.log("Error in query " + selectErrs.index);
+            // console.log("Error in query "+selectErrs.index);
+            return;
+        }
+        console.log("MULTIPLE QUERY RESULTS");
+        console.log(JSON.stringify(selectResults[0]));
+        console.log(JSON.stringify(selectResults[1]));
+
+    });
+
+    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
+});
 
 app.get('/jobPosts', function (request,response) {
 
