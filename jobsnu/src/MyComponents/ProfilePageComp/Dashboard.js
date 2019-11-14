@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        background: "#e7e7e7",
+        //background: "#e7e7e7",
         
 
       },

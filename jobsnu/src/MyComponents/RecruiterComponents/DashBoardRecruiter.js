@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme=>({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        background: "#e7e7e7",
+        //background: "#e7e7e7",
         
 
       },
@@ -73,7 +73,7 @@ function DashboardRecruiter() {
 useEffect(() => {handleLoad()},[])
         return (
             <React.Fragment>
-                <h4 style= {{marginLeft:"1%",color:"#c2b9b0"}}> Search for People here </h4>
+                <h4 style= {{marginLeft:"1%",color:"#c2b9b0"}}> Search for People here: </h4>
                 <TextField
                     id="standard-basic"
                     className={classes.textField}
@@ -105,7 +105,7 @@ useEffect(() => {handleLoad()},[])
                 <Button onClick={handleSearch} style={{marginTop:"2.2%",marginBottom:"2%",backgroundColor:"#e7717d",border:"#e7717d"}}>
                         <SearchIcon/>
                     </Button>
-                    <h4 style= {{marginLeft:"1%",color:"#c2b9b0"}}> Here are Job you posted </h4>
+                    <h4 style= {{marginLeft:"1%",color:"#c2b9b0"}}> Here are Jobs you posted: </h4>
             <Row>
             <Col>
             <OverflowScrolling className='overflow-scrolling' style={{  height: "70vh"}}>
@@ -126,7 +126,7 @@ useEffect(() => {handleLoad()},[])
                         postedById={job.postedById}
                         skillLevel={job.skillLevel}
                         skillName={job.skillName}
-                        apply={true}
+                        apply={false}
                         handleExpand={handleExpand}
 
                     />)}
@@ -147,7 +147,7 @@ useEffect(() => {handleLoad()},[])
                             postedById="{job.postedById}1"
                             skillLevel="{job.skillLevel}1"
                             skillName="{job.skillName}1"
-                            apply={true}
+                            apply={false}
                             handleExpand={handleExpand}
 
                         />
@@ -169,7 +169,7 @@ useEffect(() => {handleLoad()},[])
                             postedById="{job.postedById}2"
                             skillLevel="{job.skillLevel}2"
                             skillName="{job.skillName2}"
-                            apply={true}
+                            apply={false}
                             handleExpand={handleExpand}
 
                         />
@@ -190,7 +190,7 @@ useEffect(() => {handleLoad()},[])
                             postedById="{job.pos3tedById}"
                             skillLevel="{job.skil3lLevel}"
                             skillName="{job.skill3Name}"
-                            apply={true}
+                            apply={false}
                             handleExpand={handleExpand}
 
                         />
@@ -211,7 +211,7 @@ useEffect(() => {handleLoad()},[])
                             postedById="{job.pos4tedById}"
                             skillLevel="{job.ski4llLevel}"
                             skillName="{job.skil4lName}"
-                            apply={true}
+                            apply={false}
                             handleExpand={handleExpand}
 
                         />

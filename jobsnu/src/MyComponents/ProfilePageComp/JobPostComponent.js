@@ -49,7 +49,7 @@ export default function JobPostComponent(props) {
   };
     return(
         <Card className={classes.card}>
-      <CardActionArea>
+      <CardActionArea onClick={learnMore}>
         <CardMedia
           className={classes.media}
           component="img"
