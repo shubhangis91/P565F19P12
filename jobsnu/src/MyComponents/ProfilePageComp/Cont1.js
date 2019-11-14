@@ -41,10 +41,9 @@ function a11yProps(index) {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
-    height: 448,
+    height: '50vh',
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
@@ -60,7 +59,7 @@ function Cont1() {
   };
 
   return (
-    <div className={classes.root} style={{marginTop:"6.5%"}}>
+    <div className={classes.root} style={{marginTop:"5.5%"}}>
       <Tabs
         orientation="vertical"
         variant="scrollable"
@@ -77,7 +76,7 @@ function Cont1() {
         <Tab label="Item Six" {...a11yProps(5)} />
         <Tab label="Item Seven" {...a11yProps(6)} />
       </Tabs>
-      <TabPanel value={value} index={0}>
+      <TabPanel value={value} index={0} style={{width:"100%"}}>
         <DashBoard/>
       </TabPanel>
       <TabPanel value={value} index={1}>

@@ -39,6 +39,9 @@ function MyNavBar(props) {
     props.history.push("/");
 
   }
+  const switchToRecruiter = () => {
+    props.history.push("/homeRecruiter")
+  }
   useEffect(() => {checkLogin()},[])
   const checkLogin = () => {
     if(cookies['isNotActive']==false)    {
@@ -51,6 +54,7 @@ function MyNavBar(props) {
          <div style={{backgroundColor:"#AFD275",width:"100%"}}>
           <img src={logo}alt="mylogo" style={{width:"6%",marginLeft:"2.5%"}}/>
           <button onClick={logOut} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><strong>Log Out</strong></button>
+          <button onClick={switchToRecruiter} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><strong>Switch to Recruiter</strong></button>
         </div>
       </nav>
     </div>

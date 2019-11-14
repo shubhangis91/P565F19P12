@@ -35,7 +35,7 @@ var otpEmailSubject = 'JOBSNU - One-Time Password for Login'
 
 connection.connect();
 
-// app.use(express.static('./jobsnu/build'));
+// app.use(express.static('../jobsnu/build'));
 app.use(express.static(path.join(__dirname, "jobsnu", "build")));
 // app.use(session({
 //     secret: process.env.SESS_SECRET,

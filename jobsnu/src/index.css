@@ -25,3 +25,12 @@ code {
 .test{
   color: red;
 }
+.centercol {
+  background: #aaa;
+  overflow-y: scroll;
+}
+
+.overflow-scrolling {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
