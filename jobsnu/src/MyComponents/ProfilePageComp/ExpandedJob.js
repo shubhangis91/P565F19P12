@@ -49,9 +49,6 @@ export default function ExpandedJob(props) {
     }
     console.log(props)
 
-  const learnMore = () => {
-    props.handleExpand(props)
-  };
     return(
         <Card className={classes.card}>
           <CardContent>
@@ -61,7 +58,7 @@ export default function ExpandedJob(props) {
       </Col>
       <Col>
       <h3 style={{marginTop:"4vh"}}>{props.jobName}</h3>
-      <p style={{color:"grey"}} ><LocationOnIcon/> {props.state},{props.country}</p>
+      <p style={{color:"grey"}} ><LocationOnIcon/> {props.city},{props.state},{props.country}</p>
       </Col>
       <Col xs="auto">
       {props.apply&&<Button onClick={applyJob} size="large" style={{marginTop:"45%",marginRight:"5%",float:"center",backgroundColor:"#AFD275"}}>

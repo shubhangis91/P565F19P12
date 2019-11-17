@@ -63,7 +63,7 @@ export default function JobPostComponent(props) {
              {props.jobName}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-             <LocationOnIcon/> {props.state} {props.country}
+             <LocationOnIcon/> {props.city} {props.state} {props.country}
           </Typography>
         </CardContent>
       </CardActionArea>

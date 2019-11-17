@@ -53,7 +53,7 @@ function Dashboard() {
         axios
             .get("/jobPosts")
             .then(res => {
-                //console.log(res.data) 
+                console.log(res.data) 
                 //console.log(res.data.jobPosts)
                 setJobs(res.data.jobPosts)
             })
@@ -112,7 +112,8 @@ useEffect(() => {handleLoad()},[])
                 <OverflowScrolling className='overflow-scrolling' style={{  height: "70vh"}}>
                         {jobs.map((job,i) => <JobPostComponent 
                             city={job.city}
-                            companyId={job.companyName}
+                            companyName={job.companyName}
+                            companyId={job.companyId}
                             country={job.country}
                             description={job.description}
                             domain={job.domain}
@@ -129,6 +130,7 @@ useEffect(() => {handleLoad()},[])
                             skillName={job.skillName}
                             apply={true}
                             handleExpand={handleExpand}
+                            companyName={job.companyName}
                         />)}
                 <JobPostComponent 
                             city="job.city"
