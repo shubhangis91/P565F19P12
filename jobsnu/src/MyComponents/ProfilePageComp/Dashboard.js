@@ -60,7 +60,7 @@ function Dashboard() {
     }
     const handleSearch = () => {
         axios
-            .post("/",{search})
+            .post("/searchJobSeeker",{search})
             .then(res=>{
                 setJobs(res.data.jobPosts)
             })  
@@ -76,9 +76,11 @@ useEffect(() => {handleLoad()},[])
                 <TextField
                     id="standard-basic"
                     className={classes.textField}
-                    label="Looking For position"
+                    label="Keyword"
+                    required
                     margin="normal"
                     onChange={handleChange('position')}
+                    helperText="Position name"
                 />
                 <TextField
                     id="standard-basic"
@@ -235,6 +237,7 @@ useEffect(() => {handleLoad()},[])
                         jobName={isExpand.jobName}
                         skillLevel={isExpand.skillLevel}
                         skillName={isExpand.skillName}
+                        apply={true}
                         />
                         }
                 </div>

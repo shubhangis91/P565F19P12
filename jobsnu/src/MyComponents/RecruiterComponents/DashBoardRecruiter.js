@@ -33,7 +33,26 @@ const useStyles = makeStyles(theme=>({
   })
 );
 
+  
 function DashboardRecruiter() {
+    const experiences = [
+        {
+          value: '0',
+          label: 'Fresher (No experience)',
+        },
+        {
+          value: '2',
+          label: 'Novice (1-2 years)',
+        },
+        {
+          value: '4',
+          label: 'Intermediate (3-4 years)',
+        },
+        {
+          value: '5',
+          label: 'Expert (5+ years)',
+        },
+      ];
     const [jobs,setJobs]=useState([])
     const classes = useStyles();
     const handleChange = (name) => event => {
@@ -46,7 +65,7 @@ function DashboardRecruiter() {
       const [search, setSearch] = React.useState({
         skill:'',
         location:'',
-        name:'',
+        experience:'',
         Designation:'',
       });
       const handleExpand = (id) => {
@@ -64,8 +83,9 @@ function DashboardRecruiter() {
             })
     }
     const handleSearch = () => {
+        var request=toString(search.skill,)
         axios
-            .post("/",{search})
+            .get("/searchRecruiter",{search})
             .then(res=>{
                 setJobs(res.data.jobPosts)
             })
@@ -75,12 +95,26 @@ useEffect(() => {handleLoad()},[])
             <React.Fragment>
                 <h4 style= {{marginLeft:"1%",color:"#c2b9b0"}}> Search for People here: </h4>
                 <TextField
-                    id="standard-basic"
-                    className={classes.textField}
-                    label="Name"
-                    margin="normal"
-                    onChange={handleChange('name')}
-                />
+                id="standard-select-currency"
+                select
+                label="Select"
+                className={classes.textField}
+                value={search.experience}
+                onChange={handleChange('experience')}
+                SelectProps={{
+                    MenuProps: {
+                    className: classes.menu,
+                    },
+                }}
+                helperText="Please select required experience"
+                margin="normal"
+                >
+          {experiences.map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
                 <TextField
                     id="standard-basic"
                     className={classes.textField}

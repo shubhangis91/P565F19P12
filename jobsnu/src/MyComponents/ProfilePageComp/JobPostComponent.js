@@ -10,6 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import axios from "axios"
 import { useCookies } from 'react-cookie';
+import { LinearProgress } from '@material-ui/core';
 
 const useStyles = makeStyles({
     card: {
@@ -17,8 +18,8 @@ const useStyles = makeStyles({
         marginBottom:'5%',
         marginRight:'5%',
         background:'#F4F4F4',
-        borderRadius:'4%'
-    },
+        borderRadius:'4%',
+        },
     media: {
         height: '15%',
         width: '15%',
