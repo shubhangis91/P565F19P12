@@ -330,21 +330,21 @@ app.post('/applyJob', function (request,response) {
 });
 
 app.post('/createJob', function (req, res) {
-    let jobName = req.body.user.jobName;
-    let postedByUserId = req.body.user.userId;
-    let jobDomain = req.body.user.jobDomain;
-    let companyIndustry = req.body.user.companyIndustry;
-    let jobFunction = req.body.user.jobFunction;
-    let jobDescription = req.body.user.jobDescription;
-    let city = req.body.user.city;
-    let state =  req.body.user.state;
-    let country =  req.body.user.country;
-    let jobType = req.body.user.jobType;
-    let skills = req.body.user.skills;
+    let jobName = req.body.job.jobName;
+    let postedByUserId = req.body.job.userId;
+    let jobDomain = req.body.job.jobDomain;
+    let companyIndustry = req.body.job.companyIndustry;
+    let jobFunction = req.body.job.jobFunction;
+    let jobDescription = req.body.job.jobDescription;
+    let city = req.body.job.city;
+    let state =  req.body.job.state;
+    let country =  req.body.job.country;
+    let jobType = req.body.job.jobType;
+    let skills = req.body.job.skills;
     let skillsArr = skills.split(',');
 
     let jobTypeVal;
-    if(jobType == "Intern" || jobType == "I")
+    if(jobType == "Internship" || jobType == "I")
         jobTypeVal = "I";
     else if(jobType == "Full-Time" || jobType == "F")
         jobTypeVal = "F";
