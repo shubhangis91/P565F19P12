@@ -38,7 +38,6 @@ useEffect(() => {handleLoad()},[])
                         state={job.state}
                         jobName={job.jobName}
                         postedById={job.postedById}
-                        skillLevel={job.skillLevel}
                         skillName={job.skillName}
                         apply={false}
                     />)}

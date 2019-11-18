@@ -94,10 +94,8 @@ export default function ExpandedJob(props) {
              Job Type: {props.jobType}
           </Typography>
           <Typography gutterBottom variant="body1" component="h2">
-             Job Skill level: {props.skillLevel}
-          </Typography>
-          <Typography gutterBottom variant="body1" component="h2">
-             Job Type: {props.jobType}
+             Job Type: 
+             {props.jobType}
           </Typography>
           </div>
             </Col>

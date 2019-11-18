@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 function Dashboard() {
     const handleChange = (name) => event => {
         setSearch({ ...search, [name]: event.target.value });
-        console.log(search)
+
       };
     const [jobs,setJobs]=useState([])
     const classes = useStyles();
@@ -71,7 +71,7 @@ function Dashboard() {
               .get(url)
               .then(res=>{
                   console.log(res.data)
-                  setJobs(res.data.jobPosts)
+                  setJobs(res.data.matchedJobs)
               })
         }  
     }
@@ -129,7 +129,6 @@ useEffect(() => {handleLoad()},[])
                             state={job.state}
                             jobName={job.jobName}
                             postedById={job.postedById}
-                            skillLevel={job.skillLevel}
                             skillName={job.skillName}
                             apply={true}
                             handleExpand={handleExpand}
@@ -150,7 +149,6 @@ useEffect(() => {handleLoad()},[])
                             state="{job.state}1"
                             jobName="{job.jobName}1"
                             postedById="{job.postedById}1"
-                            skillLevel="{job.skillLevel}1"
                             skillName="{job.skillName}1"
                             apply={true}
                             handleExpand={handleExpand}
@@ -172,7 +170,6 @@ useEffect(() => {handleLoad()},[])
                             state="{job.state}2"
                             jobName="{job.jobName}2"
                             postedById="{job.postedById}2"
-                            skillLevel="{job.skillLevel}2"
                             skillName="{job.skillName2}"
                             apply={true}
                             handleExpand={handleExpand}
@@ -193,7 +190,6 @@ useEffect(() => {handleLoad()},[])
                             state="{job.state}3"
                             jobName="{job.jobNa3me}"
                             postedById="{job.pos3tedById}"
-                            skillLevel="{job.skil3lLevel}"
                             skillName="{job.skill3Name}"
                             apply={true}
                             handleExpand={handleExpand}
@@ -214,7 +210,6 @@ useEffect(() => {handleLoad()},[])
                             state="{job.stat4e}"
                             jobName="{job.jobN4ame}"
                             postedById="{job.pos4tedById}"
-                            skillLevel="{job.ski4llLevel}"
                             skillName="{job.skil4lName}"
                             apply={true}
                             handleExpand={handleExpand}
