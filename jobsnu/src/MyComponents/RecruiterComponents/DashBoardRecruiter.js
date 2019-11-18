@@ -38,19 +38,23 @@ function DashboardRecruiter() {
     const experiences = [
         {
           value: '0',
-          label: 'Fresher (No experience)',
+          label: '0-1 year',
+        },
+        {
+          value: '1',
+          label: '1-3 years',
         },
         {
           value: '2',
-          label: 'Novice (1-2 years)',
+          label: '3-5 years',
+        },
+        {
+          value: '3',
+          label: '5-10 years',
         },
         {
           value: '4',
-          label: 'Intermediate (3-4 years)',
-        },
-        {
-          value: '5',
-          label: 'Expert (5+ years)',
+          label: '10+ years',
         },
       ];
     const [jobs,setJobs]=useState([])
@@ -63,10 +67,9 @@ function DashboardRecruiter() {
       const [isExpanded,expandedJob]=useState(false)
 
       const [search, setSearch] = React.useState({
-        skill:'',
-        location:'',
-        experience:'',
-        Designation:'',
+        location:false,
+        experience:false,
+        keyword:false,
       });
       const handleExpand = (id) => {
         expandJob(id)
@@ -83,17 +86,51 @@ function DashboardRecruiter() {
             })
     }
     const handleSearch = () => {
-        var request=toString(search.skill,)
+      var url="/searchRecruiter?"
+      if(search.keyword!=false) {
+        url=url.concat("keyword=",search.keyword)
+        if(search.location!=false)
+          url=url.concat("&location=",search.location)
+        if(search.experience=="0")
+          url=url.concat("&workExFrom=","0","&workExTo=","1")
+        if(search.experience=="1")
+          url=url.concat("&workExFrom=","1","&workExTo=","3")
+        if(search.experience=="2")
+          url=url.concat("&workExFrom=","3","&workExTo=","5")
+        if(search.experience=="3")
+          url=url.concat("&workExFrom=","5","&workExTo=","10")
+        if(search.experience=="4")
+          url=url.concat("&workExFrom=","10","&workExTo=","50")
+        
+      console.log(url)
         axios
-            .get("/searchRecruiter",{search})
+            .get(url)
             .then(res=>{
+                console.log(res.data)
                 setJobs(res.data.jobPosts)
             })
-    }  
+          }}  
 useEffect(() => {handleLoad()},[])
         return (
             <React.Fragment>
                 <h4 style= {{marginLeft:"1%",color:"#c2b9b0"}}> Search for People here: </h4>
+                <TextField
+                    id="standard-basic"
+                    className={classes.textField}
+                    label="Keywords"
+                    required
+                    onChange={handleChange('keyword')}
+                    margin="normal"
+                    helperText="Enter Designation, skills, etc."
+                />
+                <TextField
+                    id="standard-basic"
+                    className={classes.textField}
+                    label="Location"
+                    margin="normal"
+                    onChange={handleChange('location')}
+                />
+                
                 <TextField
                 id="standard-select-currency"
                 select
@@ -115,27 +152,6 @@ useEffect(() => {handleLoad()},[])
             </MenuItem>
           ))}
         </TextField>
-                <TextField
-                    id="standard-basic"
-                    className={classes.textField}
-                    label="Location"
-                    margin="normal"
-                    onChange={handleChange('location')}
-                />
-                <TextField
-                    id="standard-basic"
-                    className={classes.textField}
-                    label="Required Skill"
-                    margin="normal"
-                    onChange={handleChange('skill')}
-                />
-                <TextField
-                    id="standard-basic"
-                    className={classes.textField}
-                    label="Current Designation"
-                    onChange={handleChange('designation')}
-                    margin="normal"
-                />
                 <Button onClick={handleSearch} style={{marginTop:"2.2%",marginBottom:"2%",backgroundColor:"#e7717d",border:"#e7717d"}}>
                         <SearchIcon/>
                     </Button>

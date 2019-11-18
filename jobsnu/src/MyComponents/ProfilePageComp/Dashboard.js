@@ -44,9 +44,8 @@ function Dashboard() {
     const [isExpanded,expandedJob]=useState(false)
 
     const [search, setSearch] = React.useState({
-        skill:'',
         location:'',
-        position:'',
+        keywords:'',
         company:'',
       });
     const handleLoad = (event) => {
@@ -59,11 +58,22 @@ function Dashboard() {
             })
     }
     const handleSearch = () => {
-        axios
-            .post("/searchJobSeeker",{search})
-            .then(res=>{
-                setJobs(res.data.jobPosts)
-            })  
+        var url="/searchJobSeeker?"
+        if(search.keyword!=false) {
+          url=url.concat("keyword=",search.keyword)
+          if(search.location!=false)
+            url=url.concat("&location=",search.location)
+          if(search.company!=false)
+            url=url.concat("&company=",search.company)
+        
+        console.log(url)
+          axios
+              .get(url)
+              .then(res=>{
+                  console.log(res.data)
+                  setJobs(res.data.jobPosts)
+              })
+        }  
     }
     const handleExpand = (id) => {
         expandJob(id)
@@ -79,7 +89,7 @@ useEffect(() => {handleLoad()},[])
                     label="Keyword"
                     required
                     margin="normal"
-                    onChange={handleChange('position')}
+                    onChange={handleChange('keyword')}
                     helperText="Position name"
                 />
                 <TextField
@@ -88,13 +98,6 @@ useEffect(() => {handleLoad()},[])
                     label="Location"
                     margin="normal"
                     onChange={handleChange('location')}
-                />
-                <TextField
-                    id="standard-basic"
-                    className={classes.textField}
-                    label="Required Skill"
-                    margin="normal"
-                    onChange={handleChange('skill')}
                 />
                 <TextField
                     id="standard-basic"
