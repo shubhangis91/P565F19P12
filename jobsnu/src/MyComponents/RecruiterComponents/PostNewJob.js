@@ -62,7 +62,6 @@ const useStyles = makeStyles(theme => ({
     const [cookies, setCookie] = useCookies(['userId']);
     const [job, setJob] = React.useState({
       jobName: '',
-      companyName: '',//I dont have the company id!!!! Talk to shubh
       jobDomain: '',
       companyIndustry: '',//Shdnt this be fixed to the company too
       jobFunction: '',//What does this mean
@@ -72,7 +71,7 @@ const useStyles = makeStyles(theme => ({
       country:'',
       jobType:'',
       skills:'',
-      userId:cookies['userId'],
+      userId:3,
     });
 
 const handleChange = (name) => event => {
@@ -101,10 +100,10 @@ const handleSubmit = () => {
         />
         <TextField
           id="outlined-name"
-          label="Company Name"
+          label="Skills required"
           className={classes.textField}
           //value={user.lastName}
-          onChange={handleChange('companyName')}
+          onChange={handleChange('skills')}
           margin="normal"
         />
         </Grid>
