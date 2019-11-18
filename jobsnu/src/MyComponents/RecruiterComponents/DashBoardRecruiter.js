@@ -107,7 +107,7 @@ function DashboardRecruiter() {
             .get(url)
             .then(res=>{
                 console.log(res.data)
-                setJobs(res.data.jobPosts)
+                setJobs(res.data.matchedUsers)
             })
           }}  
 useEffect(() => {handleLoad()},[])

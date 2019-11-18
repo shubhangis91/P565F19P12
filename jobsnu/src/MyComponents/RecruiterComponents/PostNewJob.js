@@ -72,8 +72,7 @@ const useStyles = makeStyles(theme => ({
       country:'',
       jobType:'',
       skills:'',
-      skillLevel:'',
-      userId:1,
+      userId:cookies['userId'],
     });
 
 const handleChange = (name) => event => {
@@ -82,7 +81,7 @@ const handleChange = (name) => event => {
 };
 const handleSubmit = () => {
   axios
-    .post('/',{job})
+    .post('/createJob',{job})
     .then(res => {
       console.log(res) 
       console.log(res.data)
