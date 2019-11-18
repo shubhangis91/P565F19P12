@@ -12,13 +12,14 @@ console.log(`Your port is ${process.env.PORT}`); // 8626
 
 const port = process.env.PORT || 3500;
 
-var connection = mysql.createConnection({
-    host     : process.env.DB_HOST,
-    user     : process.env.DB_USER,
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
     password : process.env.DB_PASS,
     port: process.env.DB_PORT,
     database: process.env.DB,
-    multipleStatements: true
+    multipleStatements: true,
+    connectionLimit: 50
 });
 
 let transporter = nodemailer.createTransport({
@@ -36,7 +37,8 @@ var otpEmailSubject = 'JOBSNU - One-Time Password for Login';
 var applicationEmailJsSubject = 'JOBSNU - Job Application Submitted';
 var applicationEmailRecSubject = "JOBSNU - New Application Received"
 
-connection.connect();
+var connection;
+
 
 // app.use(express.static('./jobsnu/build'));
 app.use(express.static(path.join(__dirname, "jobsnu", "build")));
@@ -65,10 +67,6 @@ function createEmailHtmlJs(messageJson)
         '<head>'+
         '    <meta charset="UTF-8">'+
         '    <title>Job Application Information</title>'+
-        '    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">'+
-        '    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>'+
-        '    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>'+
-        '    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>'+
         '</head>'+
         '<body>'+
         '   <h4>Job application successfully submitted.</h4>'+
@@ -95,14 +93,13 @@ function createEmailHtmlJs(messageJson)
         '               </div>'+
         '           </div>'+
         '           <div class="col-sm-4">'+
-        '               <img src="url(url_for_company_logo)">'+
+        '               <img src="url(url_for_company_logo)" alt="'+messageJson.company+'">'+
         '           </div>'+
         '    </div>'+
         '</body>'+
         '</html>';
 
     sendMessage(createMessage(htmlMessage, jobsnuEmail, messageJson.jobSeekerEmail, applicationEmailJsSubject));
-    return;
 }
 
 function createEmailHtmlRec(messageJson)
@@ -137,15 +134,11 @@ function createEmailHtmlRec(messageJson)
         '                </table>'+
         '               </div>'+
         '           </div>'+
-        '           <div class="col-sm-4">'+
-        '               <img src="url(url_for_company_logo)">'+
-        '           </div>'+
         '    </div>'+
         '</body>'+
         '</html>';
 
     sendMessage(createMessage(htmlMessage, jobsnuEmail, messageJson.recruiterEmail, applicationEmailRecSubject));
-    return;
 }
 
 function createMessage(htmlMessage, fromId, toId, subject)
@@ -163,9 +156,9 @@ function sendEmailNotifJS(jobSeekerId, jobAppliedId)
 {
     console.log("Sending email notification to user " + jobSeekerId);
     selectSql1 = "SELECT email from user_profile WHERE id ="+ jobSeekerId;
-    connection.query(selectSql1, function (selectErr1, selectResult1) {
+    pool.query(selectSql1, function (selectErr1, selectResult1) {
         if (selectErr1) {
-            console.log("Error fetching user details. See below for detailed error information.\n" + selectErr1.message)
+            console.log("Error fetching user details. See below for detailed error information.\n" + selectErr1.message);
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
             return;
         } else if (selectResult1 == '') {
@@ -181,7 +174,7 @@ function sendEmailNotifJS(jobSeekerId, jobAppliedId)
                 "INNER JOIN job_application ON job_application.job_post_id = job_post.id " +
                 "WHERE job_application.user_profile_id = "+jobSeekerId+ " AND job_application.job_post_id = "+jobAppliedId;
 
-            connection.query(selectSql2, function (selectErr2, selectResult2) {
+            pool.query(selectSql2, function (selectErr2, selectResult2) {
                 if (selectErr2) {
                     console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
                     console.log("Error in query " + selectErr2.message);
@@ -194,7 +187,7 @@ function sendEmailNotifJS(jobSeekerId, jobAppliedId)
                     "company": selectResult2[0].user_name,
                     "jobFunction" : selectResult2[0].function,
                     "location": selectResult2[0].city+", "+selectResult2[0].state+", "+selectResult2[0].country
-                }
+                };
 
                 createEmailHtmlJs(htmlMessageJson);
 
@@ -203,7 +196,7 @@ function sendEmailNotifJS(jobSeekerId, jobAppliedId)
                     "userId": jobSeekerId,
                     "jobId": jobAppliedId,
                     "notificationSent": 1
-                }
+                };
 
                 console.log("-----------Email Notification Sent------------\n" + JSON.stringify(responseJson));
                 return;
@@ -216,9 +209,9 @@ function sendEmailNotifRec(applicantId, jobId)
 {
     let selectSql1 = "SELECT email from user_profile where id = (SELECT posted_by_id " +
         "from job_post WHERE id = "+jobId+");SELECT job_name, posted_by_id from job_post where id ="+jobId;
-    connection.query(selectSql1, function (selectErr1, selectResult1) {
+    pool.query(selectSql1, function (selectErr1, selectResult1) {
         if (selectErr1) {
-            console.log("Error fetching recruiter details. See below for detailed error information.\n" + selectErr.message)
+            console.log("Error fetching recruiter details. See below for detailed error information.\n" + selectErr.message);
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
             return;
         } else {
@@ -236,7 +229,7 @@ function sendEmailNotifRec(applicantId, jobId)
                 "(CASE WHEN ABS((DAY(end_date)-DAY(start_date)) > 15) THEN 1 ELSE 0 END) as num_of_months " +
                 "from work_experience where user_profile_id = "+applicantId;
 
-            connection.query(selectSqls, function (selectErrs, selectResults) {
+            pool.query(selectSqls, function (selectErrs, selectResults) {
                 if (selectErrs) {
                     console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
                     console.log("Error in query " + selectErrs.message);
@@ -262,7 +255,7 @@ function sendEmailNotifRec(applicantId, jobId)
                     "applicantName": selectResults[0][0].first_name + " "+ selectResults[0][0].last_name,
                     "applicantSkills" : applicantSkills.substring(0, applicantSkills.length - 2).trim('"'),
                     "workEx" : workEx
-                }
+                };
                 // console.log("htmlMessageJson "+JSON.stringify(htmlMessageJson));
                 createEmailHtmlRec(htmlMessageJson);
 
@@ -303,7 +296,7 @@ app.post('/applyJob', function (request,response) {
 
     insertSql = "insert into job_application(user_profile_id, job_post_id, application_date) VALUES (?,?,CURDATE())";
     insertSqlParams = [userId, jobId];
-    connection.query(insertSql, insertSqlParams, function (selectErr, selectResult, selectFields) {
+    pool.query(insertSql, insertSqlParams, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var postResponse = {
                 "dbError": 1,
@@ -333,13 +326,12 @@ app.post('/applyJob', function (request,response) {
         }
     });
 
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
+
 });
 
 app.post('/createJob', function (req, res) {
     let jobName = req.body.user.jobName;
     let postedByUserId = req.body.user.userId;
-    let companyId = req.body.user.companyId;
     let jobDomain = req.body.user.jobDomain;
     let companyIndustry = req.body.user.companyIndustry;
     let jobFunction = req.body.user.jobFunction;
@@ -348,8 +340,8 @@ app.post('/createJob', function (req, res) {
     let state =  req.body.user.state;
     let country =  req.body.user.country;
     let jobType = req.body.user.jobType;
-    // let isActive = req.body.user.isActive;
     let skills = req.body.user.skills;
+    let skillsArr = skills.split(',');
     let skillLevel = req.body.user.skillLevel;
     let jobTypeVal;
     if(jobType == "Intern" || jobType == "I")
@@ -359,11 +351,24 @@ app.post('/createJob', function (req, res) {
     else if(jobType == "Part-Time" || jobType == "P")
         jobTypeVal = "P";
 
+    let companyId = 0;
+    let selectSql = "select current_company_id from job_seeker_profile where user_profile_id=?"
+    let selectSqlParams = [postedByUserId];
+    pool.query(selectSql,selectSqlParams, function (selectError, selectResult)
+    {
+        if(selectError)
+            throw selectError;
+        companyId = selectResult[0].current_company_id;
+        console.log("RECRUITER'S COMPANY ID: "+companyId);
+    });
+
+    console.log("RECRUITER'S COMPANY ID: "+companyId);
+
     var insertSql = 'INSERT INTO job_post(job_name, posted_by_id, company_id, domain, industry, function,' +
-        ' description, city, state, country, job_type) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+        ' description, city, state, country, job_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?);';
     var insertSqlParams = [jobName, postedByUserId, companyId, jobDomain,
         companyIndustry, jobFunction, jobDescription, city, state, country, jobTypeVal];
-    connection.query(insertSql,insertSqlParams, function (err, result)
+    pool.query(insertSql,insertSqlParams, function (err, result)
     {
         if(err) {
             console.log('[INSERT ERROR] - ',err.message);
@@ -379,9 +384,19 @@ app.post('/createJob', function (req, res) {
         else
         {
             let jobId = result.insertId;
-            insertSql = "INSERT INTO jp_skill_set(job_post_id, skill_level) VALUES (?,?)";
-            insertSqlParams = [jobId, skillLevel];
-            // TO DO - enter data in jp_skill_set table
+
+            for (let i=0; i < (skillsArr.length); i++) {
+                pool.query("SELECT id from skill_set where lower(skill_name)= ?", [skillsArr[i].toLowerCase()], function (selErr, selRes) {
+                    if(selErr)
+                        throw selErr;
+                    pool.query("insert into jp_skill_set(job_post_id, skill_id) values (?, ?)", [jobId, selRes[0].id], function (insErr, insRes) {
+                        if(insErr)
+                            throw insErr;
+                        console.log("-----Updated skill set for new job post in DB-----");
+                    });
+                });
+            }
+
             var response = {
                 "jobAdded": 1,
                 "jobId": jobId
@@ -392,7 +407,6 @@ app.post('/createJob', function (req, res) {
             res.send(JSON.stringify(response));
         }
     });
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.post('/login', function(request, response){
@@ -400,8 +414,8 @@ app.post('/login', function(request, response){
     console.log("REQUEST.BODY\n"+ request.body);
     console.log("REQUEST - Email: "+userEmail);
 
-    selectSql = "select * from user_profile where email = '" + userEmail +"'";
-    connection.query(selectSql, function (selectErr, selectResult) {
+    let selectSql = "select * from user_profile where email = '" + userEmail +"';";
+    pool.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
             var loginResponse = {
                 "dbError" : 1,
@@ -451,8 +465,6 @@ app.post('/login', function(request, response){
             response.send(JSON.stringify(loginResponse));
         }
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.post('/mfaLogin', function (req,res) {
@@ -464,7 +476,7 @@ app.post('/mfaLogin', function (req,res) {
     console.log("In LOGIN");
     var selectSQL = "select email, password, verified, mfa_enabled from login where email = '" + email + "' and password = '" + password + "'";
     // var  addSqlParams = [req.query.emailid,req.query.password];
-    connection.query(selectSQL, function (err, result) {
+    pool.query(selectSQL, function (err, result) {
         if (err) {
             console.log('[SELECT ERROR] - ', err.message);
             return;
@@ -568,7 +580,7 @@ app.post('/register', function (req, res) {
         'last_name, dob, gender, primary_contact, secondary_contact, ' +
         'registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0)';
     let insertSqlParams = [email, firstName, lastName, dob, gender, primaryContact, secondaryContact];
-    connection.query(insertSql,insertSqlParams, function (err, result)
+    pool.query(insertSql,insertSqlParams, function (err, result)
     {
         if(err) {
             console.log('[INSERT ERROR] - ',err.message);
@@ -606,7 +618,7 @@ app.post('/setEducation', function (req, res) {
         'start_date, end_date, percentage) VALUES (?,?,?,?,?,?,?)';
     let insertSqlParams = [userId, eduLevel, field, institute, dateFormat(startDate,"UTC:yyyy-mm-dd"), dateFormat(endDate, "UTC:yyyy-mm-dd"), percentage];
 
-    connection.query(insertSql,insertSqlParams, function (insertError, insertResult)
+    pool.query(insertSql,insertSqlParams, function (insertError, insertResult)
     {
         if(insertError) {
             console.log('[INSERT ERROR] - EDUCATION DETAILS', insertError.message);
@@ -636,7 +648,7 @@ app.post('/setMfa', function (request,response) {
     // let userId = request.session.userId;
 
     updateSql = "update login set mfa_enabled = " + mfaEnabled;
-    connection.query(v, function (updateErr, updateResult, updateFields) {
+    pool.query(v, function (updateErr, updateResult, updateFields) {
         if (updateErr) {
             var setMfaResponse = {
                 "dbError" : 1,
@@ -657,10 +669,6 @@ app.post('/setMfa', function (request,response) {
             response.send(JSON.stringify(setMfaResponse));
         }
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
-    // response.send(JSON.stringify(errorResonse));
-    response.redirect("error.html");
 });
 
 app.post('/set_verification_status', function (req, res) {
@@ -673,7 +681,7 @@ app.post('/set_verification_status', function (req, res) {
         let  sqlQuery = 'UPDATE login SET verified = ? where email = ? and password = ?' ;
         let  sqlQueryParams = [isVerified, email, password];
 
-        connection.query(sqlQuery, sqlQueryParams,
+        pool.query(sqlQuery, sqlQueryParams,
             function (err, result)
             {
                 if(err){
@@ -717,7 +725,7 @@ app.post('/setWorkExperience', function (req, res) {
         'company, description, designation, location) VALUES (?,?,?,?,?,?,?)';
     let insertSqlParams = [userId, dateFormat(startDate, "UTC:yyyy-mm-dd"), dateFormat(endDate, "UTC:yyyy-mm-dd"), company, description, designation, location];
 
-    connection.query(insertSql,insertSqlParams, function (insertError, insertResult)
+    pool.query(insertSql,insertSqlParams, function (insertError, insertResult)
     {
         if(insertError) {
             console.log('[INSERT ERROR] - WORK EXPERIENCE DETAILS', insertError.message);
@@ -752,7 +760,7 @@ app.post('/verify', function (req, res) {
     let  addSql = 'INSERT INTO login (email, password, otp) VALUES(?, ?, ?)';
     let  addSqlParams = [email, password, otp];
 
-    connection.query(addSql,addSqlParams,function (err, result) {
+    pool.query(addSql,addSqlParams,function (err, result) {
         if(err){
             console.log('[INSERT ERROR] - VERIFY',err.message);
             res.end("0");
@@ -814,19 +822,17 @@ app.post('/verify', function (req, res) {
 
 // GET ROUTER FUNCTIONS
 
-
 app.get('/jobPosts', function (request,response) {
 
     // let userId = request.body.user.userId;
 
-    // selectSql = "select * from job_post";
-    selectSql = "SELECT jp.*, jp_ss.skill_level, e.user_name, ss.skill_name " +
+    let selectSql = "SELECT jp.*, e.user_name, ss.skill_name " +
         "FROM job_post as jp " +
         "INNER JOIN jp_skill_set as jp_ss " +
         "ON jp.id=jp_ss.job_post_id INNER JOIN employer as e " +
         "ON jp.company_id = e.id INNER JOIN skill_set as ss " +
         "ON jp_ss.skill_id = ss.id"
-    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+    pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
@@ -858,7 +864,7 @@ app.get('/jobPosts', function (request,response) {
                 var postedByUserId = selectResult[i].posted_by_id;
                 var selectQuery2 = "select CONCAT(first_name, last_name) from user_profile where id = "+ postedByUserId;
                 let postedByName;
-                connection.query(selectQuery2, function (selectError2, selectResult2) {
+                pool.query(selectQuery2, function (selectError2, selectResult2) {
                     if(selectError2)
                     {   console.log("----------DB ERROR---------\n"+selectError2.message);
                         return;
@@ -880,8 +886,7 @@ app.get('/jobPosts', function (request,response) {
                     "description": selectResult[i].description,
                     "jobType": jobType,
                     "isActive": selectResult[i].is_active,
-                    "skillName" : selectResult[i].skill_name,
-                    "skillLevel": selectResult[i].skill_level
+                    "skillName" : selectResult[i].skill_name
                 }
                 jobPostsArr.push(jsonObj);
             }
@@ -895,8 +900,6 @@ app.get('/jobPosts', function (request,response) {
             response.send(JSON.stringify(responseJson));
         }
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/logout', function(req,res){
@@ -929,7 +932,7 @@ app.get('/profile', function (request,response) {
         " as plus_num_of_months" +
         " from work_experience";
 
-    connection.query(selectSqls, function (selectErrs, selectResults) {
+    pool.query(selectSqls, function (selectErrs, selectResults) {
         if (selectErrs) {
             console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
             console.log("Error in query " + selectErrs.index);
@@ -941,8 +944,6 @@ app.get('/profile', function (request,response) {
         console.log(JSON.stringify(selectResults[1]));
 
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/recruiterJobPosts', function (request,response) {
@@ -955,7 +956,7 @@ app.get('/recruiterJobPosts', function (request,response) {
         "ON jp.id=jp_ss.job_post_id INNER JOIN employer as e " +
         "ON jp.company_id = e.id INNER JOIN skill_set as ss " +
         "ON jp_ss.skill_id = ss.id WHERE posted_by_id = '"+ postedByUserId+ "'";
-    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+    pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
@@ -987,7 +988,7 @@ app.get('/recruiterJobPosts', function (request,response) {
                 var postedByUserId = selectResult[i].posted_by_id;
                 var selectQuery2 = "select CONCAT(first_name, last_name) from user_profile where id = "+ postedByUserId;
                 let postedByName;
-                connection.query(selectQuery2, function (selectError2, selectResult2) {
+                pool.query(selectQuery2, function (selectError2, selectResult2) {
                     if(selectError2)
                     {   console.log("----------DB ERROR---------\n"+selectError2.message);
                         return;
@@ -1017,6 +1018,7 @@ app.get('/recruiterJobPosts', function (request,response) {
 
             var responseJson = {
                 "dbError" : 0,
+                "postedByUserId": postedByUserId,
                 "jobPosts" : jobPostsArr
             }
 
@@ -1024,21 +1026,19 @@ app.get('/recruiterJobPosts', function (request,response) {
             response.send(JSON.stringify(responseJson));
         }
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/recruiterJobPostApplicants', function (request,response) {
     let postedByUserId = request.body.user.userId;
     let jobId = request.body.user.jobId;
 
-    selectSql = "SELECT job_application.*, user_profile.email, " +
+    let selectSql = "SELECT job_application.*, user_profile.email, " +
         "CONCAT(user_profile.first_name, \" \", user_profile.last_name) AS user_name " +
         "FROM job_application " +
         "INNER JOIN user_profile " +
         "ON user_profile.id = job_application.user_profile_id " +
         "WHERE job_application.job_post_id = " + jobId;
-    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+    pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
@@ -1079,6 +1079,7 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
             
             var responseJson = {
                 "dbError" : 0,
+                "postedByUserId": postedByUserId,
                 "jobApplicants" : jobApplicantsArr
             }
 
@@ -1086,67 +1087,94 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
             response.send(JSON.stringify(responseJson));
         }
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/searchRecruiter', function (request,response) {
     let userId = request.query.userId;
     let keyword = request.query.keyword;
+    let location = request.query.location;
+    let workExFrom = (request.query.workExFrom)?(request.query.workExFrom)*12:(request.query.workExFrom);
+    let workExTo = (request.query.workExTo)?(request.query.workExTo)*12:(request.query.workExTo);
 
-    let selectSqls = "SELECT js_skill_set.user_profile_id, js_skill_set.skill_id, " +
-        "skill_set.skill_name, user_profile.email, user_profile.first_name, " +
-        "user_profile.last_name FROM js_skill_set " +
-        "JOIN skill_set ON skill_set.id = js_skill_set.skill_id " +
-        "JOIN user_profile ON user_profile.id = js_skill_set.user_profile_id " +
-        "where js_skill_set.user_profile_id = "+applicantId+";" +
-        "SELECT PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM end_date), EXTRACT(YEAR_MONTH FROM start_date)) + " +
-        "(CASE WHEN ABS((DAY(end_date)-DAY(start_date)) > 15) THEN 1 ELSE 0 END) as num_of_months " +
-        "from work_experience where user_profile_id = "+applicantId;
+    let workExFlag = 0;
 
-    connection.query(selectSqls, function (selectErrs, selectResults) {
-        if (selectErrs) {
-            console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
-            console.log("Error in query " + selectErrs.message);
+    let selectSqlKeyword = "SELECT user_profile.id as user_id, user_profile.first_name, user_profile.last_name, skill_set.skill_name, job_seeker_profile.current_city,  job_seeker_profile.current_state, job_seeker_profile.current_country, job_seeker_profile.current_designation, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM CURRENT_DATE), EXTRACT(YEAR_MONTH FROM first_start_date)) + (CASE WHEN ABS((DAY(CURRENT_DATE)-DAY(first_start_date)) > 15) THEN 1 ELSE 0 END) as exp_months from user_profile INNER JOIN job_seeker_profile ON job_seeker_profile.user_profile_id = user_profile.id INNER JOIN js_skill_set ON js_skill_set.user_profile_id = user_profile.id INNER JOIN skill_set ON skill_set.id = js_skill_set.skill_id INNER JOIN work_experience_start ON work_experience_start.user_profile_id = user_profile.id WHERE (skill_set.skill_name LIKE \'%"+keyword+"%\' OR job_seeker_profile.current_designation like \'%"+keyword+"%\' or job_seeker_profile.current_job_description like \'%"+keyword+"%\')";
+    let selectSqlLocation = "SELECT user_profile.id as user_id, user_profile.first_name, user_profile.last_name, skill_set.skill_name, job_seeker_profile.current_city, job_seeker_profile.current_state, job_seeker_profile.current_country, job_seeker_profile.current_designation, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM CURRENT_DATE), EXTRACT(YEAR_MONTH FROM first_start_date)) + (CASE WHEN ABS((DAY(CURRENT_DATE)-DAY(first_start_date)) > 15) THEN 1 ELSE 0 END) as exp_months from user_profile INNER JOIN job_seeker_profile ON job_seeker_profile.user_profile_id = user_profile.id INNER JOIN js_skill_set ON js_skill_set.user_profile_id = user_profile.id INNER JOIN skill_set ON skill_set.id = js_skill_set.skill_id INNER JOIN work_experience_start ON work_experience_start.user_profile_id = user_profile.id WHERE (skill_set.skill_name LIKE \'%"+keyword+"%\' OR job_seeker_profile.current_designation like \'%"+keyword+"%\' or job_seeker_profile.current_job_description like \'%"+keyword+"%\') AND (job_seeker_profile.current_city like \'%"+location+"%\' OR job_seeker_profile.current_state like \'%"+location+"%\' OR job_seeker_profile.current_country like \'%"+location+"%\')";
+    let selectSqlWorkEx = selectSqlKeyword;
+        //"SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name, skill_set.skill_name FROM job_post INNER JOIN employer ON job_post.company_id = employer.id INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id WHERE (job_name LIKE \'%"+keyword+"%\' OR job_post.domain LIKE \'%"+keyword+"%\' OR function LIKE \'%"+keyword+"%\' OR description LIKE \'%"+keyword+"%\' OR city LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR employer.user_name LIKE \'%"+keyword+"%\' OR skill_set.skill_name LIKE \'%"+keyword+"%\') AND (employer.user_name like \'%"+company+"%\');";
+    let selectSqlAll = selectSqlLocation;
+        //"SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name, skill_set.skill_name FROM job_post INNER JOIN employer ON job_post.company_id = employer.id INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id WHERE (job_name LIKE \'%"+keyword+"%\' OR job_post.domain LIKE \'%"+keyword+"%\' OR function LIKE \'%"+keyword+"%\' OR description LIKE \'%"+keyword+"%\' OR city LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR employer.user_name LIKE \'%"+keyword+"%\' OR skill_set.skill_name LIKE \'%"+keyword+"%\') AND (job_post.city LIKE \'%"+location+"%\' OR job_post.state LIKE \'%"+location+"%\' OR job_post.country LIKE \'%"+location+"%\') AND (employer.user_name like \'%"+company+"%\');";
+
+    let selectSql= "";
+    // check search parameters
+    if(typeof location === "undefined" && (typeof workExFrom === "undefined" && typeof workExTo === "undefined"))
+        selectSql = selectSqlKeyword;
+    else if(typeof location !== "undefined" && (typeof workExFrom === "undefined" && typeof workExTo === "undefined"))
+        selectSql = selectSqlLocation;
+    else if(typeof location === "undefined" && (typeof workExFrom !== "undefined" && typeof workExTo !== "undefined")) {
+        selectSql = selectSqlWorkEx;
+        workExFlag = 1;
+    }
+    else {
+        selectSql = selectSqlAll;
+        workExFlag = 1;
+    }
+
+    console.log("workExFlag: "+workExFlag);
+
+    pool.query(selectSql, function (selectErr, selectResult, selectFields) {
+        if (selectErr) {
+            var responseJson = {
+                "dbError" : 1,
+                "matchedUsers": null
+            }
+            console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(responseJson));
+        }
+        else if (selectResult == '') {
+            var responseJson = {
+                "dbError" : 0,
+                "matchedUsers": null
+            }
+            console.log("-----DATABASE ENTRY ERROR/NO SUCH USER EXISTS-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(responseJson));
+        }
+        else
+        {
+            var jobSeekersArr = []
+            for(var i = 0; i < selectResult.length; i++)
+            {
+                var jobSeekerId = selectResult[i].id;
+                var jobSeekerName = selectResult[i].first_name + " " + selectResult[i].last_name;
+                var currDesignation = selectResult[i].current_designation;
+                var location = selectResult[i].current_city + ", " + selectResult[i].current_state + ", " + selectResult[i].current_country; ;
+                if(workExFlag)
+                    if(!((workExFrom <= selectResult[i].exp_months) && (selectResult[i].exp_months <= workExTo)))
+                        continue;
+                var workEx = calculateWorkEx(selectResult[i].exp_months);
+
+                var jsonObj = {
+                    "jobSeekerId" : jobSeekerId,
+                    "jobSeekerName" : jobSeekerName,
+                    "currDesignation" : currDesignation,
+                    "location" : location,
+                    "workEx" : workEx
+                }
+                jobSeekersArr.push(jsonObj);
+            }
+
+            var responseJson = {
+                "dbError" : 0,
+                "userId": userId,
+                "matchedJobSeekers" : jobSeekersArr
+            }
+
+            console.log("-----------Returning user(s) matched with recruiter's/employers's search------------\n"+JSON.stringify(responseJson));
+            response.send(JSON.stringify(responseJson));
             return;
         }
-
-        let applicantSkills = "";
-        for(i in selectResults[0]){
-            let skill = JSON.stringify(selectResults[0][i].skill_name).split('"').join('');
-            applicantSkills += skill +", ";
-        }
-
-        let numOfMonths = 0;
-        for (i in selectResults[1]){
-            numOfMonths += parseInt(selectResults[1][i].num_of_months);
-        }
-        let workEx = calculateWorkEx(numOfMonths);
-        let htmlMessageJson = {
-            "recruiterEmail" : recruiterEmail,
-            "jobName": jobName,
-            "applicantId" : applicantId,
-            "applicantEmail" : selectResults[0][0].email,
-            "applicantName": selectResults[0][0].first_name + " "+ selectResults[0][0].last_name,
-            "applicantSkills" : applicantSkills.substring(0, applicantSkills.length - 2).trim('"'),
-            "workEx" : workEx
-        }
-        // console.log("htmlMessageJson "+JSON.stringify(htmlMessageJson));
-        createEmailHtmlRec(htmlMessageJson);
-
-        var responseJson = {
-            "dbError": 0,
-            "jobId": jobId,
-            "applicantId" : applicantId,
-            "applicantName": selectResults[0][0].first_name + " "+ selectResults[0][0].last_name,
-            "recruiterEmail" : recruiterEmail,
-            "notificationSent": 1
-        }
-
-        console.log("-----------Email Notification Sent------------\n" + JSON.stringify(responseJson));
-        return;
     });
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/searchJobSeeker', function (request,response) {
@@ -1155,7 +1183,7 @@ app.get('/searchJobSeeker', function (request,response) {
     let location = request.query.location;
     let company = request.query.company;
 
-    let selectSqlKeyword = "SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name, skill_set.skill_name " +
+    let selectSqlKeyword = "SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name as company_name, employer.id as company_id, skill_set.skill_name " +
         "FROM job_post INNER JOIN employer ON job_post.company_id = employer.id " +
         "INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id " +
         "INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id " +
@@ -1178,11 +1206,7 @@ app.get('/searchJobSeeker', function (request,response) {
     else
         selectSql = selectSqlAll;
 
-    console.log("SQL: "+ selectSql);
-    console.log("-------------location:"+location);
-    console.log("-------------company:"+company);
-
-    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+    pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
@@ -1203,17 +1227,19 @@ app.get('/searchJobSeeker', function (request,response) {
         else
         {
             var jobsArr = []
-            for(i = 0; i < selectResult.length; i++)
+            for(var i = 0; i < selectResult.length; i++)
             {
                 var jobId = selectResult[i].id;
                 var jobName = selectResult[i].job_name;
-                var employerName = selectResult[i].user_name;
+                var companyId = selectResult[i].company_id;
+                var companyName = selectResult[i].company_name;
                 var domain = selectResult[i].domain;
 
                 var jsonObj = {
                     "jobId" : jobId,
                     "jobName" : jobName,
-                    "employerName" : employerName,
+                    "companyId" : companyId,
+                    "companyName" : companyName,
                     "domain" : domain
                 }
                 jobsArr.push(jsonObj);
@@ -1221,6 +1247,7 @@ app.get('/searchJobSeeker', function (request,response) {
 
             var responseJson = {
                 "dbError" : 0,
+                "userId" : userId,
                 "matchedJobs" : jobsArr
             }
 
@@ -1229,14 +1256,14 @@ app.get('/searchJobSeeker', function (request,response) {
             return;
         }
     });
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
+
 });
 
 app.get('/showEducation', function (request,response) {
     let userId = request.query.userId;
 
     selectSql = "select * from education where user_profile_id = " + userId;
-    connection.query(selectSql, function (selectErr, selectResult) {
+    pool.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
@@ -1282,15 +1309,13 @@ app.get('/showEducation', function (request,response) {
             response.send(JSON.stringify(responseJson));
         }
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/showWorkExperience', function (request,response) {
     let userId = request.query.userId;
 
     selectSql = "select * from work_experience where user_profile_id = " + userId;
-    connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+    pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
@@ -1335,15 +1360,13 @@ app.get('/showWorkExperience', function (request,response) {
             response.send(JSON.stringify(responseJson));
         }
     });
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 app.get('/userDetails', function (request,response) {
     let userId = request.query.userId;
 
     selectSql = "select * from user_profile where id = " + userId;
-    connection.query(selectSql, function (selectErr, selectResult) {
+    pool.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
             var loginResponse = {
                 "dbError" : 1,
@@ -1382,8 +1405,6 @@ app.get('/userDetails', function (request,response) {
             response.send(JSON.stringify(loginResponse));
         }
     })
-
-    console.log("-----UNKNOWN ERROR-----\nKindly contact ADMIN to escalate issue to DEV team.\n");
 });
 
 // TEST ROUTER FUNCTION
