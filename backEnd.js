@@ -342,7 +342,7 @@ app.post('/createJob', function (req, res) {
     let jobType = req.body.user.jobType;
     let skills = req.body.user.skills;
     let skillsArr = skills.split(',');
-    let skillLevel = req.body.user.skillLevel;
+
     let jobTypeVal;
     if(jobType == "Intern" || jobType == "I")
         jobTypeVal = "I";
@@ -361,8 +361,6 @@ app.post('/createJob', function (req, res) {
         companyId = selectResult[0].current_company_id;
         console.log("RECRUITER'S COMPANY ID: "+companyId);
     });
-
-    console.log("RECRUITER'S COMPANY ID: "+companyId);
 
     var insertSql = 'INSERT INTO job_post(job_name, posted_by_id, company_id, domain, industry, function,' +
         ' description, city, state, country, job_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?);';
@@ -386,10 +384,12 @@ app.post('/createJob', function (req, res) {
             let jobId = result.insertId;
 
             for (let i=0; i < (skillsArr.length); i++) {
-                pool.query("SELECT id from skill_set where lower(skill_name)= ?", [skillsArr[i].toLowerCase()], function (selErr, selRes) {
+                pool.query("SELECT id from skill_set where lower(skill_name)= ?", [skillsArr[i].toLowerCase().trim()], function (selErr, selRes) {
                     if(selErr)
                         throw selErr;
-                    pool.query("insert into jp_skill_set(job_post_id, skill_id) values (?, ?)", [jobId, selRes[0].id], function (insErr, insRes) {
+                    console.log("SKILL ID: ", selRes[0].id);
+                    let skillId = selRes[0].id;
+                    pool.query("insert into jp_skill_set(job_post_id, skill_id) values (?, ?)", [jobId, skillId], function (insErr, insRes) {
                         if(insErr)
                             throw insErr;
                         console.log("-----Updated skill set for new job post in DB-----");
@@ -402,7 +402,7 @@ app.post('/createJob', function (req, res) {
                 "jobId": jobId
             };
 
-            console.log("----------Job created successfully-----------\n");
+            console.log("----------Job created successfully-----------");
             console.log(response);
             res.send(JSON.stringify(response));
         }
@@ -1183,7 +1183,7 @@ app.get('/searchJobSeeker', function (request,response) {
     let location = request.query.location;
     let company = request.query.company;
 
-    let selectSqlKeyword = "SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name as company_name, employer.id as company_id, skill_set.skill_name " +
+    let selectSqlKeyword = "SELECT job_post.*, employer.user_name as company_name, employer.id as company_id, skill_set.skill_name " +
         "FROM job_post INNER JOIN employer ON job_post.company_id = employer.id " +
         "INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id " +
         "INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id " +
@@ -1234,13 +1234,26 @@ app.get('/searchJobSeeker', function (request,response) {
                 var companyId = selectResult[i].company_id;
                 var companyName = selectResult[i].company_name;
                 var domain = selectResult[i].domain;
+                var postedByUserId = selectResult[i].posted_by_id
+                var jobType = (selectResult[i].job_type='F')? "Full-Time":"Internship";
+                var postedByUserId = selectResult[i].posted_by_id;
 
                 var jsonObj = {
                     "jobId" : jobId,
                     "jobName" : jobName,
+                    "postedById": postedByUserId,
                     "companyId" : companyId,
                     "companyName" : companyName,
-                    "domain" : domain
+                    "domain" : domain,
+                    "industry": selectResult[i].industry,
+                    "city": selectResult[i].city,
+                    "state" : selectResult[i].state,
+                    "country" : selectResult[i].country,
+                    "function": selectResult[i].function,
+                    "description": selectResult[i].description,
+                    "jobType": jobType,
+                    "isActive": selectResult[i].is_active,
+                    "skillName" : selectResult[i].skill_name
                 }
                 jobsArr.push(jsonObj);
             }
