@@ -71,10 +71,10 @@ function Cont1() {
         <Tab label="DashBoard" {...a11yProps(0)} />
         <Tab label="Profile Details" {...a11yProps(1)} />
         <Tab label="Your Applications" {...a11yProps(2)} />
-        <Tab label="Item Four" {...a11yProps(3)} />
+        {/* <Tab label="Item Four" {...a11yProps(3)} />
         <Tab label="Item Five" {...a11yProps(4)} />
         <Tab label="Item Six" {...a11yProps(5)} />
-        <Tab label="Item Seven" {...a11yProps(6)} />
+        <Tab label="Item Seven" {...a11yProps(6)} /> */}
       </Tabs>
       <TabPanel value={value} index={0} style={{width:"100%"}}>
         <DashBoard/>
@@ -85,7 +85,7 @@ function Cont1() {
       <TabPanel value={value} index={2}>
         <UserJobApplications/>
       </TabPanel>
-      <TabPanel value={value} index={3}>
+      {/* <TabPanel value={value} index={3}>
         Item Four
       </TabPanel>
       <TabPanel value={value} index={4}>
@@ -96,7 +96,7 @@ function Cont1() {
       </TabPanel>
       <TabPanel value={value} index={6}>
         Item Seven
-      </TabPanel>
+      </TabPanel> */}
     </div>
   );
 }
