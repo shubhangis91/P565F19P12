@@ -15,16 +15,16 @@ const useStyles = makeStyles({
     height: 140
   }
 });
-export default function UserListComponent(props) {
+export default function ApplicantsListComponent(props) {
   return (
     <div>
       <Card>
         <CardActionArea>
           <CardContent>
-            <p>{props.currDesignation}</p>
-            <p>{props.jobSeekerName}</p>
-            <p>{props.location}</p>
-            <p>{props.workEx}</p>
+            <p>{props.applicantId}</p>
+            <p>{props.applicantName}</p>
+            <p>{props.appliedOn}</p>
+            <p>{props.applicantEmail}</p>
           </CardContent>
         </CardActionArea>
       </Card>

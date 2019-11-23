@@ -70,13 +70,27 @@ function DashboardRecruiter() {
   });
   const handleExpand = id => {
     expandJob(id);
+    getUserApplications(id.jobId);
     //console.log(expandJob);
     expandedJob(true);
   };
+  const [users, setUsers] = useState([]);
+  const getUserApplications = jobId => {
+    console.log("/recruiterJobPostApplicants?jobId=" + jobId);
+    axios.get("/recruiterJobPostApplicants?jobId=" + jobId).then(res => {
+      console.log(res);
+      console.log(res.data);
+      if (res.data.jobApplicants != null) {
+        setUsers(res.data.jobApplicants);
+      } else {
+        setUsers([]);
+      }
+    });
+  };
   const handleLoad = event => {
-    axios.get("/jobPosts").then(res => {
-      //console.log(res.data)
-      //console.log(res.data.jobPosts)
+    axios.get("/recruiterJobPosts?userId=3").then(res => {
+      console.log(res.data);
+      console.log(res.data.jobPosts);
       setJobs(res.data.jobPosts);
     });
   };
@@ -115,6 +129,7 @@ function DashboardRecruiter() {
   const showRecruiterJobsFunction = () => {
     setShowRecruiterJobs(true);
   };
+
   useEffect(() => {
     handleLoad();
   }, []);
@@ -322,8 +337,8 @@ function DashboardRecruiter() {
                     state={isExpand.state}
                     jobName={isExpand.jobName}
                     postedById={isExpand.postedById}
-                    skillLevel={isExpand.skillLevel}
                     skillName={isExpand.skillName}
+                    users={users}
                   />
                 )}
               </div>

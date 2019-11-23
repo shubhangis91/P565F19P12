@@ -924,10 +924,10 @@ app.get('/profile', function (request,response) {
 });
 
 app.get('/recruiterJobPosts', function (request,response) {
-    let postedByUserId = request.body.user.userId;
+    let postedByUserId = request.query.userId;
 
     // selectSql = "select * from job_post";
-    selectSql = "SELECT jp.*, jp_ss.skill_level, e.user_name, ss.skill_name " +
+    selectSql = "SELECT jp.*, e.user_name, ss.skill_name " +
         "FROM job_post as jp " +
         "INNER JOIN jp_skill_set as jp_ss " +
         "ON jp.id=jp_ss.job_post_id INNER JOIN employer as e " +
@@ -1006,8 +1006,8 @@ app.get('/recruiterJobPosts', function (request,response) {
 });
 
 app.get('/recruiterJobPostApplicants', function (request,response) {
-    let postedByUserId = request.body.user.userId;
-    let jobId = request.body.user.jobId;
+    let postedByUserId = request.query.userId;
+    let jobId = request.query.jobId;
 
     let selectSql = "SELECT job_application.*, user_profile.email, " +
         "CONCAT(user_profile.first_name, \" \", user_profile.last_name) AS user_name " +
@@ -1029,7 +1029,7 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "jobId": null
+                "jobApplicants": null
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")

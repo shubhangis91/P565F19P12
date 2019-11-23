@@ -15,6 +15,7 @@ import UserListComponent from "./UserListComponent.js";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import UnfoldMoreIcon from "@material-ui/icons/UnfoldMore";
+import ApplicantsListComponent from './ApplicantsListComponent'
 const useStyles = makeStyles({
   card: {
     display: "flex",
@@ -31,15 +32,7 @@ const useStyles = makeStyles({
 
 export default function ExpandedJobRecruiter(props) {
   const [cookies, setCookie] = useCookies(["userId"]);
-  const [users, setUsers] = useState([]);
   const classes = useStyles();
-  const getUserApplications = () => {
-    axios.get("/recruiterJobPostApplicants?jobId"+props.jobId).then(res => {
-      console.log(res);
-      console.log(res.data);
-      setUsers(res.data);
-    });
-  };
   const descriptionShow = () => {
     if (isExpanded == true) {
       setDescription(description.substring(0, 100).concat("..."));
@@ -53,9 +46,6 @@ export default function ExpandedJobRecruiter(props) {
   const [description, setDescription] = useState(
     props.description.substring(0, 100).concat("...")
   );
-  //useEffect(() => {
-  //  getUserApplications();
-  //}, []);
   return (
     <Card className={classes.card}>
       <CardContent>
@@ -87,17 +77,33 @@ export default function ExpandedJobRecruiter(props) {
               className="overflow-scrolling"
               style={{ height: "35vh" }}
             >
-              {users.map((user, i) => (
-                <UserListComponent
-                  currDesignation={user.currDesignation}
-                  jobSeekerName={user.jobSeekerName}
-                  location={user.location}
-                  workEx={user.workEx}
+              {console.log(props.users)}
+              {props.users.map((user, i) => (
+                <ApplicantsListComponent
+                  applicantId={user.applicantId}
+                  applicantName={user.applicantName}
+                  appliedOn={user.appliedOn}
+                  applicantEmail={user.applicantEmail}
                 />
               ))}
-              <UserListComponent />
-              <UserListComponent />
-              <UserListComponent />
+              <ApplicantsListComponent
+                applicantId="{us1er.applicantId}"
+                applicantName="{us1er.applicantName}"
+                appliedOn="{user.a1ppliedOn}"
+                applicantEmail="{u1ser.applicantEmail}"
+              />
+              <ApplicantsListComponent
+                applicantId="{user.ap2plicantId}"
+                applicantName="{user.2applicantName}"
+                appliedOn="{user.appli2edOn}"
+                applicantEmail="{user.ap2plicantEmail}"
+              />
+              <ApplicantsListComponent
+                applicantId="{user.appli3cantId}"
+                applicantName="{user.appl3icantName}"
+                appliedOn="{user.appliedO3n}"
+                applicantEmail="{user.appl3icantEmail}"
+              />
             </OverflowScrolling>
           </Col>
           <Col
