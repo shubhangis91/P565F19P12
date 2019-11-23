@@ -556,9 +556,19 @@ app.post('/register', function (req, res) {
     let primaryContact = req.body.user.primaryContact;
     let secondaryContact = req.body.user.secondaryContact;
 
-    let insertSql = 'INSERT INTO user_profile(email, first_name, ' +
+    let insertSql = "IF NOT EXISTS (SELECT * FROM user_profile WHERE email = '"+email+"')" +
+                "INSERT INTO user_profile(email, first_name, " +
+                "last_name, dob, gender, primary_contact, secondary_contact, " +
+                "registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0) "+
+            "ELSE" +
+                "UPDATE user_profile " +
+                "SET first_name = ?, last_name = ?, gender = ?," +
+                "primary_contact = ?, secondary_contact = ? " +
+                "WHERE email = '"+email+"';";
+
+    /*let insertSql = 'INSERT INTO user_profile(email, first_name, ' +
         'last_name, dob, gender, primary_contact, secondary_contact, ' +
-        'registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0)';
+        'registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0)';*/
     let insertSqlParams = [email, firstName, lastName, dob, gender, primaryContact, secondaryContact];
     pool.query(insertSql,insertSqlParams, function (err, result)
     {
@@ -1005,6 +1015,13 @@ app.get('/recruiterJobPosts', function (request,response) {
     });
 });
 
+/* to get list of users who applied for a job
+* query params: userId - user ID (recruiter who posted the job)
+*               jobId - ID of the job post for which
+*                        list of applicants is needed
+* return: JSON object containing 'jobApplicants' array containing
+*           list of job applicants
+*/
 app.get('/recruiterJobPostApplicants', function (request,response) {
     let postedByUserId = request.query.userId;
     let jobId = request.query.jobId;
