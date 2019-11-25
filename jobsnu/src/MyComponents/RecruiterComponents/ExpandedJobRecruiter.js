@@ -20,6 +20,7 @@ import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import ProfilePage from "../ProfilePage.js";
+import CompanyPage from "../CompanyPage.js";
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -52,7 +53,7 @@ export default function ExpandedJobRecruiter(props) {
   const [workExp, setWorkExp] = React.useState([]);
   const [skills, setSkills] = React.useState([]);
   const [user, setUser] = React.useState([]);
-  const handleOpen = id => {
+  const handleOpenPerson = id => {
     setOpen(true);
     console.log(id.applicantId);
     var strUser = "/userDetails";
@@ -81,14 +82,25 @@ export default function ExpandedJobRecruiter(props) {
     });
   };
 
-  const handleClose = () => {
+  const handleClosePerson = () => {
     setOpen(false);
   };
+
+  const [openComp, setOpenComp] = React.useState(false);
+
+  const handleOpenCompany = () => {
+    setOpenComp(true);
+  };
+
+  const handleCloseCompany = () => {
+    setOpenComp(false);
+  };
+
   const [cookies, setCookie] = useCookies(["userId"]);
   const classes = useStyles();
   const showUserDetails = id => {
     console.log(id);
-    handleOpen(id);
+    handleOpenPerson(id);
   };
   const descriptionShow = () => {
     if (isExpanded == true) {
@@ -105,6 +117,7 @@ export default function ExpandedJobRecruiter(props) {
   );
   const imageClick = () => {
     console.log(props.companyName);
+    handleOpenCompany();
   } 
   return (
     <Card className={classes.card}>
@@ -202,7 +215,7 @@ export default function ExpandedJobRecruiter(props) {
           aria-describedby="transition-modal-description"
           className={classes.modal}
           open={open}
-          onClose={handleClose}
+          onClose={handleClosePerson}
           closeAfterTransition
           BackdropComponent={Backdrop}
           BackdropProps={{
@@ -216,6 +229,28 @@ export default function ExpandedJobRecruiter(props) {
                 workExp={workExp}
                 user={user}
                 skills={skills}
+              />
+            </div>
+          </Fade>
+        </Modal>
+      </div>
+      <div>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className={classes.modal}
+          open={openComp}
+          onClose={handleCloseCompany}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500
+          }}
+        >
+          <Fade in={openComp}>
+            <div className={classes.paper}>
+              <CompanyPage
+                companyName={props.companyName}
               />
             </div>
           </Fade>

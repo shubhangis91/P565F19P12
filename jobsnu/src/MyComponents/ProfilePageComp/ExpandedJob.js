@@ -10,11 +10,13 @@ import Typography from "@material-ui/core/Typography";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import axios from "axios";
 import { useCookies } from "react-cookie";
-import { Box } from "@material-ui/core";
+import { Box, Modal, Fade } from "@material-ui/core";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import CompanyPage from "../CompanyPage";
+import Backdrop from "@material-ui/core/Backdrop";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme=>({
   card: {
     display: "flex",
     marginBottom: "5%",
@@ -25,8 +27,19 @@ const useStyles = makeStyles({
   media: {
     height: "15%",
     width: "15%"
-  }
-});
+  },
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3)
+  },
+}));
 
 export default function ExpandedJob(props) {
   const [cookies, setCookie] = useCookies(["userId"]);
@@ -45,7 +58,18 @@ export default function ExpandedJob(props) {
   };
   const imageClick = () => {
     console.log(props.companyName);
+    handleOpenCompany()
   } 
+  const [openComp, setOpenComp] = React.useState(false);
+
+  const handleOpenCompany = () => {
+    setOpenComp(true);
+  };
+
+  const handleCloseCompany = () => {
+    setOpenComp(false);
+  };
+
   return (
     <Card className={classes.card}>
       <CardContent>
@@ -127,6 +151,28 @@ export default function ExpandedJob(props) {
         </Row>
       </CardContent>
       <CardActions></CardActions>
+      <div>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className={classes.modal}
+          open={openComp}
+          onClose={handleCloseCompany}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500
+          }}
+        >
+          <Fade in={openComp}>
+            <div className={classes.paper}>
+              <CompanyPage
+                companyName={props.companyName}
+              />
+            </div>
+          </Fade>
+        </Modal>
+      </div>
     </Card>
   );
 }
