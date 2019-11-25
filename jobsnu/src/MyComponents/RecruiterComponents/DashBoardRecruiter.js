@@ -214,7 +214,7 @@ function DashboardRecruiter() {
                 {jobs.map((job, i) => (
                   <JobPostComponent
                     city={job.city}
-                    companyId={job.companyName}
+                    companyName={job.companyName}
                     country={job.country}
                     description={job.description}
                     domain={job.domain}
@@ -235,7 +235,7 @@ function DashboardRecruiter() {
                 ))}
                 <JobPostComponent
                   city="job.city"
-                  companyId="job.companyName1"
+                  companyName="job.companyName1"
                   country="job.country1"
                   description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor. Maecenas nisl est, ultrices nec congue eget, auctor vitae massa. Fusce luctus vestibulum augue ut aliquet. Mauris ante ligula, facilisis sed ornare eu, lobortis in odio. Praesent convallis urna a lacus interdum ut hendrerit risus congue. Nunc sagittis dictum nisi, sed ullamcorper ipsum dignissim ac"
                   domain="job.domain1"
@@ -256,7 +256,7 @@ function DashboardRecruiter() {
 
                 <JobPostComponent
                   city="job.city"
-                  companyId="job.companyName2"
+                  companyName="job.companyName2"
                   country="job.country2"
                   description="job.description2"
                   domain="job.domain2"
@@ -276,7 +276,7 @@ function DashboardRecruiter() {
                 />
                 <JobPostComponent
                   city="job.city"
-                  companyId="job.companyName3"
+                  companyName="job.companyName3"
                   country="job.country3"
                   description="job.descripti3on"
                   domain="job.domai3n"
@@ -296,7 +296,7 @@ function DashboardRecruiter() {
                 />
                 <JobPostComponent
                   city="job.ci4ty"
-                  companyId="job.comp4anyName"
+                  companyName="job.comp4anyName"
                   country="job.country4"
                   description="job.de4scription"
                   domain="job.doma4in"
@@ -324,7 +324,7 @@ function DashboardRecruiter() {
                 {isExpanded && (
                   <ExpandedJobRecruiter
                     city={isExpand.city}
-                    companyId={isExpand.companyName}
+                    companyName={isExpand.companyName}
                     country={isExpand.country}
                     description={isExpand.description}
                     domain={isExpand.domain}

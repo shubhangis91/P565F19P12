@@ -149,7 +149,7 @@ function Dashboard() {
                   ))}
                   <JobPostComponent
                     city="job.city"
-                    companyId="job.companyName1"
+                    companyName="job.companyName"
                     country="job.country1"
                     description="job.description1"
                     domain="job.domain1"
@@ -169,7 +169,7 @@ function Dashboard() {
 
                   <JobPostComponent
                     city="job.city"
-                    companyId="job.companyName2"
+                    companyName="job.companyName2"
                     country="job.country2"
                     description="job.description2"
                     domain="job.domain2"
@@ -232,7 +232,7 @@ function Dashboard() {
                   {isExpanded && (
                     <ExpandedJob
                       city={isExpand.city}
-                      companyId={isExpand.companyName}
+                      companyName={isExpand.companyName}
                       country={isExpand.country}
                       description={isExpand.description}
                       domain={isExpand.domain}

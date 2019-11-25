@@ -34,3 +34,8 @@ code {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+.break {
+  flex-basis: 100%;
+  height: 0;
+}

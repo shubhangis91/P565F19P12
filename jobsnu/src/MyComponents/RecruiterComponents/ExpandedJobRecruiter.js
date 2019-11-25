@@ -15,8 +15,13 @@ import UserListComponent from "./UserListComponent.js";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import UnfoldMoreIcon from "@material-ui/icons/UnfoldMore";
-import ApplicantsListComponent from './ApplicantsListComponent'
-const useStyles = makeStyles({
+import ApplicantsListComponent from "./ApplicantsListComponent";
+import Modal from "@material-ui/core/Modal";
+import Backdrop from "@material-ui/core/Backdrop";
+import Fade from "@material-ui/core/Fade";
+import ProfilePage from "../ProfilePage.js";
+
+const useStyles = makeStyles(theme => ({
   card: {
     display: "flex",
     marginBottom: "5%",
@@ -27,12 +32,64 @@ const useStyles = makeStyles({
   media: {
     height: "15%",
     width: "15%"
+  },
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3)
   }
-});
+}));
 
 export default function ExpandedJobRecruiter(props) {
+  const [open, setOpen] = React.useState(false);
+  const [education, setEducation] = React.useState([]);
+  const [workExp, setWorkExp] = React.useState([]);
+  const [skills, setSkills] = React.useState([]);
+  const [user, setUser] = React.useState([]);
+  const handleOpen = id => {
+    setOpen(true);
+    console.log(id.applicantId);
+    var strUser = "/userDetails";
+    var strEdu = "/showEducation";
+    var strWork = "showWorkExperience";
+    var str2 = "?userId=";
+    var str3 = id.applicantId;
+    var getUserdetails = strUser.concat(str2, str3);
+    var getEducation = strEdu.concat(str2, str3);
+    var getWork = strWork.concat(str2, str3);
+    axios.get(getUserdetails).then(res => {
+      console.log(res.data);
+      setUser(res.data);
+      console.log(user);
+      console.log(user.dob);
+    });
+    axios.get(getEducation).then(res => {
+      console.log(res.data.educationList);
+      setEducation(res.data.educationList);
+      //         console.log(education)
+    });
+    axios.get(getWork).then(res => {
+      //console.log(res.data.workExperiences)
+      setWorkExp(res.data.workExperiences);
+      //console.log(workExp)
+    });
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
   const [cookies, setCookie] = useCookies(["userId"]);
   const classes = useStyles();
+  const showUserDetails = id => {
+    console.log(id);
+    handleOpen(id);
+  };
   const descriptionShow = () => {
     if (isExpanded == true) {
       setDescription(description.substring(0, 100).concat("..."));
@@ -46,13 +103,17 @@ export default function ExpandedJobRecruiter(props) {
   const [description, setDescription] = useState(
     props.description.substring(0, 100).concat("...")
   );
+  const imageClick = () => {
+    console.log(props.companyName);
+  } 
   return (
     <Card className={classes.card}>
       <CardContent>
         <Row>
           <Col xs="auto">
             <img
-              style={{ width: "15vh" }}
+              style={{ width: "15vh",cursor: "pointer", }}
+              onClick={() => imageClick()}
               src="https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg"
             />
           </Col>
@@ -84,6 +145,7 @@ export default function ExpandedJobRecruiter(props) {
                   applicantName={user.applicantName}
                   appliedOn={user.appliedOn}
                   applicantEmail={user.applicantEmail}
+                  showUserDetails={showUserDetails}
                 />
               ))}
               <ApplicantsListComponent
@@ -91,18 +153,21 @@ export default function ExpandedJobRecruiter(props) {
                 applicantName="{us1er.applicantName}"
                 appliedOn="{user.a1ppliedOn}"
                 applicantEmail="{u1ser.applicantEmail}"
+                showUserDetails={showUserDetails}
               />
               <ApplicantsListComponent
                 applicantId="{user.ap2plicantId}"
                 applicantName="{user.2applicantName}"
                 appliedOn="{user.appli2edOn}"
                 applicantEmail="{user.ap2plicantEmail}"
+                showUserDetails={showUserDetails}
               />
               <ApplicantsListComponent
                 applicantId="{user.appli3cantId}"
                 applicantName="{user.appl3icantName}"
                 appliedOn="{user.appliedO3n}"
                 applicantEmail="{user.appl3icantEmail}"
+                showUserDetails={showUserDetails}
               />
             </OverflowScrolling>
           </Col>
@@ -131,6 +196,31 @@ export default function ExpandedJobRecruiter(props) {
         </Row>
       </CardContent>
       <CardActions></CardActions>
+      <div>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className={classes.modal}
+          open={open}
+          onClose={handleClose}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500
+          }}
+        >
+          <Fade in={open}>
+            <div className={classes.paper}>
+              <ProfilePage
+                education={education}
+                workExp={workExp}
+                user={user}
+                skills={skills}
+              />
+            </div>
+          </Fade>
+        </Modal>
+      </div>
     </Card>
   );
 }
