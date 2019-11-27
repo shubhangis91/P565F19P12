@@ -15,7 +15,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import CompanyPage from "../CompanyPage";
 import Backdrop from "@material-ui/core/Backdrop";
-
+import images from '../../img/images'
 const useStyles = makeStyles(theme=>({
   card: {
     display: "flex",
@@ -69,7 +69,7 @@ export default function ExpandedJob(props) {
   const handleCloseCompany = () => {
     setOpenComp(false);
   };
-
+  console.log(images.find(x=>x.id==props.companyName).src)
   return (
     <Card className={classes.card}>
       <CardContent>
@@ -78,7 +78,7 @@ export default function ExpandedJob(props) {
             <img
               style={{ width: "15vh", cursor: "pointer" }}
               onClick={() => imageClick()}
-              src="https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg"
+              src={images.find(x=>x.id==props.companyName).src}
             />
           </Col>
           <Col>
