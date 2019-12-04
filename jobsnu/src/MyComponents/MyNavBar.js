@@ -53,8 +53,8 @@ function MyNavBar(props) {
        <nav className="navbar navbar-expand-sm fixed-top navnav"style={{backgroundColor:"white",}}>
          <div style={{backgroundColor:"#AFD275",width:"100%"}}>
           <img src={logo}alt="mylogo" style={{width:"6%",marginLeft:"2.5%"}}/>
-          <button onClick={logOut} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><strong>Log Out</strong></button>
-          <button onClick={switchToRecruiter} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><strong>Switch to Recruiter</strong></button>
+          <button onClick={logOut} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><h5>Log Out</h5></button>
+          <button onClick={switchToRecruiter} style={{float:"right", backgroundColor:"#e7717d",height:"71px",color:"white"}}><h5>Switch to Recruiter</h5></button>
         </div>
       </nav>
     </div>

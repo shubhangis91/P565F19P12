@@ -25,6 +25,9 @@ import NewEducationPostComponent from "./NewEducationPostComponent";
 import EducationPostComponent from "./EducationPostComponent";
 import NewWorkPostComponent from "./NewWorkPostComponent";
 import WorkPostComponent from "./WorkPostComponent";
+import PaymentComponent from "./PaymentComponent"
+//import SkillsComponent from "./SkillsComponent"
+import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -272,8 +275,9 @@ export default function ProfileDetails(props) {
             Tell us about your degrees, diplomas, qualificaitons!
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
+        <ExpansionPanelDetails style={{backgroundColor:"#c3b9b0"}}>
           <Typography>
+          <VerticalTimeline>
             {education.map((edu, i) => (
               <EducationPostComponent
                 key={i}
@@ -286,6 +290,7 @@ export default function ProfileDetails(props) {
                 percentage={edu.percentage}
               />
             ))}
+            </VerticalTimeline>
             {!newEducationComponent && (
               <Button
                 variant="green"
@@ -327,8 +332,9 @@ export default function ProfileDetails(props) {
             Tell us about your work experience, it'll give you an edge!
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
+        <ExpansionPanelDetails style={{backgroundColor:"#c3b9b0"}}>
           <Typography>
+          <VerticalTimeline>
             {workExp.map((work, i) => (
               <WorkPostComponent
                 key={i}
@@ -342,6 +348,7 @@ export default function ProfileDetails(props) {
                 loadValues={loadValues}
               />
             ))}
+            </VerticalTimeline>
             {!newWorkComponent && (
               <Button
                 variant="green"
@@ -383,6 +390,24 @@ export default function ProfileDetails(props) {
         <ExpansionPanelDetails>
           <Typography>
             <PersonalData />
+          </Typography>
+        </ExpansionPanelDetails>
+        </ExpansionPanel>
+
+        <ExpansionPanel
+        expanded={expanded === "panel5"}
+        onChange={handleExpand("panel5")}
+      >
+        <ExpansionPanelSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel5bh-content"
+          id="panel5bh-header"
+        >
+          <Typography className={classes.heading}>Payment data</Typography>
+        </ExpansionPanelSummary>
+      <ExpansionPanelDetails>
+          <Typography>
+            <PaymentComponent/>
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>

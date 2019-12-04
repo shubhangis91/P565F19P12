@@ -21,11 +21,10 @@ export default function ApplicantsListComponent(props) {
     props.showUserDetails(props);
   };
   return (
-    <div>
-      <Card>
+    <div style={{marginBottom:"3vh", marginTop:"3vh"}}>
+      <Card style={{borderRadius:"2vh"}}>
         <CardActionArea onClick={show}>
           <CardContent>
-            <p>{props.applicantId}</p>
             <p>{props.applicantName}</p>
             <p>{props.appliedOn}</p>
             <p>{props.applicantEmail}</p>

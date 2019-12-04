@@ -11,6 +11,10 @@ import EducationPostComponent from "./ProfilePageComp/EducationPostComponent";
 import WorkPostComponent from "./ProfilePageComp/WorkPostComponent";
 import OverflowScrolling from "react-overflow-scrolling";
 import ChatIcon from '@material-ui/icons/Chat';
+import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
+import 'react-vertical-timeline-component/style.min.css';
+import { textAlign } from "@material-ui/system";
+
 const useStyles = makeStyles({
   card: {
     maxWidth: 345
@@ -30,17 +34,22 @@ export default function ProfilePage(props) {
     <div>
       <Card>
         {/* <CardActionArea onClick={show}> */}
-          <CardContent>
+          <CardContent style={{backgroundColor:"#F4F4F4"}}>
             <p>{props.user.firstName} {props.user.lastName}</p>
             <p>{props.user.primaryContact} {props.user.secondaryContact}</p>
             <Button style={{backgroundColor:"#e7717d"}}>
                 <ChatIcon/> Message
             </Button>
+            <br/>
+            <br/>
+            <div style={{display:"block", textAlign:"center"}}>
+            <h4 style={{color:"#ff4081", fontWeight:"300"}}> Here's the User's Time Line: </h4>
+            </div>
             <OverflowScrolling
               className="overflow-scrolling"
-              style={{ height: "70vh" }}
+              style={{ height: "70vh",backgroundColor:"#c3b9b0", borderRadius:"4vh"}}
             >
-            <Typography>
+            <VerticalTimeline >
               {props.education.map((edu, i) => (
                 <EducationPostComponent
                   key={i}
@@ -53,8 +62,6 @@ export default function ProfilePage(props) {
                   percentage={edu.percentage}
                 />
               ))}
-            </Typography>
-            <Typography>
               {props.workExp.map((work, i) => (
                 <WorkPostComponent
                   key={i}
@@ -67,7 +74,7 @@ export default function ProfilePage(props) {
                   location={work.location}
                 />
               ))}
-            </Typography>
+              </VerticalTimeline>
             </OverflowScrolling>
           </CardContent>
         {/* </CardActionArea> */}

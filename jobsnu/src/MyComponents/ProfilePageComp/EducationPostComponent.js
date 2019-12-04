@@ -11,8 +11,9 @@ import LocationOnIcon from "@material-ui/icons/LocationOn";
 import LocationCityIcon from "@material-ui/icons/LocationCity";
 import { Paper } from "@material-ui/core";
 import Collapse from '@material-ui/core/Collapse';
-
-const useStyles = makeStyles({
+import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
+import 'react-vertical-timeline-component/style.min.css';
+import SchoolIcon from '@material-ui/icons/School';const useStyles = makeStyles({
   card: {
     display: "flex",
     marginTop: "5%",
@@ -33,41 +34,57 @@ export default function EducationPostComponent(props) {
     showDescription(!description)
   }
   const [description,showDescription]=useState(false)
-
+  const[date,setDate]=useState(props.startDate.substring(0, 4) + " - " + props.endDate.substring(0, 4))
   return (
-    <div>
-    <Card className={classes.card}>
-      <CardActionArea
-      //  onClick={show}
-      >
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="h2">
-            {props.eduLevel} {props.eduField}
-          </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
-            <LocationCityIcon /> {props.institute}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-      <CardActions>
-        <Typography gutterBottom>
-          {props.startDate.substring(0, 7)} {props.endDate.substring(0, 7)}
-        </Typography>
-        <Typography gutterBottom >
-          Grade: <br/> <div style={{textAlign:"center"}}>{props.percentage}</div>
-        </Typography>
-        {/* <Button size="small" color="primary" onClick={show}>
-          Learn More
-        </Button> */}
-      </CardActions>
-    </Card>
-    <Paper>
-    <Collapse in={description} timeout="auto" unmountOnExit>
-        <Typography paragraph style={{marginLeft:"1%"}}>
-        {props.description}
-        </Typography>
-    </Collapse>
-    </Paper>
-    </div>
+    <VerticalTimelineElement
+    className="vertical-timeline-element--work"
+    contentStyle={{ background: '#e7717d', color: '#fff' }}
+    contentArrowStyle={{ borderRight: '7px solid  #e7717d' }}
+    date={date}
+    iconStyle={{ background: '#e7717d', color: '#fff' }}
+    icon={<SchoolIcon />}
+  >
+    <h4 className="vertical-timeline-element-title">{props.eduLevel} {props.eduField}</h4>
+    <h5 className="vertical-timeline-element-subtitle"><LocationCityIcon /> {props.institute}</h5>
+    <p>
+    Grade:{props.percentage} <br/>
+     {props.description}
+     Creative Direction, User Experience, Visual Design, Project Management, Team Leading
+    </p>
+  </VerticalTimelineElement>
+    // <div>
+    // <Card className={classes.card}>
+    //   <CardActionArea
+    //   //  onClick={show}
+    //   >
+    //     <CardContent>
+    //       <Typography gutterBottom variant="h5" component="h2">
+    //         {props.eduLevel} {props.eduField}
+    //       </Typography>
+    //       <Typography variant="body2" color="textSecondary" component="p">
+    //         <LocationCityIcon /> {props.institute}
+    //       </Typography>
+    //     </CardContent>
+    //   </CardActionArea>
+    //   <CardActions>
+    //     <Typography gutterBottom>
+    //       {props.startDate.substring(0, 7)} {props.endDate.substring(0, 7)}
+    //     </Typography>
+    //     <Typography gutterBottom >
+    //       Grade: <br/> <div style={{textAlign:"center"}}>{props.percentage}</div>
+    //     </Typography>
+    //     {/* <Button size="small" color="primary" onClick={show}>
+    //       Learn More
+    //     </Button> */}
+    //   </CardActions>
+    // </Card>
+    // <Paper>
+    // <Collapse in={description} timeout="auto" unmountOnExit>
+    //     <Typography paragraph style={{marginLeft:"1%"}}>
+    //     {props.description}
+    //     </Typography>
+    // </Collapse>
+    // </Paper>
+    // </div>
   );
 }

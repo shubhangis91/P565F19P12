@@ -20,7 +20,8 @@
     "express-session": "^1.17.0",
     "mysql": "^2.17.1",
     "nodemailer": "^6.3.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "react-payment-request-api": "^3.1.0"
   },
   "engines": {
     "node": "10.16.3"

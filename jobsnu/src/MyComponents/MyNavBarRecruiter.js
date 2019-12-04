@@ -53,8 +53,8 @@ function MyNavBarRecruiter(props) {
        <nav className="navbar navbar-expand-sm fixed-top navnav"style={{backgroundColor:"white",}}>
          <div style={{backgroundColor:"#e7717d",width:"100%"}}>
           <img src={logo}alt="mylogo" style={{width:"6%",marginLeft:"2.5%"}}/>
-          <button onClick={logOut} style={{float:"right", backgroundColor:"#AFD275",height:"71px",color:"#7E685A"}}><strong>Log Out</strong></button>
-          <button onClick={switchToUser} style={{float:"right", backgroundColor:"#AFD275",height:"71px",color:"#7E685A"}}><strong>Switch to User</strong></button>         
+          <button onClick={logOut} style={{float:"right", backgroundColor:"#AFD275",height:"71px",color:"#7E685A"}}><h5>Log Out</h5></button>
+          <button onClick={switchToUser} style={{float:"right", backgroundColor:"#AFD275",height:"71px",color:"#7E685A"}}><h5>Switch to User</h5></button>         
         </div>
       </nav>
     </div>
