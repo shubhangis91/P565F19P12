@@ -1,4 +1,4 @@
-var mysql  = require('mysql'); 
+var mysql  = require('mysql');
 var express = require('express');
 var nodemailer = require('nodemailer');
 // var session = require('express-session');
@@ -33,12 +33,10 @@ let transporter = nodemailer.createTransport({
 var app = express();
 var jobsnuEmail = 'jobsnu.se@gmail.com';
 var verificationEmailSubject =  'JOBSNU - E-mail Verification';
-var otpEmailSubject = 'JOBSNU - One-Time Password for Login';
+var otpEmailSubject = 'JOBSNU - One-Time Password (OTP) for Login';
 var applicationEmailJsSubject = 'JOBSNU - Job Application Submitted';
-var applicationEmailRecSubject = "JOBSNU - New Application Received"
-
-var connection;
-
+var applicationEmailRecSubject = "JOBSNU - New Application Received";
+let passwordResetSubject = "JOBSNU - Password Updated Successfully";
 
 // app.use(express.static('./jobsnu/build'));
 app.use(express.static(path.join(__dirname, "jobsnu", "build")));
@@ -287,6 +285,58 @@ function sendMessage(message)
         }
     });
 }
+
+// PATCH ROUTER FUNCTIONS
+
+/* To reset user's password (to be called after
+ * answers have been verified for their correctness by FE)
+ * Request body params: - email -> user's email ID
+ *                      - password -> new password set by the user
+ * Returns: JSON object containing
+ *          - passwordReset -> true/false depending on
+ *                             successfull/unsuccessful DB update, resp.
+ */
+app.patch('/resetPassword', function (req, res) {
+    let email = req.body.user.email;
+    let password = req.body.user.password;
+
+    // Update password in login table
+    let  updateSql = 'UPDATE login SET password = ?' +
+        'where email = ?';
+    let  updateSqlParams = [password, email];
+
+    pool.query(updateSql,updateSqlParams,function (err, result) {
+        if(err){
+            console.log('[UPDATE ERROR] - PASSWORD RESET',err.message);
+            res.send();
+        }
+
+        let htmlMessageString = '<!DOCTYPE html>'+
+            '<html lang="en">'+
+            '<head>'+
+            '    <meta charset="UTF-8">'+
+            '    <title>'+passwordResetSubject+'</title>'+
+            '</head>'+
+            '<body>'+
+            '   <h4>Jobsnu Password Reset Successful</h4>'+
+            '   <p>Your password has been successfully reset.</p>'+
+            '   <p>Kindly use your new password to log in to jobsnu.com</p>'+
+            '</body>'+
+            '</html>';
+        let passwordResetMessage = createMessage(htmlMessageString, jobsnuEmail, email, passwordResetSubject);
+        sendMessage(passwordResetMessage);
+
+        // Output JSON format
+        var response = {
+            "email": email,
+            "passwordReset": true
+        };
+
+        console.log(JSON.stringify(response));
+        res.send(JSON.stringify(response));
+    });
+
+});
 
 // POST ROUTER FUNCTIONS
 
@@ -557,14 +607,14 @@ app.post('/register', function (req, res) {
     let secondaryContact = req.body.user.secondaryContact;
 
     let insertSql = "IF NOT EXISTS (SELECT * FROM user_profile WHERE email = '"+email+"')" +
-                "INSERT INTO user_profile(email, first_name, " +
-                "last_name, dob, gender, primary_contact, secondary_contact, " +
-                "registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0) "+
-            "ELSE" +
-                "UPDATE user_profile " +
-                "SET first_name = ?, last_name = ?, gender = ?," +
-                "primary_contact = ?, secondary_contact = ? " +
-                "WHERE email = '"+email+"';";
+        "INSERT INTO user_profile(email, first_name, " +
+        "last_name, dob, gender, primary_contact, secondary_contact, " +
+        "registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0) "+
+        "ELSE" +
+        "UPDATE user_profile " +
+        "SET first_name = ?, last_name = ?, gender = ?," +
+        "primary_contact = ?, secondary_contact = ? " +
+        "WHERE email = '"+email+"';";
 
     /*let insertSql = 'INSERT INTO user_profile(email, first_name, ' +
         'last_name, dob, gender, primary_contact, secondary_contact, ' +
@@ -661,6 +711,34 @@ app.post('/setMfa', function (request,response) {
     });
 });
 
+app.post('/setSecurityQuestions', function (req, res) {
+    let userId = req.body.user.userId;
+    let question1 = req.body.user.question1;
+    let answer1 = req.body.user.answer1;
+    let question2 = req.body.user.question2;
+    let answer2 = req.body.user.answer2;
+
+    let insertSql = 'INSERT INTO security_questions VALUES (?,?,?,?,?)';
+    let insertSqlParams = [userId, question1, answer1, question2, answer2];
+
+    pool.query(insertSql,insertSqlParams, function (insertError, insertResult)
+    {
+        if(insertError) {
+            console.log('[INSERT ERROR] - SECRET QUESTIONS', insertError.message);
+            return;
+        }
+
+        console.log("Secret questions for user "+ userId+" updated successfully.\n", insertResult);
+
+        var responseJson = {
+            "userId" : userId,
+            "questionsUpdated" : true
+        };
+        console.log("------------SECRET QUESTIONS - RESPONSE----------\n"+JSON.stringify(responseJson));
+        res.end(JSON.stringify(responseJson));
+    });
+});
+
 app.post('/set_verification_status', function (req, res) {
     let isVerified = req.body.user.isVerified;
     let email = req.body.user.email;
@@ -741,7 +819,6 @@ app.post('/setWorkExperience', function (req, res) {
 });
 
 app.post('/verify', function (req, res) {
-    console.log(req.body);
     let email = req.body.user.email;
     let password = req.body.user.password;
     let otp = req.body.user.otp;
@@ -782,12 +859,12 @@ app.post('/verify', function (req, res) {
             "                   Kindly use the code below to complete your registration process on Jobsnu.<p>" +
             "</div>" +
             "<div style=\" font-size: 1px; position:absolute;left:352px;top:700px; width:600px; height:40px; background-color:#7E685A \"> " +
-            "*Terms & conditions apply."
-        "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
-        "</div>" +
-        "</div>" +
-        "</body>" +
-        "</html>";
+                "*Terms & conditions apply."+
+                "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
+            "</div>" +
+            "</div>" +
+            "</body>" +
+            "</html>";
         let verificationMessage = createMessage(htmlMessageString, jobsnuEmail, email, verificationEmailSubject);
         sendMessage(verificationMessage);
 
@@ -807,7 +884,6 @@ app.post('/verify', function (req, res) {
         res.send(response);
     });
 
-    // console.log(response);
 });
 
 // GET ROUTER FUNCTIONS
@@ -1070,7 +1146,7 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
                 }
                 jobApplicantsArr.push(jsonObj);
             }
-            
+
             var responseJson = {
                 "dbError" : 0,
                 "postedByUserId": postedByUserId,
@@ -1095,9 +1171,9 @@ app.get('/searchRecruiter', function (request,response) {
     let selectSqlKeyword = "SELECT user_profile.id as user_id, user_profile.first_name, user_profile.last_name, skill_set.skill_name, job_seeker_profile.current_city,  job_seeker_profile.current_state, job_seeker_profile.current_country, job_seeker_profile.current_designation, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM CURRENT_DATE), EXTRACT(YEAR_MONTH FROM first_start_date)) + (CASE WHEN ABS((DAY(CURRENT_DATE)-DAY(first_start_date)) > 15) THEN 1 ELSE 0 END) as exp_months from user_profile INNER JOIN job_seeker_profile ON job_seeker_profile.user_profile_id = user_profile.id INNER JOIN js_skill_set ON js_skill_set.user_profile_id = user_profile.id INNER JOIN skill_set ON skill_set.id = js_skill_set.skill_id INNER JOIN work_experience_start ON work_experience_start.user_profile_id = user_profile.id WHERE (skill_set.skill_name LIKE \'%"+keyword+"%\' OR job_seeker_profile.current_designation like \'%"+keyword+"%\' or job_seeker_profile.current_job_description like \'%"+keyword+"%\')";
     let selectSqlLocation = "SELECT user_profile.id as user_id, user_profile.first_name, user_profile.last_name, skill_set.skill_name, job_seeker_profile.current_city, job_seeker_profile.current_state, job_seeker_profile.current_country, job_seeker_profile.current_designation, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM CURRENT_DATE), EXTRACT(YEAR_MONTH FROM first_start_date)) + (CASE WHEN ABS((DAY(CURRENT_DATE)-DAY(first_start_date)) > 15) THEN 1 ELSE 0 END) as exp_months from user_profile INNER JOIN job_seeker_profile ON job_seeker_profile.user_profile_id = user_profile.id INNER JOIN js_skill_set ON js_skill_set.user_profile_id = user_profile.id INNER JOIN skill_set ON skill_set.id = js_skill_set.skill_id INNER JOIN work_experience_start ON work_experience_start.user_profile_id = user_profile.id WHERE (skill_set.skill_name LIKE \'%"+keyword+"%\' OR job_seeker_profile.current_designation like \'%"+keyword+"%\' or job_seeker_profile.current_job_description like \'%"+keyword+"%\') AND (job_seeker_profile.current_city like \'%"+location+"%\' OR job_seeker_profile.current_state like \'%"+location+"%\' OR job_seeker_profile.current_country like \'%"+location+"%\')";
     let selectSqlWorkEx = selectSqlKeyword;
-        //"SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name, skill_set.skill_name FROM job_post INNER JOIN employer ON job_post.company_id = employer.id INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id WHERE (job_name LIKE \'%"+keyword+"%\' OR job_post.domain LIKE \'%"+keyword+"%\' OR function LIKE \'%"+keyword+"%\' OR description LIKE \'%"+keyword+"%\' OR city LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR employer.user_name LIKE \'%"+keyword+"%\' OR skill_set.skill_name LIKE \'%"+keyword+"%\') AND (employer.user_name like \'%"+company+"%\');";
+    //"SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name, skill_set.skill_name FROM job_post INNER JOIN employer ON job_post.company_id = employer.id INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id WHERE (job_name LIKE \'%"+keyword+"%\' OR job_post.domain LIKE \'%"+keyword+"%\' OR function LIKE \'%"+keyword+"%\' OR description LIKE \'%"+keyword+"%\' OR city LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR employer.user_name LIKE \'%"+keyword+"%\' OR skill_set.skill_name LIKE \'%"+keyword+"%\') AND (employer.user_name like \'%"+company+"%\');";
     let selectSqlAll = selectSqlLocation;
-        //"SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name, skill_set.skill_name FROM job_post INNER JOIN employer ON job_post.company_id = employer.id INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id WHERE (job_name LIKE \'%"+keyword+"%\' OR job_post.domain LIKE \'%"+keyword+"%\' OR function LIKE \'%"+keyword+"%\' OR description LIKE \'%"+keyword+"%\' OR city LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR employer.user_name LIKE \'%"+keyword+"%\' OR skill_set.skill_name LIKE \'%"+keyword+"%\') AND (job_post.city LIKE \'%"+location+"%\' OR job_post.state LIKE \'%"+location+"%\' OR job_post.country LIKE \'%"+location+"%\') AND (employer.user_name like \'%"+company+"%\');";
+    //"SELECT job_post.id, job_post.job_name, job_post.domain, employer.user_name, skill_set.skill_name FROM job_post INNER JOIN employer ON job_post.company_id = employer.id INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id INNER JOIN skill_set ON skill_set.id = jp_skill_set.skill_id WHERE (job_name LIKE \'%"+keyword+"%\' OR job_post.domain LIKE \'%"+keyword+"%\' OR function LIKE \'%"+keyword+"%\' OR description LIKE \'%"+keyword+"%\' OR city LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR state LIKE \'%"+keyword+"%\' OR employer.user_name LIKE \'%"+keyword+"%\' OR skill_set.skill_name LIKE \'%"+keyword+"%\') AND (job_post.city LIKE \'%"+location+"%\' OR job_post.state LIKE \'%"+location+"%\' OR job_post.country LIKE \'%"+location+"%\') AND (employer.user_name like \'%"+company+"%\');";
 
     let selectSql= "";
     // check search parameters
@@ -1266,6 +1342,47 @@ app.get('/searchJobSeeker', function (request,response) {
 
 });
 
+app.get('/forgotPassword', function (request,response) {
+    let email = request.query.email;
+
+    let selectSql = "SELECT * from security_questions " +
+        "where user_profile_id = (select id from user_profile where email = ?)";
+    let selectSqlParams = [email];
+    pool.query(selectSql, selectSqlParams, function (selectErr, selectResult, selectFields) {
+        if (selectErr) {
+            var responseJson = {
+                "dbError" : 1,
+                "matchedUser": null
+            }
+            console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(responseJson));
+        }
+        else if (selectResult == '') {
+            var responseJson = {
+                "dbError" : 0,
+                "matchedUser": null
+            }
+            console.log("-----DATABASE ENTRY ERROR/NO SUCH USER EXISTS-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(responseJson));
+        }
+        else
+        {
+            var responseJson = {
+                "dbError" : 0,
+                "userId": selectResult[0].user_profile_id,
+                "question1" : selectResult[0].question1,
+                "answer1" : selectResult[0].answer1,
+                "question2" : selectResult[0].question2,
+                "answer2" : selectResult[0].answer2
+            }
+            // FE verifies answers -> redirects to /resetPassword
+            console.log("-----------Returning security questions for USER "+selectResult[0].user_profile_id+"------------\n"+JSON.stringify(responseJson));
+            response.send(JSON.stringify(responseJson));
+        }
+    });
+});
+
 app.get('/showEducation', function (request,response) {
     let userId = request.query.userId;
 
@@ -1417,12 +1534,12 @@ app.get('/userDetails', function (request,response) {
 // TEST ROUTER FUNCTION
 
 app.get('/test_home', function(request, response) {
-	if (request) {
-		response.send('Welcome!');
-	} else {
-		response.send('Please login to view this page!');
-	}
-	response.end();
+    if (request) {
+        response.send('Welcome!');
+    } else {
+        response.send('Please login to view this page!');
+    }
+    response.end();
 });
 
 app.get("*", (req, res) => {
@@ -1430,10 +1547,10 @@ app.get("*", (req, res) => {
 });
 
 var server = app.listen(port, function () {
-  
+
     var host = server.address().address
     var port = server.address().port
-    
+
     console.log("www.jobs-nu.com/login.html", host, port);
-    
-  });
+
+});
