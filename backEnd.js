@@ -19,7 +19,8 @@ const pool = mysql.createPool({
     port: process.env.DB_PORT,
     database: process.env.DB,
     multipleStatements: true,
-    connectionLimit: 50
+    connectionLimit: 100,
+    queueLimit: 50
 });
 
 let transporter = nodemailer.createTransport({
@@ -213,10 +214,8 @@ function sendEmailNotifRec(applicantId, jobId)
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
             return;
         } else {
-            // console.log("selectResult1: "+ JSON.stringify(selectResult1));
             let recruiterEmail = selectResult1[0][0].email;
             let jobName = selectResult1[1][0].job_name;
-            // console.log("RECRUITER EMAIL: "+recruiterEmail);
             let selectSqls = "SELECT js_skill_set.user_profile_id, js_skill_set.skill_id, " +
                 "skill_set.skill_name, user_profile.email, user_profile.first_name, " +
                 "user_profile.last_name FROM js_skill_set " +
@@ -888,13 +887,143 @@ app.post('/verify', function (req, res) {
 
 // GET ROUTER FUNCTIONS
 
-app.get('/jobPosts', function (request,response) {
-    let selectSql = "SELECT jp.*, e.user_name, ss.skill_name " +
+app.get('/companyDetails', function (request,response) {
+    let companyId = request.query.companyId;
+
+    let selectSql = "select * from employer where id = " + companyId;
+    pool.query(selectSql, function (selectErr, selectResult) {
+        if (selectErr) {
+            var loginResponse = {
+                "dbError" : 1,
+                "userId": null
+            }
+
+            console.log("Error fetching employer details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(loginResponse));
+        }
+        else if (selectResult == '') {
+            var loginResponse = {
+                "dbError" : 0,
+                "userId": null
+            }
+
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(loginResponse));
+        }
+        else {
+            var loginResponse = {
+                "dbError" : 0,
+                "companyId": selectResult[0].id,
+                "companyUsername": selectResult[0].user_name,
+                "companyName": selectResult[0].employer_name,
+                "establishedDate": dateFormat(selectResult[0].established_date, "UTC:yyyy-mm-dd"),
+                "companySize": selectResult[0].size,
+                "headquarters": selectResult[0].headquarters,
+                "website": selectResult[0].website,
+                "domain": selectResult[0].domain,
+                "industry": selectResult[0].industry,
+                "emailId": selectResult[0].email_id,
+                "primaryContact": selectResult[0].primary_contact,
+                "about": selectResult[0].about
+            }
+
+            console.log("-----------Company Details------------\n" + JSON.stringify(loginResponse));
+            response.send(JSON.stringify(loginResponse));
+        }
+    });
+});
+
+app.get('/companyJobPosts', function (request,response) {
+    let companyId = request.query.companyId;
+
+    let selectSql = "SELECT jp.*, CONCAT(up.first_name, ' ', up.last_name) as recruiter_name, " +
+        "e.user_name, ss.skill_name " +
+        "FROM job_post as jp " +
+        "inner join user_profile as up ON jp.posted_by_id = up.id " +
+        "INNER JOIN jp_skill_set as jp_ss ON jp.id=jp_ss.job_post_id " +
+        "INNER JOIN employer as e ON jp.company_id = e.id " +
+        "INNER JOIN skill_set as ss ON jp_ss.skill_id = ss.id " +
+        "WHERE jp.company_id = "+ companyId;
+    pool.getConnection(function(err, connection) {
+
+        connection.query(selectSql, function (selectErr, selectResult, selectFields) {
+            if (selectErr) {
+                var responseJson = {
+                    "dbError" : 1,
+                    "jobId": null
+                }
+
+                console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
+                console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+                response.send(JSON.stringify(responseJson));
+            }
+            else if (selectResult == '') {
+                var responseJson = {
+                    "dbError" : 0,
+                    "jobId": null
+                }
+
+                console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+                response.send(JSON.stringify(responseJson));
+            }
+            else {
+                var jobPostsMap = new Map();
+                for (let i = 0; i < selectResult.length; i++)
+                {
+                    var jobId = selectResult[i].id;
+                    var jobType = (selectResult[i].job_type = 'F') ? "Full-Time" : "Internship";
+                    var postedByUserId = selectResult[i].posted_by_id;
+                    if (jobPostsMap.has(jobId))
+                        jobPostsMap.get(jobId).skillName.push(selectResult[i].skill_name);
+                    else
+                    {
+                        var jsonObj = {
+                            "jobId": jobId,
+                            "jobName": selectResult[i].job_name,
+                            "postedById": postedByUserId,
+                            "postedByName": selectResult[i].recruiter_name,
+                            "companyName": selectResult[i].user_name,
+                            "city": selectResult[i].city,
+                            "state": selectResult[i].state,
+                            "country": selectResult[i].country,
+                            "domain": selectResult[i].domain,
+                            "industry": selectResult[i].industry,
+                            "function": selectResult[i].function,
+                            "description": selectResult[i].description,
+                            "jobType": jobType,
+                            "isActive": selectResult[i].is_active,
+                            "skillName": [selectResult[i].skill_name]
+                        }
+
+                        jobPostsMap.set(jobId, jsonObj);
+                    }
+                }
+
+                var responseJson = {
+                    "dbError": 0,
+                    "jobPosts": Array.from(jobPostsMap.values())
+                }
+
+                console.log("-----------Returning jobs in company "+companyId+"------------\n"+JSON.stringify(responseJson));
+                response.send(JSON.stringify(responseJson));
+            }
+        });
+        connection.release();
+    });
+});
+
+app.get('/jobPostDetails', function (request,response) {
+    let jobId = request.query.jobId;
+
+    let selectSql = "SELECT jp.*, CONCAT(up.first_name, ' ', up.last_name) as recruiter_name, " +
+        "e.user_name, ss.skill_name " +
         "FROM job_post as jp " +
         "INNER JOIN jp_skill_set as jp_ss " +
         "ON jp.id=jp_ss.job_post_id INNER JOIN employer as e " +
         "ON jp.company_id = e.id INNER JOIN skill_set as ss " +
-        "ON jp_ss.skill_id = ss.id"
+        "ON jp_ss.skill_id = ss.id" +
+        "WHERE jp.id = "+jobId;
     pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
@@ -916,9 +1045,6 @@ app.get('/jobPosts', function (request,response) {
             response.send(JSON.stringify(responseJson));
         }
         else {
-            console.log("IN JOB POSTS\n");
-            // console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.userId + "\n" + request.session.username);
-
             var jobPostsArr = []
             for(i = 0; i < selectResult.length; i++)
             {
@@ -965,7 +1091,80 @@ app.get('/jobPosts', function (request,response) {
     });
 });
 
-app.get('/logout', function(req,res){
+app.get('/jobPosts', function (request,response) {
+    let selectSql = "SELECT jp.*, CONCAT(up.first_name, ' ', up.last_name) as recruiter_name, " +
+        "e.user_name, ss.skill_name " +
+        "FROM job_post as jp " +
+        "inner join user_profile as up ON jp.posted_by_id = up.id " +
+        "INNER JOIN jp_skill_set as jp_ss ON jp.id=jp_ss.job_post_id " +
+        "INNER JOIN employer as e ON jp.company_id = e.id " +
+        "INNER JOIN skill_set as ss ON jp_ss.skill_id = ss.id"
+    pool.query(selectSql, function (selectErr, selectResult, selectFields) {
+        if (selectErr) {
+            var responseJson = {
+                "dbError": 1,
+                "jobId": null
+            }
+
+            console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(responseJson));
+        } else if (selectResult == '') {
+            var responseJson = {
+                "dbError": 0,
+                "jobId": null
+            }
+
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(responseJson));
+        }
+        else
+        {
+            var jobPostsMap = new Map();
+            for (let i = 0; i < selectResult.length; i++)
+            {
+                var jobId = selectResult[i].id;
+                var jobType = (selectResult[i].job_type = 'F') ? "Full-Time" : "Internship";
+                var postedByUserId = selectResult[i].posted_by_id;
+                if (jobPostsMap.has(jobId))
+                    jobPostsMap.get(jobId).skillName.push(selectResult[i].skill_name);
+                else
+                {
+                    var jsonObj = {
+                        "jobId": jobId,
+                        "jobName": selectResult[i].job_name,
+                        "postedById": postedByUserId,
+                        "postedByName": selectResult[i].recruiter_name,
+                        "companyName": selectResult[i].user_name,
+                        "city": selectResult[i].city,
+                        "state": selectResult[i].state,
+                        "country": selectResult[i].country,
+                        "domain": selectResult[i].domain,
+                        "industry": selectResult[i].industry,
+                        "function": selectResult[i].function,
+                        "description": selectResult[i].description,
+                        "jobType": jobType,
+                        "isActive": selectResult[i].is_active,
+                        "skillName": [selectResult[i].skill_name]
+                    }
+
+                    jobPostsMap.set(jobId, jsonObj);
+                    // jobPostsArr.push(jsonObj);
+                }
+            }
+
+            var responseJson = {
+                "dbError": 0,
+                "jobPosts": Array.from(jobPostsMap.values())
+            }
+
+            console.log("-----------Returning job posts------------\n" + JSON.stringify(responseJson));
+            response.send(JSON.stringify(responseJson));
+        }
+    });
+});
+
+app.get('/logout', function(req,res) {
     req.session.destroy(function(err) {
         if(err) {
             console.log(err);
@@ -999,7 +1198,6 @@ app.get('/profile', function (request,response) {
         if (selectErrs) {
             console.log("-----DATABASE ERROR-----\nError fetching job details. See below for detailed error information.\n");
             console.log("Error in query " + selectErrs.index);
-            // console.log("Error in query "+selectErrs.index);
             return;
         }
         console.log("MULTIPLE QUERY RESULTS");
@@ -1012,13 +1210,14 @@ app.get('/profile', function (request,response) {
 app.get('/recruiterJobPosts', function (request,response) {
     let postedByUserId = request.query.userId;
 
-    // selectSql = "select * from job_post";
-    selectSql = "SELECT jp.*, e.user_name, ss.skill_name " +
+    let selectSql = "SELECT jp.*, CONCAT(up.first_name, ' ', up.last_name) as recruiter_name, " +
+        "e.user_name, ss.skill_name " +
         "FROM job_post as jp " +
-        "INNER JOIN jp_skill_set as jp_ss " +
-        "ON jp.id=jp_ss.job_post_id INNER JOIN employer as e " +
-        "ON jp.company_id = e.id INNER JOIN skill_set as ss " +
-        "ON jp_ss.skill_id = ss.id WHERE posted_by_id = '"+ postedByUserId+ "'";
+        "inner join user_profile as up ON jp.posted_by_id = up.id " +
+        "INNER JOIN jp_skill_set as jp_ss ON jp.id=jp_ss.job_post_id " +
+        "INNER JOIN employer as e ON jp.company_id = e.id " +
+        "INNER JOIN skill_set as ss ON jp_ss.skill_id = ss.id " +
+        "WHERE jp.posted_by_id = "+ postedByUserId;
     pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
@@ -1032,7 +1231,7 @@ app.get('/recruiterJobPosts', function (request,response) {
         }
         else if (selectResult == '') {
             var responseJson = {
-                "dbError" : 0,
+                "dbEntryError" : 1,
                 "jobId": null
             }
 
@@ -1040,49 +1239,42 @@ app.get('/recruiterJobPosts', function (request,response) {
             response.send(JSON.stringify(responseJson));
         }
         else {
-            console.log("IN JOB POSTS\n");
-            // console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.userId + "\n" + request.session.username);
-
-            var jobPostsArr = []
-            for(i = 0; i < selectResult.length; i++)
+            var jobPostsMap = new Map();
+            for (let i = 0; i < selectResult.length; i++)
             {
                 var jobId = selectResult[i].id;
-                var jobType = (selectResult[i].job_type='F')? "Full-Time":"Internship";
+                var jobType = (selectResult[i].job_type = 'F') ? "Full-Time" : "Internship";
                 var postedByUserId = selectResult[i].posted_by_id;
-                var selectQuery2 = "select CONCAT(first_name, last_name) from user_profile where id = "+ postedByUserId;
-                let postedByName;
-                pool.query(selectQuery2, function (selectError2, selectResult2) {
-                    if(selectError2)
-                    {   console.log("----------DB ERROR---------\n"+selectError2.message);
-                        return;
+                if (jobPostsMap.has(jobId))
+                    jobPostsMap.get(jobId).skillName.push(selectResult[i].skill_name);
+                else
+                {
+                    var jsonObj = {
+                        "jobId": jobId,
+                        "jobName": selectResult[i].job_name,
+                        "postedById": postedByUserId,
+                        "postedByName": selectResult[i].recruiter_name,
+                        "companyName": selectResult[i].user_name,
+                        "city": selectResult[i].city,
+                        "state": selectResult[i].state,
+                        "country": selectResult[i].country,
+                        "domain": selectResult[i].domain,
+                        "industry": selectResult[i].industry,
+                        "function": selectResult[i].function,
+                        "description": selectResult[i].description,
+                        "jobType": jobType,
+                        "isActive": selectResult[i].is_active,
+                        "skillName": [selectResult[i].skill_name]
                     }
-                    postedByName = selectResult2[0].first_name + " " + selectResult2[0].last_name;
-                });
-                var jsonObj = {
-                    "jobId": jobId,
-                    "jobName" : selectResult[i].job_name,
-                    "postedById": postedByUserId,
-                    "postedByName" : postedByName,
-                    "companyName" : selectResult[i].user_name,
-                    "city": selectResult[i].city,
-                    "state" : selectResult[i].state,
-                    "country" : selectResult[i].country,
-                    "domain": selectResult[i].domain,
-                    "industry": selectResult[i].industry,
-                    "function": selectResult[i].function,
-                    "description": selectResult[i].description,
-                    "jobType": jobType,
-                    "isActive": selectResult[i].is_active,
-                    "skillName" : selectResult[i].skill_name,
-                    "skillLevel": selectResult[i].skill_level
+
+                    jobPostsMap.set(jobId, jsonObj);
+                    // jobPostsArr.push(jsonObj);
                 }
-                jobPostsArr.push(jsonObj);
             }
 
             var responseJson = {
-                "dbError" : 0,
-                "postedByUserId": postedByUserId,
-                "jobPosts" : jobPostsArr
+                "dbError": 0,
+                "jobPosts": Array.from(jobPostsMap.values())
             }
 
             console.log("-----------Returning job posts------------\n"+responseJson);
