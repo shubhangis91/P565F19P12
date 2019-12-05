@@ -647,7 +647,7 @@ app.post('/register', function (req, res) {
 app.post('/setEducation', function (req, res) {
     let userId = req.body.education.userId;
     let eduLevel = req.body.education.eduLevel;
-    let eduField = req.body.education.eduField;
+    let field = req.body.education.eduField;
     let institute = req.body.education.institute;
     let startDate = req.body.education.startDate;
     let endDate = req.body.education.endDate;

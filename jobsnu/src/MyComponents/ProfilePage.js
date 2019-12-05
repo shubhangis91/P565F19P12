@@ -10,9 +10,12 @@ import Typography from "@material-ui/core/Typography";
 import EducationPostComponent from "./ProfilePageComp/EducationPostComponent";
 import WorkPostComponent from "./ProfilePageComp/WorkPostComponent";
 import OverflowScrolling from "react-overflow-scrolling";
-import ChatIcon from '@material-ui/icons/Chat';
-import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
-import 'react-vertical-timeline-component/style.min.css';
+import ChatIcon from "@material-ui/icons/Chat";
+import {
+  VerticalTimeline,
+  VerticalTimelineElement
+} from "react-vertical-timeline-component";
+import "react-vertical-timeline-component/style.min.css";
 import { textAlign } from "@material-ui/system";
 
 const useStyles = makeStyles({
@@ -24,32 +27,43 @@ const useStyles = makeStyles({
   }
 });
 export default function ProfilePage(props) {
-//   const show = () => {
-//     console.log(props.education)
-//     console.log(props.workExp)
-//     console.log(props.user)
-//     console.log(props.skill)
-//   };
+  //   const show = () => {
+  //     console.log(props.education)
+  //     console.log(props.workExp)
+  //     console.log(props.user)
+  //     console.log(props.skill)
+  //   };
   return (
     <div>
-      <Card>
+      <Card style={{ borderRadius: "4vh" }}>
         {/* <CardActionArea onClick={show}> */}
-          <CardContent style={{backgroundColor:"#F4F4F4"}}>
-            <p>{props.user.firstName} {props.user.lastName}</p>
-            <p>{props.user.primaryContact} {props.user.secondaryContact}</p>
-            <Button style={{backgroundColor:"#e7717d"}}>
-                <ChatIcon/> Message
-            </Button>
-            <br/>
-            <br/>
-            <div style={{display:"block", textAlign:"center"}}>
-            <h4 style={{color:"#ff4081", fontWeight:"300"}}> Here's the User's Time Line: </h4>
-            </div>
-            <OverflowScrolling
-              className="overflow-scrolling"
-              style={{ height: "70vh",backgroundColor:"#c3b9b0", borderRadius:"4vh"}}
-            >
-            <VerticalTimeline >
+        <CardContent style={{ backgroundColor: "#F4F4F4" }}>
+          <p>
+            {props.user.firstName} {props.user.lastName}
+          </p>
+          <p>
+            {props.user.primaryContact} {props.user.secondaryContact}
+          </p>
+          <Button style={{ backgroundColor: "#e7717d",color:"#fff" }}>
+            <ChatIcon />  Message
+          </Button>
+          <br />
+          <br />
+          <div style={{ display: "block", textAlign: "center" }}>
+            <h4 style={{ color: "#ff4081", fontWeight: "300" }}>
+              {" "}
+              Here's the User's Time Line:{" "}
+            </h4>
+          </div>
+          <OverflowScrolling
+            className="overflow-scrolling"
+            style={{
+              height: "70vh",
+              backgroundColor: "#c3b9b0",
+              borderRadius: "4vh"
+            }}
+          >
+            <VerticalTimeline>
               {props.education.map((edu, i) => (
                 <EducationPostComponent
                   key={i}
@@ -74,9 +88,9 @@ export default function ProfilePage(props) {
                   location={work.location}
                 />
               ))}
-              </VerticalTimeline>
-            </OverflowScrolling>
-          </CardContent>
+            </VerticalTimeline>
+          </OverflowScrolling>
+        </CardContent>
         {/* </CardActionArea> */}
       </Card>
     </div>

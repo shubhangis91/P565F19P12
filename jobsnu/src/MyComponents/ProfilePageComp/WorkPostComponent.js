@@ -46,7 +46,7 @@ export default function WorkPostComponent(props) {
     showDescription(!description)
   }
   const[date,setDate]=useState(props.startDate.substring(0, 4) + " - " + props.endDate.substring(0, 4))
-  console.log(date)
+  //console.log(date)
   return (
     <VerticalTimelineElement
     className="vertical-timeline-element--work"

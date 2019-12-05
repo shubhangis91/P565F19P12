@@ -79,6 +79,7 @@ class LogIn extends React.Component {
             cookies.set('userId', undefined, { path: '/' })
             cookies.set('userEmail', false, { path: '/' })
             cookies.set('isNotActive', false, { path: '/' })
+            cookies.set('isRecruiter', false, { path: '/' })
             console.log(cookies.get('userEmail'))
             console.log(cookies.get('isNotActive'))
         }
@@ -111,6 +112,16 @@ class LogIn extends React.Component {
                     })
                 }
 
+                if(res.data.verified ==1){
+                    axios
+                        .post("/login", {user})
+                        .then(resp =>{
+                            console.log(resp.data)
+                            if(resp.data.isReqruiter == "Y")    {
+                                cookies.set('isRecruiter', true, { path: '/' })
+                            }
+                        })
+                }
             })
     }
 

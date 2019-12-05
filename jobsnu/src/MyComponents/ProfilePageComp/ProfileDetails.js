@@ -134,7 +134,7 @@ export default function ProfileDetails(props) {
   }, []);
   const [newEducationComponent, setNewEducationComponent] = React.useState(
     false
-  );
+  ); 
 
   const handleAddEducation = event => {
     setNewEducationComponent(!newEducationComponent);

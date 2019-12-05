@@ -17,7 +17,7 @@ import SchoolIcon from '@material-ui/icons/School';const useStyles = makeStyles(
   card: {
     display: "flex",
     marginTop: "5%",
-    maxWidth:"140vh",
+    minWidth:"",
     background:'#F4F4F4',
 
   },
@@ -33,24 +33,25 @@ export default function EducationPostComponent(props) {
     console.log(props)
     showDescription(!description)
   }
+  //console.log(props)
   const [description,showDescription]=useState(false)
   const[date,setDate]=useState(props.startDate.substring(0, 4) + " - " + props.endDate.substring(0, 4))
   return (
     <VerticalTimelineElement
     className="vertical-timeline-element--work"
-    contentStyle={{ background: '#e7717d', color: '#fff' }}
+    contentStyle={{ background: '#e7717d', color: '#fff'}}
     contentArrowStyle={{ borderRight: '7px solid  #e7717d' }}
     date={date}
     iconStyle={{ background: '#e7717d', color: '#fff' }}
     icon={<SchoolIcon />}
   >
-    <h4 className="vertical-timeline-element-title">{props.eduLevel} {props.eduField}</h4>
-    <h5 className="vertical-timeline-element-subtitle"><LocationCityIcon /> {props.institute}</h5>
+    <div>
+    <h3 className="vertical-timeline-element-title">{props.eduLevel} {props.eduField}</h3>
+    <h4 className="vertical-timeline-element-subtitle"><LocationCityIcon /> {props.institute}</h4>
     <p>
     Grade:{props.percentage} <br/>
-     {props.description}
-     Creative Direction, User Experience, Visual Design, Project Management, Team Leading
     </p>
+    </div>
   </VerticalTimelineElement>
     // <div>
     // <Card className={classes.card}>
