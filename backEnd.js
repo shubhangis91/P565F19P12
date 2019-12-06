@@ -474,18 +474,11 @@ app.post('/login', function(request, response){
             response.send(JSON.stringify(loginResponse));
         }
         else {
-            // Set session variables
-            // request.session.loggedIn = true;
-            // request.session.userId = selectResult[0].id;
-            // request.session.username = selectResult[0].first_name;
-
-            // console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.userId + "\n" + request.session.username);
-
             var loginResponse = {
                 "dbError" : 0,
                 "invalid": 0,
                 "verified": 1,
-                "userId": selectResult[0].userId,
+                "userId": selectResult[0].id,
                 "username": selectResult[0].first_name,
                 "isRecruiter": selectResult[0].is_recruiter
             }
@@ -561,11 +554,11 @@ app.post('/mfaLogin', function (req,res) {
                     "</div>" +
                     "<div style=\" font-size: 1px; position:absolute;left:352px;top:700px; width:600px; height:40px; background-color:#7E685A \"> " +
                     "*Terms & conditions apply."
-                "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
-                "</div>" +
-                "</div>" +
-                "</body>" +
-                "</html>";
+                    "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
+                    "</div>" +
+                    "</div>" +
+                    "</body>" +
+                    "</html>";
                 let otpMessage = createMessage(htmlMessageString, jobsnuEmail, email, otpEmailSubject);
                 sendMessage(otpMessage);
 
@@ -647,7 +640,7 @@ app.post('/register', function (req, res) {
 app.post('/setEducation', function (req, res) {
     let userId = req.body.education.userId;
     let eduLevel = req.body.education.eduLevel;
-    let field = req.body.education.eduField;
+    let eduField = req.body.education.eduField;
     let institute = req.body.education.institute;
     let startDate = req.body.education.startDate;
     let endDate = req.body.education.endDate;
@@ -1010,6 +1003,51 @@ app.get('/companyJobPosts', function (request,response) {
             }
         });
         connection.release();
+    });
+});
+
+app.get('/companyRecruiters', function (request,response) {
+    let companyId = request.query.companyId;
+
+    let selectSql = "select up.id, " +
+        "CONCAT(up.first_name, ' ', up.last_name) as recruiter_name, up.email, jsp.current_designation, " +
+        "concat(jsp.current_city, ', ', jsp.current_state, ', ', jsp.current_country) as location " +
+        "from user_profile as up " +
+        "inner join job_seeker_profile as jsp on jsp.user_profile_id = up.id " +
+        "where up.is_recruiter = 'Y' and jsp.current_company_id =  " + companyId;
+    pool.query(selectSql, function (selectErr, selectResult) {
+        if (selectErr) {
+            var jsonResponse = {
+                "dbError" : 1,
+                "userId": null
+            }
+
+            console.log("Error fetching recruiter details. See below for detailed error information.\n" + selectErr.message)
+            console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
+            response.send(JSON.stringify(jsonResponse));
+        }
+        else if (selectResult == '') {
+            var jsonResponse = {
+                "dbEntryError" : 1,
+                "userId": null
+            }
+
+            console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
+            response.send(JSON.stringify(jsonResponse));
+        }
+        else {
+            var jsonResponse = {
+                "companyId" : companyId,
+                "userId": selectResult[0].id,
+                "recruiterName": selectResult[0].recruiter_name,
+                "email": selectResult[0].email,
+                "currentDesignation": selectResult[0].current_designation,
+                "location": selectResult[0].location
+            }
+
+            console.log("-----------Returning details of recruiter in company "+companyId+"------------\n" + JSON.stringify(jsonResponse));
+            response.send(JSON.stringify(jsonResponse));
+        }
     });
 });
 
@@ -1681,7 +1719,7 @@ app.get('/showWorkExperience', function (request,response) {
 app.get('/userDetails', function (request,response) {
     let userId = request.query.userId;
 
-    selectSql = "select * from user_profile where id = " + userId;
+    let selectSql = "select * from user_profile where id = " + userId;
     pool.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
             var loginResponse = {
