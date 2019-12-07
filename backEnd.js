@@ -485,7 +485,7 @@ app.post('/login', function(request, response){
                 "dbError" : 0,
                 "invalid": 0,
                 "verified": 1,
-                "userId": selectResult[0].userId,
+                "userId": selectResult[0].id,
                 "username": selectResult[0].first_name,
                 "isRecruiter": selectResult[0].is_recruiter
             }

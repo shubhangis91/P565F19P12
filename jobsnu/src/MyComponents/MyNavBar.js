@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import logo from "../img/logo2.png";
 import { useCookies, setCookie, withCookies } from "react-cookie";
+import { useState } from "react";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -27,9 +28,9 @@ function MyNavBar(props) {
     "userEmail",
     "userId",
     "isActive",
-    "isReqruiter"
+    "isRecruiter"
   ]);
-
+  const [showButton, setShow] = useState(cookies["isRecruiter"]);
   const classes = useStyles();
   const logOut = () => {
     console.log("Logging out and removing cookies");
@@ -62,6 +63,8 @@ function MyNavBar(props) {
       pushToLogin();
     }
   };
+  console.log(cookies["isRecruiter"]);
+  console.log(showButton);
   return (
     <div data-spy="scroll" data-target=".navbar" data-offset="50">
       <nav
@@ -85,7 +88,7 @@ function MyNavBar(props) {
           >
             <h5>Log Out</h5>
           </button>
-          {cookies["isRecruiter"] && (
+          {showButton && (
             <button
               onClick={switchToRecruiter}
               style={{

@@ -33,12 +33,12 @@ class OTPbox extends React.Component {
             //console.log(cookies.get('userEmail'))
             //console.log(cookies.get('userId'))
             console.log(cookies.get('isNotAtive'))
-            if(this.props.login==1) {
-                cookies.set('userId', 1, { path: '/' })
-            }
-            else{  
-                cookies.set('userId', 3, { path: '/' })
-            }
+            // if(this.props.login==1) {
+            //     //cookies.set('userId', 1, { path: '/' })
+            // }
+            // else{  
+            //     cookies.set('userId', 3, { path: '/' })
+            // }
             cookies.set('isNotActive', true, { path: '/' })
             cookies.set('userEmail', this.props.email, { path: '/' })
             //console.log(cookies.get('userEmail'))

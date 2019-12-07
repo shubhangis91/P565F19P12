@@ -28,7 +28,7 @@ import SchoolIcon from '@material-ui/icons/School';const useStyles = makeStyles(
 });
 
 export default function EducationPostComponent(props) {
-  const classes = useStyles();
+  //const classes = useStyles();
   const show = () => {
     console.log(props)
     showDescription(!description)
