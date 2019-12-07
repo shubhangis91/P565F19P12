@@ -104,11 +104,7 @@ export default function JobPostComponent(props) {
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
              {props.jobName}   
-             {skills.map((skill, i) => (
-                <Tooltip title="This skill is required">
-                <Chip label={skill} color="secondary"/>
-                </Tooltip>
-              ))}
+        
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
              <LocationOnIcon/> {props.city}, {props.state}, {props.country}
@@ -164,6 +160,11 @@ export default function JobPostComponent(props) {
           </Fade>
         </Modal>
       </div>
+      {props.skillName.map((skill, i) => (
+                <Tooltip title="This skill is required">
+                <Chip label={skill} color="secondary"/>
+                </Tooltip>
+              ))}
       </CardActions>
     </Card>
     );
