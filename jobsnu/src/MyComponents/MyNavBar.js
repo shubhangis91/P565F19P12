@@ -1,6 +1,9 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+import Tooltip from '@material-ui/core/Tooltip';
+import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
+
 import {
   Route,
   Link,
@@ -30,7 +33,8 @@ function MyNavBar(props) {
     "isActive",
     "isRecruiter"
   ]);
-  const [showButton, setShow] = useState(cookies["isRecruiter"]);
+  const [showButton, setShow] = useState(false);
+
   const classes = useStyles();
   const logOut = () => {
     console.log("Logging out and removing cookies");
@@ -48,7 +52,6 @@ function MyNavBar(props) {
     console.log(cookies["isRecruiter"]);
     pushToLogin();
   };
-
   const pushToLogin = () => {
     props.history.push("/");
   };
@@ -57,14 +60,23 @@ function MyNavBar(props) {
   };
   useEffect(() => {
     checkLogin();
+    setRec();
   }, []);
   const checkLogin = () => {
     if (cookies["isNotActive"] == false) {
       pushToLogin();
     }
   };
-  console.log(cookies["isRecruiter"]);
-  console.log(showButton);
+    const setRec = () => {
+    if (cookies["isRecruiter"] == 'false') {
+      setShow(false);
+    } else {
+      setShow(true);
+    }
+    console.log(cookies["isRecruiter"]);
+    console.log(showButton);
+
+  };
   return (
     <div data-spy="scroll" data-target=".navbar" data-offset="50">
       <nav
@@ -77,29 +89,36 @@ function MyNavBar(props) {
             alt="mylogo"
             style={{ width: "6%", marginLeft: "2.5%" }}
           />
-          <button
+          <Button
+            className={classes.menuButton}
             onClick={logOut}
             style={{
               float: "right",
-              backgroundColor: "#e7717d",
-              height: "71px",
-              color: "white"
+              // backgroundColor: "#AFD275",
+              color: "#ff4081",
+              marginTop: "1.2%",
+              borderRadius:"20vh",
             }}
           >
-            <h5>Log Out</h5>
-          </button>
+          
+          <strong>Log Out</strong>
+          </Button>
           {showButton && (
-            <button
+            <Tooltip title="Switch to REcruiter Profile">
+            <Button
+              className={classes.menuButton}
               onClick={switchToRecruiter}
               style={{
                 float: "right",
-                backgroundColor: "#e7717d",
-                height: "71px",
-                color: "white"
+                // backgroundColor: "#AFD275",
+                color: "#ff4081",
+                marginTop: "1.2%",
+                borderRadius:"20vh",
               }}
             >
-              <h5>Switch to Recruiter</h5>
-            </button>
+              <CompareArrowsIcon/>
+            </Button>
+            </Tooltip>
           )}
         </div>
       </nav>

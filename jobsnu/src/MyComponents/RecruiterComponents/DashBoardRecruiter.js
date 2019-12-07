@@ -182,6 +182,7 @@ function DashboardRecruiter() {
         style={{
           marginTop: "2.2%",
           marginBottom: "2%",
+          marginLeft: "1.5%",
           backgroundColor: "#e7717d",
           border: "#e7717d"
         }}
@@ -193,6 +194,7 @@ function DashboardRecruiter() {
         style={{
           marginTop: "2.2%",
           marginBottom: "2%",
+          marginLeft: "1.5%",
           backgroundColor: "#e7717d",
           border: "#e7717d"
         }}

@@ -108,7 +108,7 @@ function Dashboard() {
         <Button
           variant="green"
           onClick={handleSearch}
-          style={{ marginTop: "2%", marginBottom: "2%" }}
+          style={{ marginTop: "2%", marginBottom: "2%", marginLeft: "1.5%" }}
         >
           <SearchIcon />
         </Button>

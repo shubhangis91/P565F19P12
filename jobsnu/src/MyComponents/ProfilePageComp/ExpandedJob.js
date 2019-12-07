@@ -15,8 +15,11 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import CompanyPage from "../CompanyPage";
 import Backdrop from "@material-ui/core/Backdrop";
-import images from '../../img/images'
-const useStyles = makeStyles(theme=>({
+import images from "../../img/images";
+import Chip from "@material-ui/core/Chip";
+import Tooltip from '@material-ui/core/Tooltip';
+
+const useStyles = makeStyles(theme => ({
   card: {
     display: "flex",
     marginBottom: "5%",
@@ -38,10 +41,11 @@ const useStyles = makeStyles(theme=>({
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
     padding: theme.spacing(2, 4, 3)
-  },
+  }
 }));
 
 export default function ExpandedJob(props) {
+  const [skills, setSkills] = useState(props.skillName);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [moreDetials, setMoreDetails] = useState(false);
   const classes = useStyles();
@@ -54,12 +58,18 @@ export default function ExpandedJob(props) {
     axios.post("/applyJob", { user }).then(res => {
       console.log(res);
       console.log(res.data);
+      if (res.data.jobApplied == "1") {
+        handleOpenSucc();
+      }
+      if (res.data.jobApplied == "0") {
+        handleOpenFail();
+      }
     });
   };
   const imageClick = () => {
     console.log(props.companyName);
-    handleOpenCompany()
-  } 
+    handleOpenCompany();
+  };
   const [openComp, setOpenComp] = React.useState(false);
 
   const handleOpenCompany = () => {
@@ -69,7 +79,28 @@ export default function ExpandedJob(props) {
   const handleCloseCompany = () => {
     setOpenComp(false);
   };
-  console.log(images.find(x=>x.id==props.companyName).src)
+  console.log(images.find(x => x.id == props.companyName).src);
+
+  const handleOpenSucc = () => {
+    setOpenSucc(true);
+  };
+  const handleCloseSucc = () => {
+    setOpenSucc(false);
+    window.location.reload(false);
+  };
+
+  const [openSucc, setOpenSucc] = React.useState(false);
+
+  const handleOpenFail = () => {
+    setOpenFail(true);
+  };
+  const handleCloseFail = () => {
+    setOpenFail(false);
+    window.location.reload(false);
+  };
+
+  const [openFail, setOpenFail] = React.useState(false);
+
   return (
     <Card className={classes.card}>
       <CardContent>
@@ -78,7 +109,7 @@ export default function ExpandedJob(props) {
             <img
               style={{ width: "15vh", cursor: "pointer" }}
               onClick={() => imageClick()}
-              src={images.find(x=>x.id==props.companyName).src}
+              src={images.find(x => x.id == props.companyName).src}
             />
           </Col>
           <Col>
@@ -87,6 +118,7 @@ export default function ExpandedJob(props) {
               <LocationOnIcon /> {props.city},{props.state},{props.country}
             </p>
           </Col>
+
           <Col xs="auto">
             {props.apply && (
               <Button
@@ -112,8 +144,14 @@ export default function ExpandedJob(props) {
               fontWeight="fontWeightMedium"
               component="h2"
             >
+              
+              {props.skillName.map((skill, i) => (
+                <Tooltip title="This skill is required">
+                <Chip label={skill} color="secondary"/>
+                </Tooltip>
+              ))}
               <br />
-              <br />
+
               {props.description}
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
               imperdiet, nulla et dictum interdum, nisi lorem egestas odio,
@@ -166,9 +204,55 @@ export default function ExpandedJob(props) {
         >
           <Fade in={openComp}>
             <div className={classes.paper}>
-              <CompanyPage
-                companyName={props.companyName}
-              />
+              <CompanyPage companyName={props.companyName} />
+            </div>
+          </Fade>
+        </Modal>
+      </div>
+      <div>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className={classes.modal}
+          open={openSucc}
+          onClose={handleCloseSucc}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500
+          }}
+        >
+          <Fade in={openSucc}>
+            <div className={classes.paper}>
+              <h3>
+                Your application was a Success, the Recruiter has been Notified!
+              </h3>
+              <Button variant="primary" onClick={handleCloseSucc}>
+                Okay
+              </Button>
+            </div>
+          </Fade>
+        </Modal>
+      </div>
+      <div>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          className={classes.modal}
+          open={openFail}
+          onClose={handleCloseFail}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500
+          }}
+        >
+          <Fade in={openFail}>
+            <div className={classes.paper}>
+              <h3>Your application was a Failure, please try refreshing!</h3>
+              <Button variant="primary" onClick={handleCloseFail}>
+                Okay
+              </Button>
             </div>
           </Fade>
         </Modal>

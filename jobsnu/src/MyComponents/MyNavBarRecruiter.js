@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
+import Tooltip from '@material-ui/core/Tooltip';
+import CompareArrowsIcon from '@material-ui/icons/CompareArrows';
 import {
   Route,
   Link,
@@ -73,28 +75,34 @@ function MyNavBarRecruiter(props) {
             alt="mylogo"
             style={{ width: "6%", marginLeft: "2.5%" }}
           />
-          <button
+          <Button
+            className={classes.menuButton}
             onClick={logOut}
             style={{
               float: "right",
-              backgroundColor: "#AFD275",
-              height: "71px",
-              color: "#7E685A"
+              // backgroundColor: "#AFD275",
+              color: "#AFD275",
+              marginTop: "1.2%",
+              borderRadius:"20vh",
             }}
           >
-            <h5>Log Out</h5>
-          </button>
-          <button
+            <strong>Log Out</strong>
+          </Button>
+          <Tooltip title="Switch to User Profile">
+          <Button
+            className={classes.menuButton}
             onClick={switchToUser}
             style={{
               float: "right",
-              backgroundColor: "#AFD275",
-              height: "71px",
-              color: "#7E685A"
+              // backgroundColor: "#AFD275",
+              color: "#AFD275",
+              marginTop: "1.2%",
+              borderRadius:"20vh",
             }}
           >
-            <h5>Switch to User</h5>
-          </button>
+            <CompareArrowsIcon/>
+          </Button>
+          </Tooltip>
         </div>
       </nav>
     </div>
