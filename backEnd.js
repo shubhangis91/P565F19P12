@@ -848,8 +848,8 @@ app.post('/skillAssessmentScore', function (request,response) {
     score = correct/total*100;
 
     let updateSql = "update js_skill_set set skill_level = ? " +
-        "where user_profile_id = ?"
-    let updateSqlParams = [score, userId];
+        "where user_profile_id = ? and skill_id = (SELECT id from skill_set where skill_name = ?)";
+    let updateSqlParams = [score, userId, skillName];
     pool.query(updateSql, updateSqlParams, function (updateErr, updateRes) {
         if(updateErr) {
             var responseJson = {
