@@ -1615,13 +1615,15 @@ app.get('/forgotPassword', function (request,response) {
 
 app.get('/showEducation', function (request,response) {
     let userId = request.query.userId;
-
+    var educationArr = []
     selectSql = "select * from education where user_profile_id = " + userId;
     pool.query(selectSql, function (selectErr, selectResult) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "userId": null
+                "userId": null,
+                "educationList" : educationArr
+
             }
 
             console.log("[SELECT ERROR] - EDUCATION DETAILS\n", selectErr.message);
@@ -1632,14 +1634,16 @@ app.get('/showEducation', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "userId": null
+                "userId": null,
+                "educationList" : educationArr
+
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
             response.send(JSON.stringify(responseJson));
         }
         else {
-            var educationArr = []
+            
             for(i = 0; i < selectResult.length; i++)
             {
                 var jsonObj = {
@@ -1667,13 +1671,15 @@ app.get('/showEducation', function (request,response) {
 
 app.get('/showWorkExperience', function (request,response) {
     let userId = request.query.userId;
+    var workExperienceArr = []
 
     selectSql = "select * from work_experience where user_profile_id = " + userId;
     pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "jobId": null
+                "jobId": null,
+                "workExperiences" : workExperienceArr,
             }
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
@@ -1683,14 +1689,14 @@ app.get('/showWorkExperience', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "jobId": null
+                "jobId": null,
+                "workExperiences" : workExperienceArr
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
             response.send(JSON.stringify(responseJson));
         }
         else {
-            var workExperienceArr = []
             for(i = 0; i < selectResult.length; i++)
             {
                 var jsonObj = {

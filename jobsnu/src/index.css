@@ -34,6 +34,10 @@ code {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
+.overflow-scrollingy {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
 .break {
   flex-basis: 100%;

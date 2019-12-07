@@ -235,7 +235,7 @@ function DashboardRecruiter() {
                     handleExpand={handleExpand}
                   />
                 ))}
-                <JobPostComponent
+                {/* <JobPostComponent
                   city="job.city"
                   companyName="job.companyName1"
                   country="job.country1"
@@ -315,7 +315,7 @@ function DashboardRecruiter() {
                   skillName="{job.skil4lName}"
                   apply={false}
                   handleExpand={handleExpand}
-                />
+                /> */}
               </OverflowScrolling>
             </Col>
 

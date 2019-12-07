@@ -17,7 +17,8 @@ import CompanyPage from "../CompanyPage";
 import Backdrop from "@material-ui/core/Backdrop";
 import images from "../../img/images";
 import Chip from "@material-ui/core/Chip";
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from "@material-ui/core/Tooltip";
+import OverflowScrolling from "react-overflow-scrolling";
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -48,6 +49,18 @@ export default function ExpandedJob(props) {
   const [skills, setSkills] = useState(props.skillName);
   const [cookies, setCookie] = useCookies(["userId"]);
   const [moreDetials, setMoreDetails] = useState(false);
+  const [compDetails, setCompDetails] = useState({
+    companyName:'',
+    companySize:'',
+    domain:'',
+    emailId:'',
+    establishedDate:'',
+    headquarters:'',
+    primaryContact:'',
+    industry:'',
+    website:'',
+    about:'',
+  });
   const classes = useStyles();
   const applyJob = event => {
     const user = {
@@ -73,9 +86,21 @@ export default function ExpandedJob(props) {
   const [openComp, setOpenComp] = React.useState(false);
 
   const handleOpenCompany = () => {
+    if (props.companyName == "Walmart") {
+      getCompanyDetails("1");
+    }
+    if (props.companyName == "Facebook") {
+      getCompanyDetails("2");
+    }
     setOpenComp(true);
   };
-
+  const getCompanyDetails = companyId => {
+    console.log("/companyDetails?companyId=" + companyId);
+    axios.get("/companyDetails?companyId=" + companyId).then(res => {
+      console.log(res.data);
+      setCompDetails(res.data);
+    });
+  };
   const handleCloseCompany = () => {
     setOpenComp(false);
   };
@@ -144,14 +169,21 @@ export default function ExpandedJob(props) {
               fontWeight="fontWeightMedium"
               component="h2"
             >
-              
-              {props.skillName.map((skill, i) => (
-                <Tooltip title="This skill is required">
-                <Chip label={skill} color="secondary"/>
-                </Tooltip>
-              ))}
+              <OverflowScrolling
+                className="overflow-scrolling"
+                style={{ height: "4.5vh" }}
+              >
+                {props.skillName.map((skill, i) => (
+                  <Tooltip title="This skill is required">
+                    <Chip
+                      style={{ marginRight: "1%" }}
+                      label={skill}
+                      color="secondary"
+                    />
+                  </Tooltip>
+                ))}
+              </OverflowScrolling>
               <br />
-
               {props.description}
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
               imperdiet, nulla et dictum interdum, nisi lorem egestas odio,
@@ -204,7 +236,18 @@ export default function ExpandedJob(props) {
         >
           <Fade in={openComp}>
             <div className={classes.paper}>
-              <CompanyPage companyName={props.companyName} />
+              <CompanyPage
+                companyName={compDetails.companyName}
+                companySize={compDetails.companySize}
+                domain={compDetails.domain}
+                emailId={compDetails.emailId}
+                establishedDate={compDetails.establishedDate}
+                headquarters={compDetails.headquarters}
+                primaryContact={compDetails.primaryContact}
+                industry={compDetails.industry}
+                website={compDetails.website}
+                about={compDetails.about}
+              />
             </div>
           </Fade>
         </Modal>

@@ -21,15 +21,14 @@ const useStyles = makeStyles({
 });
 export default function CompanyPage(props) {
   const show = () => {
-    console.log(props)
+    console.log(props.companySize)
   };
   return (
     <div>
       <Card>
         <CardActionArea onClick={show}>
           <CardContent>
-            <p>{props.companyName}</p>
-            <h1>oye</h1>
+            <p>{props.companyName} {props.companySize} {props.domain} {props.emailId} {props.establishedDate} {props.headquarters} {props.primaryContact} {props.industry} {props.website} {props.about} </p>
             <OverflowScrolling
               className="overflow-scrolling"
               style={{ height: "70vh" }}

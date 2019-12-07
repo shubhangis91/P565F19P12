@@ -25,9 +25,12 @@ import NewEducationPostComponent from "./NewEducationPostComponent";
 import EducationPostComponent from "./EducationPostComponent";
 import NewWorkPostComponent from "./NewWorkPostComponent";
 import WorkPostComponent from "./WorkPostComponent";
-import PaymentComponent from "./PaymentComponent"
+import PaymentComponent from "./PaymentComponent";
 //import SkillsComponent from "./SkillsComponent"
-import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
+import {
+  VerticalTimeline,
+  VerticalTimelineElement
+} from "react-vertical-timeline-component";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -67,7 +70,7 @@ const useStyles = makeStyles(theme => ({
 export default function ProfileDetails(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
-  const [cookies, setCookie] = useCookies(["userEmail"]);
+  const [cookies, setCookie] = useCookies(["userEmail", "userId"]);
 
   const handleExpand = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -91,7 +94,7 @@ export default function ProfileDetails(props) {
     secondaryContact: "",
     primaryContact: "",
     gender: "",
-    userId: 1
+    userId: cookies["userId"]
   });
   const [education, setEducation] = useState([]);
   const [workExp, setWork] = useState([]);
@@ -116,13 +119,11 @@ export default function ProfileDetails(props) {
       console.log(user);
       console.log(user.dob);
     });
-    axios
-          .get(getEducation)
-          .then(res => {
-            console.log(res.data.educationList)
-            setEducation(res.data.educationList)
-    //         console.log(education)
-          })
+    axios.get(getEducation).then(res => {
+      console.log(res.data.educationList);
+      setEducation(res.data.educationList);
+      //         console.log(education)
+    });
     axios.get(getWork).then(res => {
       //console.log(res.data.workExperiences)
       setWork(res.data.workExperiences);
@@ -134,7 +135,7 @@ export default function ProfileDetails(props) {
   }, []);
   const [newEducationComponent, setNewEducationComponent] = React.useState(
     false
-  ); 
+  );
 
   const handleAddEducation = event => {
     setNewEducationComponent(!newEducationComponent);
@@ -275,21 +276,21 @@ export default function ProfileDetails(props) {
             Tell us about your degrees, diplomas, qualificaitons!
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails style={{backgroundColor:"#c3b9b0"}}>
+        <ExpansionPanelDetails style={{ backgroundColor: "#c3b9b0" }}>
           <Typography>
-          <VerticalTimeline>
-            {education.map((edu, i) => (
-              <EducationPostComponent
-                key={i}
-                userId={edu.userId}
-                eduLevel={edu.eduLevel}
-                eduField={edu.eduField}
-                institute={edu.institute}
-                startDate={edu.startDate}
-                endDate={edu.endDate}
-                percentage={edu.percentage}
-              />
-            ))}
+            <VerticalTimeline>
+              {education.map((edu, i) => (
+                <EducationPostComponent
+                  key={i}
+                  userId={edu.userId}
+                  eduLevel={edu.eduLevel}
+                  eduField={edu.eduField}
+                  institute={edu.institute}
+                  startDate={edu.startDate}
+                  endDate={edu.endDate}
+                  percentage={edu.percentage}
+                />
+              ))}
             </VerticalTimeline>
             {!newEducationComponent && (
               <Button
@@ -332,22 +333,22 @@ export default function ProfileDetails(props) {
             Tell us about your work experience, it'll give you an edge!
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails style={{backgroundColor:"#c3b9b0"}}>
+        <ExpansionPanelDetails style={{ backgroundColor: "#c3b9b0" }}>
           <Typography>
-          <VerticalTimeline>
-            {workExp.map((work, i) => (
-              <WorkPostComponent
-                key={i}
-                userId={work.userId}
-                company={work.company}
-                startDate={work.startDate}
-                endDate={work.endDate}
-                description={work.description}
-                designation={work.designation}
-                location={work.location}
-                loadValues={loadValues}
-              />
-            ))}
+            <VerticalTimeline>
+              {workExp.map((work, i) => (
+                <WorkPostComponent
+                  key={i}
+                  userId={work.userId}
+                  company={work.company}
+                  startDate={work.startDate}
+                  endDate={work.endDate}
+                  description={work.description}
+                  designation={work.designation}
+                  location={work.location}
+                  loadValues={loadValues}
+                />
+              ))}
             </VerticalTimeline>
             {!newWorkComponent && (
               <Button
@@ -392,9 +393,9 @@ export default function ProfileDetails(props) {
             <PersonalData />
           </Typography>
         </ExpansionPanelDetails>
-        </ExpansionPanel>
+      </ExpansionPanel>
 
-        <ExpansionPanel
+      <ExpansionPanel
         expanded={expanded === "panel5"}
         onChange={handleExpand("panel5")}
       >
@@ -405,9 +406,9 @@ export default function ProfileDetails(props) {
         >
           <Typography className={classes.heading}>Payment data</Typography>
         </ExpansionPanelSummary>
-      <ExpansionPanelDetails>
+        <ExpansionPanelDetails>
           <Typography>
-            <PaymentComponent/>
+            <PaymentComponent />
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>

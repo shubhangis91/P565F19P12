@@ -53,6 +53,18 @@ export default function ExpandedJobRecruiter(props) {
   const [workExp, setWorkExp] = React.useState([]);
   const [skills, setSkills] = React.useState([]);
   const [user, setUser] = React.useState([]);
+  const [compDetails, setCompDetails] = useState({
+    companyName:'',
+    companySize:'',
+    domain:'',
+    emailId:'',
+    establishedDate:'',
+    headquarters:'',
+    primaryContact:'',
+    industry:'',
+    website:'',
+    about:'',
+  });
   const handleOpenPerson = id => {
     setOpen(true);
     console.log(id.applicantId);
@@ -89,7 +101,20 @@ export default function ExpandedJobRecruiter(props) {
   const [openComp, setOpenComp] = React.useState(false);
 
   const handleOpenCompany = () => {
+    if (props.companyName == "Walmart") {
+      getCompanyDetails("1");
+    }
+    if (props.companyName == "Facebook") {
+      getCompanyDetails("2");
+    }
     setOpenComp(true);
+  };
+  const getCompanyDetails = companyId => {
+    console.log("/companyDetails?companyId=" + companyId);
+    axios.get("/companyDetails?companyId=" + companyId).then(res => {
+      console.log(res.data);
+      setCompDetails(res.data);
+    });
   };
 
   const handleCloseCompany = () => {
@@ -249,8 +274,17 @@ export default function ExpandedJobRecruiter(props) {
         >
           <Fade in={openComp}>
             <div className={classes.paper}>
-              <CompanyPage
-                companyName={props.companyName}
+            <CompanyPage
+                companyName={compDetails.companyName}
+                companySize={compDetails.companySize}
+                domain={compDetails.domain}
+                emailId={compDetails.emailId}
+                establishedDate={compDetails.establishedDate}
+                headquarters={compDetails.headquarters}
+                primaryContact={compDetails.primaryContact}
+                industry={compDetails.industry}
+                website={compDetails.website}
+                about={compDetails.about}
               />
             </div>
           </Fade>

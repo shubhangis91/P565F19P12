@@ -147,7 +147,7 @@ function Dashboard() {
                       companyName={job.companyName}
                     />
                   ))}
-                  <JobPostComponent
+                  {/* <JobPostComponent
                     city="job.city"
                     companyName="job.companyName"
                     country="job.country1"
@@ -165,6 +165,7 @@ function Dashboard() {
                     skillName="{job.skillName}1"
                     apply={true}
                     handleExpand={handleExpand}
+                    skillsN
                   />
 
                   <JobPostComponent
@@ -222,7 +223,7 @@ function Dashboard() {
                     postedById="{job.pos4tedById}"
                     skillName="{job.skil4lName}"
                     apply={true}
-                    handleExpand={handleExpand}
+                    handleExpand={handleExpand} */}
                   />
                 </OverflowScrolling>
               </Col>

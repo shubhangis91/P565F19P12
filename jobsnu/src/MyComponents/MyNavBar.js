@@ -104,7 +104,7 @@ function MyNavBar(props) {
           <strong>Log Out</strong>
           </Button>
           {showButton && (
-            <Tooltip title="Switch to REcruiter Profile">
+            <Tooltip title="Switch to Recruiter Profile">
             <Button
               className={classes.menuButton}
               onClick={switchToRecruiter}

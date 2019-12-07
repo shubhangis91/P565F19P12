@@ -13,6 +13,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import FormLabel from "@material-ui/core/FormLabel";
 import Button from "react-bootstrap/Button";
+import { useCookies, setCookie, withCookies } from "react-cookie";
 
 const useStyles = makeStyles(theme => ({
   textField: {
@@ -25,14 +26,16 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function JobPostComponent(props) {
+  const [cookies, setCookie] = useCookies(["userEmail", "userId"]);
+
   const [education, setEducation] = React.useState({
-    userId: 1,
+    userId: cookies["userId"],
     eduLevel: "",
     institute: "",
     startDate: "",
     endDate: "",
     percentage: "",
-    eduField: "",
+    eduField: ""
   });
   const handleChange = name => event => {
     setEducation({ ...education, [name]: event.target.value });

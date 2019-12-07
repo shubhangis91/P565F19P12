@@ -1,57 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Button from '@material-ui/core/Button';
-import Typography from '@material-ui/core/Typography';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import axios from "axios"
-import { useCookies } from 'react-cookie';
-import { LinearProgress } from '@material-ui/core';
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
+import LocationOnIcon from "@material-ui/icons/LocationOn";
+import axios from "axios";
+import { useCookies } from "react-cookie";
+import { LinearProgress } from "@material-ui/core";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import Chip from "@material-ui/core/Chip";
-import Tooltip from '@material-ui/core/Tooltip';
-
+import Tooltip from "@material-ui/core/Tooltip";
+import OverflowScrolling from "react-overflow-scrolling";
 const useStyles = makeStyles(theme => ({
-    card: {
-        display:'flex',
-        marginBottom:'5%',
-        marginRight:'5%',
-        background:'#F4F4F4',
-        borderRadius:'4%',
-        },
-    media: {
-        height: '15%',
-        width: '15%',
-      },
-      modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-      paper: {
-        backgroundColor: theme.palette.background.paper,
-        border: '2px solid #ff4081',
-        boxShadow: theme.shadows[5],
-        padding: theme.spacing(2, 4, 3),
-      },
+  card: {
+    display: "flex",
+    marginBottom: "5%",
+    marginRight: "5%",
+    background: "#F4F4F4",
+    borderRadius: "4%"
+  },
+  media: {
+    height: "15%",
+    width: "15%"
+  },
+  modal: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #ff4081",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3)
+  }
+}));
 
-    }));
-  
 export default function JobPostComponent(props) {
-  const [cookies, setCookie] = useCookies(['userId']);
+  const [cookies, setCookie] = useCookies(["userId"]);
   const classes = useStyles();
   const [skills, setSkills] = useState(props.skillName);
 
   const handleOpenSucc = () => {
     setOpenSucc(true);
   };
-  const handleCloseSucc= () => {
+  const handleCloseSucc = () => {
     setOpenSucc(false);
     window.location.reload(false);
   };
@@ -61,38 +60,35 @@ export default function JobPostComponent(props) {
   const handleOpenFail = () => {
     setOpenFail(true);
   };
-  const handleCloseFail= () => {
+  const handleCloseFail = () => {
     setOpenFail(false);
     window.location.reload(false);
   };
 
   const [openFail, setOpenFail] = React.useState(false);
 
-  const applyJob = (event) => {
+  const applyJob = event => {
     const user = {
-      userId:parseInt(cookies['userId']),
-      jobId:props.jobId,
-  }
-  console.log(user)
-    axios
-        .post('/applyJob',{user})
-        .then(res => {
-          console.log(res) 
-          console.log(res.data)
-          if(res.data.jobApplied=="1")  {
-            handleOpenSucc()
-          }
-          if(res.data.jobApplied=="0")  {
-            handleOpenFail()
-          }
-          })
-    }
-  const learnMore = () => {
-    props.handleExpand(props)
+      userId: parseInt(cookies["userId"]),
+      jobId: props.jobId
+    };
+    console.log(user);
+    axios.post("/applyJob", { user }).then(res => {
+      console.log(res);
+      console.log(res.data);
+      if (res.data.jobApplied == "1") {
+        handleOpenSucc();
+      }
+      if (res.data.jobApplied == "0") {
+        handleOpenFail();
+      }
+    });
   };
-  console.log(props.skillName)
-    return(
-        <Card className={classes.card}>
+  const learnMore = () => {
+    props.handleExpand(props);
+  };
+  return (
+    <Card className={classes.card}>
       <CardActionArea onClick={learnMore}>
         <CardMedia
           className={classes.media}
@@ -103,69 +99,83 @@ export default function JobPostComponent(props) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-             {props.jobName}   
-        
+            {props.jobName}
+            <br/>
+            <OverflowScrolling
+                  className="overflow-scrolling"
+                  style={{ height: "4.5vh" }}
+                >
+            {props.skillName.map((skill, i) => (
+              <Tooltip title="This skill is required">
+                <Chip style={{marginRight:'1%'}} label={skill} color="secondary" />
+              </Tooltip>
+            ))}
+            </OverflowScrolling>
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-             <LocationOnIcon/> {props.city}, {props.state}, {props.country}
+            <LocationOnIcon /> {props.city}, {props.state}, {props.country}
           </Typography>
         </CardContent>
       </CardActionArea>
       <CardActions>
-        {props.apply&&<Button onClick={applyJob} size="small" color="primary">
-          Apply
-        </Button>}
+        {props.apply && (
+          <Button onClick={applyJob} size="small" color="primary">
+            Apply
+          </Button>
+        )}
         <Button onClick={learnMore} size="small" color="primary">
           Details
         </Button>
         <div>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          className={classes.modal}
-          open={openSucc}
-          onClose={handleCloseSucc}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500
-          }}
-        >
-          <Fade in={openSucc}>
-            <div className={classes.paper}>
-              <h3>Your application was a Success, the Recruiter has been Notified!</h3>
-              <Button variant="primary" onClick={handleCloseSucc}>Okay</Button>
-            </div>
-          </Fade>
-        </Modal>
-      </div>
-      <div>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          className={classes.modal}
-          open={openFail}
-          onClose={handleCloseFail}
-          closeAfterTransition
-          BackdropComponent={Backdrop}
-          BackdropProps={{
-            timeout: 500
-          }}
-        >
-          <Fade in={openFail}>
-            <div className={classes.paper}>
-              <h3>Your application was a Failure, please try refreshing!</h3>
-              <Button variant="primary" onClick={handleCloseFail}>Okay</Button>
-            </div>
-          </Fade>
-        </Modal>
-      </div>
-      {props.skillName.map((skill, i) => (
-                <Tooltip title="This skill is required">
-                <Chip label={skill} color="secondary"/>
-                </Tooltip>
-              ))}
+          <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            className={classes.modal}
+            open={openSucc}
+            onClose={handleCloseSucc}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+              timeout: 500
+            }}
+          >
+            <Fade in={openSucc}>
+              <div className={classes.paper}>
+                <h3>
+                  Your application was a Success, the Recruiter has been
+                  Notified!
+                </h3>
+                <Button variant="primary" onClick={handleCloseSucc}>
+                  Okay
+                </Button>
+              </div>
+            </Fade>
+          </Modal>
+        </div>
+        <div>
+          <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            className={classes.modal}
+            open={openFail}
+            onClose={handleCloseFail}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+              timeout: 500
+            }}
+          >
+            <Fade in={openFail}>
+              <div className={classes.paper}>
+                <h3>Your application was a Failure, please try refreshing!</h3>
+                <Button variant="primary" onClick={handleCloseFail}>
+                  Okay
+                </Button>
+              </div>
+            </Fade>
+          </Modal>
+        </div>
       </CardActions>
     </Card>
-    );
+  );
 }
