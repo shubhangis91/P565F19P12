@@ -11,6 +11,8 @@ import EducationPostComponent from "./ProfilePageComp/EducationPostComponent";
 import WorkPostComponent from "./ProfilePageComp/WorkPostComponent";
 import OverflowScrolling from "react-overflow-scrolling";
 import ChatIcon from '@material-ui/icons/Chat';
+import Alert from "react-bootstrap/Alert";
+
 const useStyles = makeStyles({
   card: {
     maxWidth: 345
@@ -33,6 +35,7 @@ export default function CompanyPage(props) {
               className="overflow-scrolling"
               style={{ height: "70vh" }}
             >
+              
             </OverflowScrolling>
           </CardContent>
         </CardActionArea>

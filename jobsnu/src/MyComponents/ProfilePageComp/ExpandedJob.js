@@ -292,7 +292,7 @@ export default function ExpandedJob(props) {
         >
           <Fade in={openFail}>
             <div className={classes.paper}>
-              <h3>Your application was a Failure, please try refreshing!</h3>
+              <h3>Your application was a Failure, please try refreshing, You have already applied to Job!</h3>
               <Button variant="primary" onClick={handleCloseFail}>
                 Okay
               </Button>
