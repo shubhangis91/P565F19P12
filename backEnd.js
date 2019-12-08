@@ -1777,7 +1777,8 @@ app.get('/showEducation', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "userId": null
+                "userId": null,
+                "educationList" : educationArr
             }
 
             console.log("[SELECT ERROR] - EDUCATION DETAILS\n", selectErr.message);
@@ -1788,7 +1789,9 @@ app.get('/showEducation', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "userId": null
+                "userId": null,
+                "educationList" : educationArr
+
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
@@ -1830,7 +1833,10 @@ app.get('/showWorkExperience', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "jobId": null
+                "jobId": null,
+                "workExperiences" : workExperienceArr
+
+                
             }
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
@@ -1840,7 +1846,9 @@ app.get('/showWorkExperience', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "jobId": null
+                "jobId": null,
+                "workExperiences" : workExperienceArr
+
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")

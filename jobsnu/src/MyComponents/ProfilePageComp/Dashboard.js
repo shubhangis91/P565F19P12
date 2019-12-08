@@ -10,6 +10,8 @@ import SearchIcon from "@material-ui/icons/Search";
 import Button from "react-bootstrap/Button";
 import MenuItem from "@material-ui/core/MenuItem";
 import ExpandedJob from "./ExpandedJob";
+import { useCookies } from "react-cookie";
+
 const useStyles = makeStyles(theme => ({
   centercol: {
     overflowY: "scroll"
@@ -36,13 +38,14 @@ function Dashboard() {
   const [isExpand, expandJob] = useState();
   const [isExpanded, expandedJob] = useState(false);
   const [searchRes, setSearchRes] = useState(true);
+  const [cookies, setCookie] = useCookies(["userEmail", "userId"]);
   const [search, setSearch] = React.useState({
     location: "",
     keywords: "",
     company: ""
   });
   const handleLoad = event => {
-    axios.get("/jobPosts").then(res => {
+    axios.get("/jobPosts?userId="+cookies["userId"]).then(res => {
       console.log(res.data);
       //console.log(res.data.jobPosts)
       setJobs(res.data.jobPosts);

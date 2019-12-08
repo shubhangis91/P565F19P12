@@ -4,14 +4,14 @@ import JobPostComponent from "./JobPostComponent"
 import { useCookies } from "react-cookie";
 function UserJobApplications() {
     const [jobs,setJobs]=useState([])
-    const [cookie,setCookie]=useCookies(['userId'])
+    const [cookies,setCookie]=useCookies(['userId'])
     const handleLoad = (event) => {
         var strJob = "";
         var str2 = "?userId="
-        var str3 = cookie['userId'];
+        var str3 = cookies['userId'];
         var Appn = strJob.concat(str2,str3)
         axios
-            .get("/jobPosts")
+            .get("/jobPosts?userId="+cookies["userId"])
             .then(res => {
                 //console.log(Appn)
                 //console.log(res.data) 
