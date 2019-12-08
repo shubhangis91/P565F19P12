@@ -34,6 +34,7 @@ class LogIn extends React.Component {
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
     this.checkIsActive = this.checkIsActive.bind(this);
+    this.pushToForgotPassword = this.pushToForgotPassword.bind(this)
   }
 
   handleChange = event => {
@@ -123,7 +124,10 @@ class LogIn extends React.Component {
       }
     });
   }
+pushToForgotPassword(){
+  this.props.history.push("/forgotPassword");
 
+}
   render() {
     return (
       <div
@@ -197,7 +201,7 @@ class LogIn extends React.Component {
               src="https://icon-library.net/images/forgot-icon/forgot-icon-11.jpg"
               style={{ width: "20px" }}
             />
-            <a style={{ color: "#7E685A" }} href="/forgotPassword">
+            <a style={{ color: "#7E685A" , cursor: "pointer"}} onClick={this.pushToForgotPassword} >
               {" "}
               I forgot my password, Help!
             </a>

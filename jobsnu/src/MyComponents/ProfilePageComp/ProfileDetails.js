@@ -26,6 +26,7 @@ import EducationPostComponent from "./EducationPostComponent";
 import NewWorkPostComponent from "./NewWorkPostComponent";
 import WorkPostComponent from "./WorkPostComponent";
 import PaymentComponent from "./PaymentComponent";
+import ModeChanger from "./ModeChanger"
 //import SkillsComponent from "./skill"
 import {
   VerticalTimeline,
@@ -71,7 +72,11 @@ export default function ProfileDetails(props) {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const [cookies, setCookie] = useCookies(["userEmail", "userId"]);
-
+  const [paid,setPaid]= useState(false)
+  const toggleDonateModal = () => {
+    setPaid(true)
+    console.log(paid)
+  }
   const handleExpand = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
   };
@@ -408,7 +413,8 @@ export default function ProfileDetails(props) {
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Typography>
-            <PaymentComponent />
+            {!paid&&<PaymentComponent amount="10" toggleDonateModal={toggleDonateModal}/>}
+            {paid&&<ModeChanger/>}
           </Typography>
         </ExpansionPanelDetails>
       </ExpansionPanel>
