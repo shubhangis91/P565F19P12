@@ -1,0 +1,86 @@
+.UserList {
+  border-right: 1px solid #e0e0e0;
+  background: #fefefe;
+  height: 100%;
+  max-width: 30vw;
+  display: flex;
+  flex-direction: column;
+  cursor: not-allowed;
+}
+
+.UserList__titlebar {
+  display: flex;
+  align-items: center;
+  background: #ededed;
+  padding: 0rem 0.5rem;
+  height: 4rem;
+}
+
+.UserList__titlebar__avatar {
+  width: 3rem;
+  border-radius: 1.5rem;
+}
+
+.UserList__titlebar__logged-in-as {
+  margin: 0 0 0 0.5rem;
+}
+
+.UserList__container {
+  display: flex;
+  flex-direction: column;
+}
+
+.UserList__container__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.UserList__container__list__item {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1rem;
+}
+
+.UserList__container__list__item--selected {
+  background: #f2f2f2;
+}
+
+.UserList__container__list__item__avatar {
+  height: 4.2rem;
+  border-radius: 2.1rem;
+  margin-right: 1rem;
+}
+
+.UserList__container__list__item__content {
+  padding: 0.5rem;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.UserList__container__list__item__content__name {
+  font-weight: bold;
+  margin: 0;
+}
+
+.UserList__container__list__item__content__text {
+  color: #606060;
+  margin: 0;
+  margin-top: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.UserList__container__list__item__time {
+  color: #a0a0a0;
+  padding: 0.5rem;
+  flex-grow: 1;
+  text-align: right;
+}
+
+@media only screen and (max-width: 900px) {
+  .UserList {
+    display: none;
+  }
+}

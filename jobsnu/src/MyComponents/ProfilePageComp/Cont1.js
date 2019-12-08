@@ -9,6 +9,7 @@ import ProfileDetails from './ProfileDetails'
 import DashBoard from './Dashboard'
 import UserJobApplications from './UserJobApplications'
 import SkillAssessment from './SkillAssessment'
+import ChatComponent from './ChatComponent'
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -73,9 +74,9 @@ function Cont1() {
         <Tab label="Profile Details" {...a11yProps(1)} />
         <Tab label="Your Applications" {...a11yProps(2)} />
         <Tab label="Skill Assessment" {...a11yProps(3)} />
-        {/* <Tab label="Item Five" {...a11yProps(4)} />
-        <Tab label="Item Six" {...a11yProps(5)} />
-        <Tab label="Item Seven" {...a11yProps(6)} /> */}
+        <Tab label="Chat" {...a11yProps(4)} />
+        {/* <Tab label="Item Six" {...a11yProps(5)} /> */}
+        {/* <Tab label="Item Seven" {...a11yProps(6)} /> */}
       </Tabs>
       <TabPanel value={value} index={0} style={{width:"100%"}}>
         <DashBoard/>
@@ -89,10 +90,10 @@ function Cont1() {
       <TabPanel value={value} index={3}>
         <SkillAssessment/>
       </TabPanel>
-      {/* <TabPanel value={value} index={4}>
-        Item Five
+      <TabPanel value={value} index={4}>
+         <ChatComponent/>
       </TabPanel>
-      <TabPanel value={value} index={5}>
+      {/* <TabPanel value={value} index={5}>
         Item Six
       </TabPanel>
       <TabPanel value={value} index={6}>

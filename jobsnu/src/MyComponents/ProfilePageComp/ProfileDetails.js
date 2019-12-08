@@ -26,7 +26,7 @@ import EducationPostComponent from "./EducationPostComponent";
 import NewWorkPostComponent from "./NewWorkPostComponent";
 import WorkPostComponent from "./WorkPostComponent";
 import PaymentComponent from "./PaymentComponent";
-//import SkillsComponent from "./SkillsComponent"
+//import SkillsComponent from "./skill"
 import {
   VerticalTimeline,
   VerticalTimelineElement

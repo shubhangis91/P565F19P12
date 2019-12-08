@@ -8,6 +8,7 @@ import Box from '@material-ui/core/Box';
 import ProfileDetails from '../ProfilePageComp/ProfileDetails'
 import DashBoardRecruiter from './DashBoardRecruiter'
 import PostNewJob from './PostNewJob.js'
+import ChatComponent from '../ProfilePageComp/ChatComponent';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -57,6 +58,7 @@ function RecruiterPage() {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    console.log(newValue);
   };
 
   return (
@@ -71,22 +73,22 @@ function RecruiterPage() {
       >
         <Tab label="Feed" {...a11yProps(0)} />
         <Tab label="Post A New Job" {...a11yProps(1)} />
-        {/* <Tab label="item three" {...a11yProps(2)} />
-        <Tab label="Item Four" {...a11yProps(3)} />
+        <Tab label="Chat" {...a11yProps(2)} />
+        {/* <Tab label="Item Four" {...a11yProps(3)} />
         <Tab label="Item Five" {...a11yProps(4)} />
         <Tab label="Item Six" {...a11yProps(5)} />
         <Tab label="Item Seven" {...a11yProps(6)} /> */}
       </Tabs>
       <TabPanel value={value} index={0} style={{width:"100%"}}>
-        <DashBoardRecruiter/>
+        <DashBoardRecruiter handleChange={handleChange} value={value} />
       </TabPanel>
       <TabPanel value={value} index={1}>
         <PostNewJob/>
       </TabPanel>
-      {/* <TabPanel value={value} index={2}>
-          item 3
+      <TabPanel value={value} index={2}>
+          <ChatComponent/>
       </TabPanel>
-      <TabPanel value={value} index={3}>
+      {/* <TabPanel value={value} index={3}>
         Item Four
       </TabPanel>
       <TabPanel value={value} index={4}>

@@ -17,7 +17,14 @@ import {
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
 import { textAlign } from "@material-ui/system";
-
+import { Tab } from "@material-ui/core";
+import Tabs from "@material-ui/core/Tabs";
+function a11yProps(index) {
+  return {
+    id: `vertical-tab-${index}`,
+    "aria-controls": `vertical-tabpanel-${index}`
+  };
+}
 const useStyles = makeStyles({
   card: {
     maxWidth: 345
@@ -44,9 +51,23 @@ export default function ProfilePage(props) {
           <p>
             {props.user.primaryContact} {props.user.secondaryContact}
           </p>
-          <Button style={{ backgroundColor: "#e7717d",color:"#fff" }}>
-            <ChatIcon />  Message
-          </Button>
+          <Tabs
+            orientation="vertical"
+            variant="scrollable"
+            value={props.value}
+            onChange={props.handleChange}
+            aria-label="Vertical tabs example"
+            //className={classes.tabs}
+          >
+            <Tab label="" {...a11yProps(0)} disabled style={{display:"none"}} />
+            <Tab label="" {...a11yProps(1)} disabled style={{display:"none"}}/>
+            <Tab
+              label="Message"
+              {...a11yProps(2)}
+              onClick={props.handleClosePerson}
+            />
+          </Tabs>
+          <ChatIcon /> Message
           <br />
           <br />
           <div style={{ display: "block", textAlign: "center" }}>

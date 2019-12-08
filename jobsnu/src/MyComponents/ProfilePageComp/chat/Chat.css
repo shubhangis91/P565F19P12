@@ -1,0 +1,145 @@
+.Chat {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.Chat__titlebar {
+  display: flex;
+  align-items: center;
+  background: #ededed;
+  padding: 0rem 0.5rem;
+  height: 4rem;
+}
+
+.Chat__titlebar__avatar {
+  width: 3rem;
+  border-radius: 1.5rem;
+  margin-right: 1rem;
+}
+
+.Chat__titlebar__details {
+  display: flex;
+  flex-direction: column;
+}
+
+.Chat__titlebar__details__presence {
+  font-size: 0.8em;
+  opacity: 0.5;
+  margin-top: 0.2rem;
+}
+
+.Chat__messages {
+  background-image: linear-gradient(#d3d3d3, #d0d0d0);
+  flex: 1;
+  padding: 2rem 4rem;
+  overflow-y: scroll;
+}
+
+.Chat__messages__message__wrapper {
+  display: flex;
+}
+
+.Chat__messages__message__wrapper--other {
+  justify-content: flex-start;
+}
+
+.Chat__messages__message__wrapper--self {
+  justify-content: flex-end;
+}
+
+.Chat__messages__message__wrapper__inner {
+  margin-bottom: 1rem;
+}
+
+.Chat__messages__message {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  padding-bottom: 0.5rem;
+  min-width: 300px;
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.08);
+  display: block;
+  position: relative;
+}
+
+.Chat__messages__message__seen {
+  text-align: right;
+  padding-top: 0.2rem;
+  padding-right: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.Chat__messages__message__arrow {
+  position: absolute;
+  width: 0;
+  bottom: 42px;
+  left: -16px;
+  height: 0;
+}
+
+.Chat__messages__message__arrow.alt {
+  right: -2px;
+  bottom: 40px;
+  left: auto;
+}
+
+.Chat__messages__message__arrow:after {
+  content: '';
+  position: absolute;
+  border: 0 solid transparent;
+  border-top: 9px solid #ffffff;
+  border-radius: 0 20px 0;
+  width: 15px;
+  height: 30px;
+  transform: rotate(145deg);
+}
+
+.Chat__messages__message__arrow.alt:after {
+  transform: rotate(45deg) scaleY(-1);
+  border-top: 9px solid #542182;
+}
+
+.Chat__messages__message--other {
+  background: #fefefe;
+}
+
+.Chat__messages__message--self {
+  background: #542182;
+  color: #ffffff;
+}
+
+.Chat__messages__message__time {
+  text-align: right;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.Chat__compose {
+  box-sizing: border-box;
+  padding: 1rem;
+  background: #ededed;
+  display: flex;
+}
+
+.Chat__compose__input {
+  box-sizing: border-box;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.Chat__compose__button {
+  border: 1px solid #c5c5c5;
+  background: none;
+  margin-left: 1rem;
+  padding: 0rem 1rem;
+  border-radius: 0.3rem;
+}
+
+.Chat__compose__button:hover {
+  cursor: pointer;
+}

@@ -184,6 +184,7 @@ export default function ExpandedJobRecruiter(props) {
                   appliedOn={user.appliedOn}
                   applicantEmail={user.applicantEmail}
                   showUserDetails={showUserDetails}
+                  andleChange={props.handleChange} value={props.value}
                 />
               ))}
               <ApplicantsListComponent
@@ -254,6 +255,9 @@ export default function ExpandedJobRecruiter(props) {
                 workExp={workExp}
                 user={user}
                 skills={skills}
+                handleChange={props.handleChange} 
+                value={props.value}
+                handleClosePerson={handleClosePerson}
               />
             </div>
           </Fade>

@@ -12,6 +12,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import ExpandedJob from "./ExpandedJobRecruiter.js";
 import ExpandedJobRecruiter from "./ExpandedJobRecruiter.js";
 import UserListComponent from "./UserListComponent";
+
 const useStyles = makeStyles(theme => ({
   centercol: {
     overflowY: "scroll"
@@ -29,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function DashboardRecruiter() {
+function DashboardRecruiter(props) {
   const experiences = [
     {
       value: "0",
@@ -155,7 +156,7 @@ function DashboardRecruiter() {
         margin="normal"
         onChange={handleChange("location")}
       />
-
+      
       <TextField
         id="standard-select-currency"
         select
@@ -201,6 +202,9 @@ function DashboardRecruiter() {
       >
         Back
       </Button>
+
+      
+      
       {showRecruiterJobs && (
         <div>
           <h4 style={{ marginLeft: "1%", color: "#c2b9b0" }}>
@@ -341,6 +345,8 @@ function DashboardRecruiter() {
                     postedById={isExpand.postedById}
                     skillName={isExpand.skillName}
                     users={users}
+                    handleChange={props.handleChange} 
+                    value={props.value}
                   />
                 )}
               </div>
