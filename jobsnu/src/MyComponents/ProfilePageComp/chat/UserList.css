@@ -5,7 +5,7 @@
   max-width: 30vw;
   display: flex;
   flex-direction: column;
-  cursor: not-allowed;
+  cursor: pointer;
 }
 
 .UserList__titlebar {

@@ -5,7 +5,12 @@ var nodemailer = require('nodemailer');
 var bodyParser = require('body-parser');
 var path = require('path');
 var dateFormat = require('dateformat');
+const Chatkit = require('@pusher/chatkit-server');
 
+const chatkit = new Chatkit.default({
+    instanceLocator: 'v1:us1:37bc05a7-986f-45ba-ab7e-8ad47510f2f2',
+    key: '57961704-54db-4473-9ec3-97f14f13fbea:k1hpe0uC7RnY/RDd8hxAF6loRSVPjE3+aLn3W7rniEg=',
+  })
 const dotenv = require('dotenv');
 dotenv.config();
 console.log(`Your port is ${process.env.PORT}`); // 8626
@@ -603,7 +608,7 @@ app.post('/register', function (req, res) {
         "SET first_name = ?, last_name = ?, gender = ?," +
         "primary_contact = ?, secondary_contact = ? " +
         "WHERE email = '"+email+"';";
-
+        
     /*let insertSql = 'INSERT INTO user_profile(email, first_name, ' +
         'last_name, dob, gender, primary_contact, secondary_contact, ' +
         'registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0)';*/
@@ -628,6 +633,7 @@ app.post('/register', function (req, res) {
         "primaryContact": primaryContact,
         "secondaryContact": secondaryContact
     };
+   
     // should show profile saved message/saved profile details
     console.log(response);
     res.end(JSON.stringify(response));
@@ -946,6 +952,22 @@ app.post('/verify', function (req, res) {
 });
 
 // GET ROUTER FUNCTIONS
+
+app.get('/getUserChats', function (request,response) {
+    let userId = request.query.userId;
+    console.log("Chat user Id is"+userId)
+    chatkit.getUserRooms({
+        userId: userId,
+      })
+        .then((res) => {
+            response.send(res)
+          console.log(res);
+        }).catch((err) => {
+            console.log(err);
+            response.status(400).send([])
+        });
+
+})
 
 app.get('/companyDetails', function (request,response) {
     let companyId = request.query.companyId;

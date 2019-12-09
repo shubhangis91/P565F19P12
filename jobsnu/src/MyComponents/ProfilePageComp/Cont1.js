@@ -10,6 +10,8 @@ import DashBoard from './Dashboard'
 import UserJobApplications from './UserJobApplications'
 import SkillAssessment from './SkillAssessment'
 import ChatComponent from './ChatComponent'
+import { useCookies } from "react-cookie";
+
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -54,10 +56,11 @@ const useStyles = makeStyles(theme => ({
 
 function Cont1() {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
-
+  const [cookies, setCookie] = useCookies(["userEmail", "userId",'tabValue']);
+  const [value, setValue] = React.useState(parseInt(cookies["tabValue"]));
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    console.log(typeof cookies["tabValue"])
   };
 
   return (

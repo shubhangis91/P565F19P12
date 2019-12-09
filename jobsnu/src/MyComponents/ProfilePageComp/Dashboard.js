@@ -48,7 +48,8 @@ function Dashboard() {
     axios.get("/jobPosts?userId="+cookies["userId"]).then(res => {
       console.log(res.data);
       //console.log(res.data.jobPosts)
-      setJobs(res.data.jobPosts);
+      if(res.data.jobPosts!=null){
+      setJobs(res.data.jobPosts);}
     });
   };
   const handleSearch = () => {

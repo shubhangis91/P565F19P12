@@ -19,6 +19,8 @@ import "react-vertical-timeline-component/style.min.css";
 import { textAlign } from "@material-ui/system";
 import { Tab } from "@material-ui/core";
 import Tabs from "@material-ui/core/Tabs";
+import { useCookies } from "react-cookie";
+
 function a11yProps(index) {
   return {
     id: `vertical-tab-${index}`,
@@ -34,6 +36,7 @@ const useStyles = makeStyles({
   }
 });
 export default function ProfilePage(props) {
+
   //   const show = () => {
   //     console.log(props.education)
   //     console.log(props.workExp)

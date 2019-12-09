@@ -82,6 +82,8 @@ class LogIn extends React.Component {
       cookies.set("userEmail", false, { path: "/" });
       cookies.set("isNotActive", false, { path: "/" });
       cookies.set("isRecruiter", false, { path: "/" });
+      cookies.set("otherUserId", 2, { path: "/" });
+      cookies.set("tabValue", 0, { path: "/" });
       console.log(cookies.get("userEmail"));
       console.log(cookies.get("isNotActive"));
     }

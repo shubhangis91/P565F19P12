@@ -16,7 +16,8 @@ function UserJobApplications() {
                 //console.log(Appn)
                 //console.log(res.data) 
                 //console.log(res.data.jobPosts)
-                setJobs(res.data.jobPosts)
+                if(res.data.jobPosts!=null){
+                setJobs(res.data.jobPosts)}
             })
     }
 useEffect(() => {handleLoad()},[])

@@ -67,6 +67,10 @@ export default function ExpandedJobRecruiter(props) {
   });
   const handleOpenPerson = id => {
     setOpen(true);
+    
+    setId(id.applicantId)
+    setCookie("otherUserId", id.applicantId)
+
     console.log(id.applicantId);
     var strUser = "/userDetails";
     var strEdu = "/showEducation";
@@ -93,9 +97,11 @@ export default function ExpandedJobRecruiter(props) {
       //console.log(workExp)
     });
   };
+  const [cookies, setCookie] = useCookies(["tabValue", "userId",'otherUserId']);
 
   const handleClosePerson = () => {
     setOpen(false);
+
   };
 
   const [openComp, setOpenComp] = React.useState(false);
@@ -120,8 +126,7 @@ export default function ExpandedJobRecruiter(props) {
   const handleCloseCompany = () => {
     setOpenComp(false);
   };
-
-  const [cookies, setCookie] = useCookies(["userId"]);
+  const [id, setId] = useCookies(["userId"]);
   const classes = useStyles();
   const showUserDetails = id => {
     console.log(id);
@@ -251,6 +256,7 @@ export default function ExpandedJobRecruiter(props) {
           <Fade in={open}>
             <div className={classes.paper}>
               <ProfilePage
+                applicantId={id}
                 education={education}
                 workExp={workExp}
                 user={user}

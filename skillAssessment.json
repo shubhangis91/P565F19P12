@@ -1,0 +1,16 @@
+{
+	"Java" : [
+		{"id": 1,"question": "Which of the following is not OOPS concept in Java?", "choices" :  {"a":"Inheritance","b":"Encapsulation","c":"Polymorphism","d":"Compilation"}, "answer" : "d"},
+		{"id": 2,"question": "Which of the following is a type of polymorphism in Java?", "choices" : {"a":"Compile time polymorphism","b":"Execution time polymorphism","c":"Multiple polymorphism","d":"Multilevel polymorphism"}, "answer" : "a"},
+		{"id": 3,"question": "When is method overloading determined in Java?", "choices" : {"a":"At run time","b":"At compile time","c":"At coding time","d":"At execution time"}, "answer" : "b"},
+		{"id": 4,"question": "Which concept of Java is a way of converting real world objects in terms of class?", "choices" : {"a":"Polymorphism","b":"Encapsulation","c":"Abstraction","d":"Inheritance"}, "answer" : "c"},
+		{"id": 5,"question": "Method overriding is combination of inheritance and polymorphism?", "choices" : {"a":"True","b":"False"}, "answer" : "a"}
+	],
+	"Android" : [
+		{"id": 1,"question": "What is broadcast receiver in android?", "choices" : {"a":"It will react on broadcast announcements.","b":"It will do background functionalities as services.","c":"It will pass the data between activities.","d":"None of the Above"}, "answer" : "a"},
+		{"id": 2,"question": "How to get current location in android?", "choices" : {"a":"Using GPRS","b":"Using location provider","c":"A & B","d":"SQlite", "e": "Network servers"}, "answer" : "c"},
+		{"id": 3,"question": "How Many Levels Of Securities Are In Android?", "choices" : {"a":"Android Level Security","b":"App And Kernel Level Security","c":"Java Level Security","d":"None Of The Above"}, "answer" : "b"},
+		{"id": 4,"question": "Which Of The Following Does Not Belong To Transitions?", "choices" :{"a":"ViewFlipper","b":"ViewAnimator","c":"ViewSwitcher","d":"ViewSlider"}, "answer" : "d"},
+		{"id": 5,"question": "What Does AAPT Stands For?", "choices" : {"a":"Android Asset Processing Tool","b":"Android Asset Providing Tool","c":"Android Asset Packaging Tool","d":"Android Asset Packaging Technique"}, "answer" : "c"}
+	]
+}
