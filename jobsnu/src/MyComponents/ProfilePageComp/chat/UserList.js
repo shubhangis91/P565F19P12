@@ -56,7 +56,7 @@ function UserList( props ) {
               </p>
             </div>
             <div className="UserList__container__list__item__time">
-              {chat.last_message_at.substring(11, 16)}
+              {/* {chat.last_message_at.substring(11, 16)} */}
             </div>
           </li>
                   ))}
