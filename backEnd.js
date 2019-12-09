@@ -608,10 +608,6 @@ app.post('/register', function (req, res) {
         "SET first_name = ?, last_name = ?, gender = ?," +
         "primary_contact = ?, secondary_contact = ? " +
         "WHERE email = '"+email+"';";
-        
-    /*let insertSql = 'INSERT INTO user_profile(email, first_name, ' +
-        'last_name, dob, gender, primary_contact, secondary_contact, ' +
-        'registration_date,	is_recruiter) VALUES(?,?,?,?,?,?,?,CURDATE(),0)';*/
     let insertSqlParams = [email, firstName, lastName, dob, gender, primaryContact, secondaryContact];
     pool.query(insertSql,insertSqlParams, function (err, result)
     {
@@ -625,6 +621,7 @@ app.post('/register', function (req, res) {
     });
 
     var response = {
+        "userId" : result.insertId,
         "email": email,
         "firsName":firstName,
         "lastName":lastName,
@@ -636,7 +633,7 @@ app.post('/register', function (req, res) {
    
     // should show profile saved message/saved profile details
     console.log(response);
-    res.end(JSON.stringify(response));
+    res.send(JSON.stringify(response));
 });
 
 app.post('/setEducation', function (req, res) {
@@ -1033,7 +1030,7 @@ app.get('/companyJobPosts', function (request,response) {
             if (selectErr) {
                 var responseJson = {
                     "dbError" : 1,
-                    "jobId": null
+                    "jobPosts": []
                 }
 
                 console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
@@ -1043,7 +1040,7 @@ app.get('/companyJobPosts', function (request,response) {
             else if (selectResult == '') {
                 var responseJson = {
                     "dbError" : 0,
-                    "jobId": null
+                    "jobPosts": []
                 }
 
                 console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
@@ -1267,6 +1264,8 @@ app.get('/jobSeekerApplications', function (request,response) {
 app.get('/jobPostDetails', function (request,response) {
     let jobId = request.query.jobId;
 
+    var jobPostsArr = [];
+
     let selectSql = "SELECT jp.*, CONCAT(up.first_name, ' ', up.last_name) as recruiter_name, " +
         "e.user_name, ss.skill_name " +
         "FROM job_post as jp " +
@@ -1279,7 +1278,7 @@ app.get('/jobPostDetails', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "jobId": null
+                "jobPosts": jobPostsArr
             }
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
@@ -1289,14 +1288,13 @@ app.get('/jobPostDetails', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "jobId": null
+                "jobPosts": jobPostsArr
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
             response.send(JSON.stringify(responseJson));
         }
         else {
-            var jobPostsArr = []
             for(i = 0; i < selectResult.length; i++)
             {
                 var jobId = selectResult[i].id;
@@ -1359,7 +1357,7 @@ app.get('/jobPosts', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError": 1,
-                "jobId": null
+                "jobPosts": []
             }
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
@@ -1368,7 +1366,7 @@ app.get('/jobPosts', function (request,response) {
         } else if (selectResult == '') {
             var responseJson = {
                 "dbError": 0,
-                "jobId": null
+                "jobPosts": []
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
@@ -1405,7 +1403,6 @@ app.get('/jobPosts', function (request,response) {
                     }
 
                     jobPostsMap.set(jobId, jsonObj);
-                    // jobPostsArr.push(jsonObj);
                 }
             }
 
@@ -1478,7 +1475,7 @@ app.get('/recruiterJobPosts', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "jobId": null
+                "jobPosts": []
             }
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
@@ -1488,7 +1485,7 @@ app.get('/recruiterJobPosts', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbEntryError" : 1,
-                "jobId": null
+                "jobPosts": []
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
@@ -1524,7 +1521,6 @@ app.get('/recruiterJobPosts', function (request,response) {
                     }
 
                     jobPostsMap.set(jobId, jsonObj);
-                    // jobPostsArr.push(jsonObj);
                 }
             }
 
@@ -1550,6 +1546,8 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
     let postedByUserId = request.query.userId;
     let jobId = request.query.jobId;
 
+    var jobApplicantsArr = [];
+
     let selectSql = "SELECT job_application.*, user_profile.email, " +
         "CONCAT(user_profile.first_name, \" \", user_profile.last_name) AS user_name " +
         "FROM job_application " +
@@ -1560,7 +1558,7 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "jobId": null
+                "jobApplicants": jobApplicantsArr
             }
 
             console.log("Error fetching job applicant details. See below for detailed error information.\n" + selectErr.message)
@@ -1570,7 +1568,7 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "jobApplicants": null
+                "jobApplicants": jobApplicantsArr
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
@@ -1578,7 +1576,7 @@ app.get('/recruiterJobPostApplicants', function (request,response) {
         }
         else
         {
-            var jobApplicantsArr = []
+
             for(i = 0; i < selectResult.length; i++)
             {
                 var applicantId = selectResult[i].user_profile_id;
@@ -1614,6 +1612,7 @@ app.get('/searchRecruiter', function (request,response) {
     let workExFrom = (request.query.workExFrom)?(request.query.workExFrom)*12:(request.query.workExFrom);
     let workExTo = (request.query.workExTo)?(request.query.workExTo)*12:(request.query.workExTo);
 
+    var jobSeekersArr = [];
     let workExFlag = 0;
 
     let selectSqlKeyword = "SELECT user_profile.id as user_id, user_profile.first_name, user_profile.last_name, skill_set.skill_name, job_seeker_profile.current_city,  job_seeker_profile.current_state, job_seeker_profile.current_country, job_seeker_profile.current_designation, PERIOD_DIFF(EXTRACT(YEAR_MONTH FROM CURRENT_DATE), EXTRACT(YEAR_MONTH FROM first_start_date)) + (CASE WHEN ABS((DAY(CURRENT_DATE)-DAY(first_start_date)) > 15) THEN 1 ELSE 0 END) as exp_months from user_profile INNER JOIN job_seeker_profile ON job_seeker_profile.user_profile_id = user_profile.id INNER JOIN js_skill_set ON js_skill_set.user_profile_id = user_profile.id INNER JOIN skill_set ON skill_set.id = js_skill_set.skill_id INNER JOIN work_experience_start ON work_experience_start.user_profile_id = user_profile.id WHERE (skill_set.skill_name LIKE \'%"+keyword+"%\' OR job_seeker_profile.current_designation like \'%"+keyword+"%\' or job_seeker_profile.current_job_description like \'%"+keyword+"%\')";
@@ -1638,13 +1637,11 @@ app.get('/searchRecruiter', function (request,response) {
         workExFlag = 1;
     }
 
-    console.log("workExFlag: "+workExFlag);
-
     pool.query(selectSql, function (selectErr, selectResult, selectFields) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "matchedUsers": null
+                "matchedJobSeekers": jobSeekersArr
             }
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
@@ -1653,14 +1650,13 @@ app.get('/searchRecruiter', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "matchedUsers": null
+                "matchedJobSeekers": jobSeekersArr
             }
             console.log("-----DATABASE ENTRY ERROR/NO SUCH USER EXISTS-----\nKindly contact ADMIN.\n")
             response.send(JSON.stringify(responseJson));
         }
         else
         {
-            var jobSeekersArr = []
             for(var i = 0; i < selectResult.length; i++)
             {
                 var jobSeekerId = selectResult[i].id;
@@ -1701,6 +1697,8 @@ app.get('/searchJobSeeker', function (request,response) {
     let location = request.query.location;
     let company = request.query.company;
 
+    var jobsArr = [];
+
     let selectSqlKeyword = "SELECT job_post.*, employer.user_name as company_name, employer.id as company_id, skill_set.skill_name " +
         "FROM job_post INNER JOIN employer ON job_post.company_id = employer.id " +
         "INNER JOIN jp_skill_set ON job_post.id = jp_skill_set.job_post_id " +
@@ -1728,7 +1726,7 @@ app.get('/searchJobSeeker', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "jobId": null
+                "matchedJobs": jobsArr
             }
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
             console.log("-----DATABASE CONNECTIVITY ERROR-----\nKindly contact ADMIN.\n");
@@ -1737,14 +1735,13 @@ app.get('/searchJobSeeker', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "jobId": null
+                "matchedJobs": jobsArr
             }
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
             response.send(JSON.stringify(responseJson));
         }
         else
         {
-            var jobsArr = []
             for(var i = 0; i < selectResult.length; i++)
             {
                 var jobId = selectResult[i].id;
@@ -1799,8 +1796,7 @@ app.get('/showEducation', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "userId": null,
-                "educationList" : educationArr
+                "educationArr": educationArr
             }
 
             console.log("[SELECT ERROR] - EDUCATION DETAILS\n", selectErr.message);
@@ -1811,9 +1807,7 @@ app.get('/showEducation', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "userId": null,
-                "educationList" : educationArr
-
+                "educationArr": educationArr
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
@@ -1855,10 +1849,7 @@ app.get('/showWorkExperience', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "jobId": null,
-                "workExperiences" : workExperienceArr
-
-                
+                "workExperiences": workExperienceArr
             }
 
             console.log("Error fetching job details. See below for detailed error information.\n" + selectErr.message)
@@ -1868,9 +1859,7 @@ app.get('/showWorkExperience', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "jobId": null,
-                "workExperiences" : workExperienceArr
-
+                "workExperiences": workExperienceArr
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
@@ -1905,17 +1894,18 @@ app.get('/showWorkExperience', function (request,response) {
 app.get('/skillAssessment', function (request,response) {
     let skillName = request.query.skillName;
 
+    let questionsArr = [];
+
     if(!skillAssessJson.hasOwnProperty(skillName))
     {
         let responseJson = {
             "entryError" : true,
-            "questions" : null
+            "questions" : questionsArr
         }
         response.send(JSON.stringify(responseJson));
         return;
     }
 
-    let questionsArr = [];
     for(let i in skillAssessJson[skillName]) {
         let questionArrEle = skillAssessJson[skillName][i];
         let questionJson = {
