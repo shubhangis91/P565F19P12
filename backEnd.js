@@ -1796,7 +1796,7 @@ app.get('/showEducation', function (request,response) {
         if (selectErr) {
             var responseJson = {
                 "dbError" : 1,
-                "educationArr": educationArr
+                "educationList": educationArr
             }
 
             console.log("[SELECT ERROR] - EDUCATION DETAILS\n", selectErr.message);
@@ -1807,7 +1807,7 @@ app.get('/showEducation', function (request,response) {
         else if (selectResult == '') {
             var responseJson = {
                 "dbError" : 0,
-                "educationArr": educationArr
+                "educationList": educationArr
             }
 
             console.log("-----DATABASE ENTRY ERROR-----\nKindly contact ADMIN.\n")
