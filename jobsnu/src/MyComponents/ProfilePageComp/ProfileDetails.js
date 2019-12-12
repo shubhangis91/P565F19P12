@@ -119,13 +119,13 @@ export default function ProfileDetails(props) {
     var getEducation = strEdu.concat(str2, str3);
     var getWork = strWork.concat(str2, str3);
     axios.get(getUserdetails).then(res => {
-      console.log(res.data);
+      // console.log(res.data.dob.substring(0, 10));
       setValues(res.data);
-      console.log(user);
+      // console.log(user);
       console.log(user.dob);
     });
     axios.get(getEducation).then(res => {
-      console.log(res.data.educationList);
+     // console.log(res.data.educationList);
       setEducation(res.data.educationList);
       //         console.log(education)
     });
@@ -212,9 +212,9 @@ export default function ProfileDetails(props) {
                 </Grid>
                 <TextField
                   id="date"
-                  label="dob"
+                  label="Date of Birth"
                   type="date"
-                  defaultValue={user.dob.substring(0, 10)}
+                  value={user.dob.substring(0, 10)}
                   className={classes.textField}
                   onChange={handleChange("dob")}
                   InputLabelProps={{

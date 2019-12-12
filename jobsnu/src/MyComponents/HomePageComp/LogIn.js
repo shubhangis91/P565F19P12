@@ -6,6 +6,12 @@ import OTPbox from "./OTPbox";
 import { withCookies, Cookies } from "react-cookie";
 import { instanceOf } from "prop-types";
 import { withRouter } from "react-router-dom";
+//import { GoogleLogin } from "react-google-login";
+import { GoogleAPI, GoogleLogin, GoogleLogout } from "react-google-oauth";
+
+const responseGoogle = response => {
+  console.log(response);
+};
 
 class LogIn extends React.Component {
   static propTypes = {
@@ -34,7 +40,7 @@ class LogIn extends React.Component {
     this.validateEmail = this.validateEmail.bind(this);
     this.validatePassword = this.validatePassword.bind(this);
     this.checkIsActive = this.checkIsActive.bind(this);
-    this.pushToForgotPassword = this.pushToForgotPassword.bind(this)
+    this.pushToForgotPassword = this.pushToForgotPassword.bind(this);
   }
 
   handleChange = event => {
@@ -126,10 +132,9 @@ class LogIn extends React.Component {
       }
     });
   }
-pushToForgotPassword(){
-  this.props.history.push("/forgotPassword");
-
-}
+  pushToForgotPassword() {
+    this.props.history.push("/forgotPassword");
+  }
   render() {
     return (
       <div
@@ -147,6 +152,9 @@ pushToForgotPassword(){
             marginBottom: "45%"
           }}
         >
+          <h2 style={{ color: "#7e685a" }}>
+            Put in your Log-in Detials here:{" "}
+          </h2>
           <Form.Group controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
             <input
@@ -198,12 +206,47 @@ pushToForgotPassword(){
           >
             Register Me!
           </Button>
+          <GoogleAPI
+            clientId="69721391201-skpelns354dcip3jnm7nfrb99vgeklbe.apps.googleusercontent.com"
+            // onUpdateSigninStatus={CALLBACK}
+            //   onInitFailure={CALLBACK}
+          >
+            <div>
+              <div>
+                <br/>
+                <GoogleLogin />
+              </div>
+            </div>
+          </GoogleAPI>
+          {/* <GoogleLogin
+              clientId="69721391201-skpelns354dcip3jnm7nfrb99vgeklbe.apps.googleusercontent.com"
+              render={renderProps => (
+                <Button
+                  onClick={renderProps.onClick}
+                  disabled={renderProps.disabled}
+                >
+                  Login With Gmail
+                </Button>
+              )}
+              buttonText="Login"
+              onSuccess={responseGoogle}
+              onFailure={responseGoogle}
+              cookiePolicy={"single_host_origin"}
+            /> */}
           <div style={{ marginTop: "2.5%" }}>
             <img
               src="https://icon-library.net/images/forgot-icon/forgot-icon-11.jpg"
               style={{ width: "20px" }}
             />
-            <a style={{ color: "#7E685A" , cursor: "pointer"}} onClick={this.pushToForgotPassword} >
+
+            <a
+              style={{
+                color: "#7E685A",
+                cursor: "pointer",
+                textDecoration: "underline"
+              }}
+              onClick={this.pushToForgotPassword}
+            >
               {" "}
               I forgot my password, Help!
             </a>

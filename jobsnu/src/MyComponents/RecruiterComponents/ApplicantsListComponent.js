@@ -26,7 +26,7 @@ export default function ApplicantsListComponent(props) {
         <CardActionArea onClick={show}>
           <CardContent>
             <p>{props.applicantName}</p>
-            <p>{props.appliedOn}</p>
+            <p>Application Date: {props.appliedOn}</p>
             <p>{props.applicantEmail}</p>
           </CardContent>
         </CardActionArea>

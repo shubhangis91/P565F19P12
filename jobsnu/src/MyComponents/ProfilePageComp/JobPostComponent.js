@@ -102,6 +102,7 @@ export default function JobPostComponent(props) {
   }
   useEffect(() => {
     handleImage();
+    console.log(props)
   }, []);
   return (
     <Card className={classes.card} style={{minWidth:"40vh",backgroundColor:"#fff0f2"}}>
@@ -115,17 +116,14 @@ export default function JobPostComponent(props) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-            {props.jobName}
-            <br/>
-
+            {props.jobName} <h6 style={{color:"#7e685a",display: "inline"}}> at {props.companyName}</h6></Typography>
             {props.skillName.map((skill, i) => (
               <Tooltip title="This skill is required">
                 <Chip style={{marginRight:'1%'}} label={skill} color="secondary" />
               </Tooltip>
             ))}
-          </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            <LocationOnIcon /> {props.city}, {props.state}, {props.country}
+            <LocationOnIcon />{props.city}, {props.state}, {props.country}
           </Typography>
         </CardContent>
       </CardActionArea>

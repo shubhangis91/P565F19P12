@@ -71,7 +71,7 @@ class OTPbox extends React.Component {
         return(
             <Modal show={this.props.fade}>
                 <Modal.Header closeButton>
-                    Please enter the 6 digit OTP emailed to you below 
+                    Please enter the 6 digit code emailed to you below 
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
@@ -82,7 +82,7 @@ class OTPbox extends React.Component {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick= {this.handleSubmit} style={{marginLeft: "1%",backgroundColor:"#AFD275",borderColor:"#7E685A", color:"#7E685A"}} >
-                        Sumbit OTP
+                        Sumbit 
                     </Button>
                     <br/>
                 </Modal.Footer>
