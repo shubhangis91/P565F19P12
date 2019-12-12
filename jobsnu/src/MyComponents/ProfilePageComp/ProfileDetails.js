@@ -35,7 +35,7 @@ import {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: "100%"
+    width: "90%"
   },
 
   heading: {
@@ -391,7 +391,7 @@ export default function ProfileDetails(props) {
           aria-controls="panel4bh-content"
           id="panel4bh-header"
         >
-          <Typography className={classes.heading}>Personal data</Typography>
+          <Typography className={classes.heading}>Security data</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Typography>

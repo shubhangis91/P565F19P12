@@ -6,6 +6,8 @@ import UserList from './UserList';
 import chatkitLogo from './chatkit-logo.svg';
 import { useCookies } from "react-cookie";
 import Axios from 'axios';
+import { domainToASCII } from 'url';
+import { isTSAnyKeyword } from '@babel/types';
 
 const tokenProvider = new TokenProvider({
   url: 'https://us1.pusherplatform.io/services/chatkit_token_provider/v1/37bc05a7-986f-45ba-ab7e-8ad47510f2f2/token',
@@ -14,17 +16,23 @@ const instanceLocator = 'v1:us1:37bc05a7-986f-45ba-ab7e-8ad47510f2f2';
 
 function ChatComponent() {
   const [cookies, setCookie] = useCookies(["tabValue", "userId",'otherUserId']);
+  const [state,setState] = useState('')
   const refresh = () => {
-    setCookie("tabValue",0)
-    window.location.reload(false);
+    setCookie("tabValue",4)
+    doit()
   }
-  setCookie("tabValue",4)
+  const doit = () => {
+    window.location.reload(false)
+  }
+
   const [chats,setChats]=useState([])
   const [otherUser,setOtherUser]=useState(cookies["otherUserId"]);
   const [flag,setFlag]=useState(true)
   const urlParams = new URLSearchParams(window.location.search);
   const userId = cookies["userId"]
   console.log(otherUser)
+  //useEffect(() => { window.location.reload(false);}, [state])
+  useEffect(() => { setCookie("tabValue",0);}, [])
   return (
     <div className="Chatapp">
         <>

@@ -228,7 +228,6 @@ function Dashboard() {
                     skillName="{job.skil4lName}"
                     apply={true}
                     handleExpand={handleExpand} */}
-                  />
                 </OverflowScrolling>
               </Col>
 

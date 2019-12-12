@@ -3,6 +3,9 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  max-width:600px;
+  overflow-wrap: anywhere;
+  /* border: 1px solid #d0d0d0; */
 }
 
 .Chat__titlebar {
@@ -89,7 +92,7 @@
   content: '';
   position: absolute;
   border: 0 solid transparent;
-  border-top: 9px solid #ffffff;
+  border-top: 9px solid #e7717d;
   border-radius: 0 20px 0;
   width: 15px;
   height: 30px;
@@ -98,16 +101,16 @@
 
 .Chat__messages__message__arrow.alt:after {
   transform: rotate(45deg) scaleY(-1);
-  border-top: 9px solid #542182;
+  border-top: 9px solid #afd275;
 }
 
 .Chat__messages__message--other {
-  background: #fefefe;
+  background: #e7717d;
 }
 
 .Chat__messages__message--self {
-  background: #542182;
-  color: #ffffff;
+  background: #afd275;
+  /* color: #ffffff; */
 }
 
 .Chat__messages__message__time {

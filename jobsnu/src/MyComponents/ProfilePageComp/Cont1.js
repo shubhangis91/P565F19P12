@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -48,6 +48,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.paper,
     display: 'flex',
     height: '50vh',
+   // minWidth:"25vh",
   },
   tabs: {
     borderRight: `1px solid ${theme.palette.divider}`,
@@ -60,11 +61,12 @@ function Cont1() {
   const [value, setValue] = React.useState(parseInt(cookies["tabValue"]));
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    console.log(typeof cookies["tabValue"])
+    console.log(newValue)
+    setCookie("tabValue",newValue)
   };
-
+  useEffect(() => {     console.log(cookies["tabValue"])}, [cookies['tabValue']])
   return (
-    <div className={classes.root} style={{marginTop:"5.5%"}}>
+    <div className={classes.root} style={{marginTop:"5.5%",minWidth:"25vh"}}>
       <Tabs
         orientation="vertical"
         variant="scrollable"
@@ -73,7 +75,7 @@ function Cont1() {
         aria-label="Vertical tabs example"
         className={classes.tabs}
       >
-        <Tab label="DashBoard" {...a11yProps(0)} />
+        <Tab label="Your DashBoard" {...a11yProps(0)} />
         <Tab label="Profile Details" {...a11yProps(1)} />
         <Tab label="Your Applications" {...a11yProps(2)} />
         <Tab label="Skill Assessment" {...a11yProps(3)} />
@@ -81,7 +83,7 @@ function Cont1() {
         {/* <Tab label="Item Six" {...a11yProps(5)} /> */}
         {/* <Tab label="Item Seven" {...a11yProps(6)} /> */}
       </Tabs>
-      <TabPanel value={value} index={0} style={{width:"100%"}}>
+      <TabPanel value={value} index={0} style={{width:"90%"}}>
         <DashBoard/>
       </TabPanel>
       <TabPanel value={value} index={1}>

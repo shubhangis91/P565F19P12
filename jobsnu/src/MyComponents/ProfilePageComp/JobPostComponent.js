@@ -88,7 +88,7 @@ export default function JobPostComponent(props) {
     props.handleExpand(props);
   };
   return (
-    <Card className={classes.card}>
+    <Card className={classes.card} style={{minWidth:"40vh"}}>
       <CardActionArea onClick={learnMore}>
         <CardMedia
           className={classes.media}
