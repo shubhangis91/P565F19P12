@@ -12,6 +12,7 @@ import WorkPostComponent from "./ProfilePageComp/WorkPostComponent";
 import OverflowScrolling from "react-overflow-scrolling";
 import ChatIcon from '@material-ui/icons/Chat';
 import Alert from "react-bootstrap/Alert";
+import images from "../img/images";
 
 const useStyles = makeStyles({
   card: {
@@ -23,18 +24,50 @@ const useStyles = makeStyles({
 });
 export default function CompanyPage(props) {
   const show = () => {
-    console.log(props.companySize)
+    
   };
+  const [image, setImage] = React.useState('https://icon-library.net/images/facebook-icon-square/facebook-icon-square-8.jpg');
+
+  const handleImage = () => {
+    if(props.companyName == "Walmart") {
+      setImage('https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg');
+      //console.log("wall")
+    }
+    if (props.companyName == "Facebook, Inc.") {
+      setImage("https://icon-library.net/images/facebook-icon-square/facebook-icon-square-8.jpg");
+    }
+    if (props.companyName == "Google") {
+      setImage("https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg");
+    }
+  }
+  
+  useEffect(() => {
+    handleImage();
+    console.log(props)
+  }, []);
   return (
     <div>
       <Card>
         <CardActionArea onClick={show}>
           <CardContent>
-            <p>{props.companyName} {props.companySize} {props.domain} {props.emailId} {props.establishedDate} {props.headquarters} {props.primaryContact} {props.industry} {props.website} {props.about} </p>
+            
             <OverflowScrolling
               className="overflow-scrolling"
-              style={{ height: "70vh" }}
+              style={{ height: "40vh" }}
             >
+              <img
+              style={{ width: "15vh",cursor: "pointer", }}
+              //onClick={() => imageClick()}
+              src={image}
+            />
+              <h3>{props.companyName}</h3> 
+              <h4>For more info, go to: {props.website}</h4>
+              {/* <p>Company size :{props.companySize}</p> */}
+              <p>Company Domain:{props.domain} </p>
+               <p>Support Email id:{props.emailId}</p> 
+               <p>Date Founded:{props.establishedDate}</p> 
+               <p>Located at:{props.headquarters}</p> 
+               <p>{props.about} </p>
               
             </OverflowScrolling>
           </CardContent>

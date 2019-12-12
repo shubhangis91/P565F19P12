@@ -21,6 +21,7 @@ import Backdrop from "@material-ui/core/Backdrop";
 import Fade from "@material-ui/core/Fade";
 import ProfilePage from "../ProfilePage.js";
 import CompanyPage from "../CompanyPage.js";
+import images from "../../img/images";
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -158,7 +159,7 @@ export default function ExpandedJobRecruiter(props) {
             <img
               style={{ width: "15vh",cursor: "pointer", }}
               onClick={() => imageClick()}
-              src="https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg"
+              src={images.find(x => x.id == props.companyName).src}
             />
           </Col>
           <Col>

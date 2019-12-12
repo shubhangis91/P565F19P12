@@ -89,7 +89,7 @@ export default function JobPostComponent(props) {
   const learnMore = () => {
     props.handleExpand(props);
   };
-  const [image, setImage] = React.useState('https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg');
+  const [image, setImage] = React.useState('https://icon-library.net/images/facebook-icon-square/facebook-icon-square-8.jpg');
 
   const handleImage = () => {
     if(props.companyName == "Walmart") {
@@ -97,7 +97,7 @@ export default function JobPostComponent(props) {
       //console.log("wall")
     }
     if (props.companyName == "Facebook") {
-      setImage("https://www.ebusinessweekly.co.zw/wp-content/uploads/sites/23/2018/09/amazon_logo_500500._V323939215_-e1536167552323.png");
+      setImage("https://icon-library.net/images/facebook-icon-square/facebook-icon-square-8.jpg");
     }
     if (props.companyName == "Google") {
       setImage("https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg");
