@@ -92,14 +92,18 @@ export default function JobPostComponent(props) {
   const [image, setImage] = React.useState('https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg');
 
   const handleImage = () => {
-    if(props.companyId == "Walmart") {
+    if(props.companyName == "Walmart") {
       setImage('https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg');
       //console.log("wall")
     }
-    if (props.companyId == "Facebook") {
+    if (props.companyName == "Facebook") {
       setImage("https://www.ebusinessweekly.co.zw/wp-content/uploads/sites/23/2018/09/amazon_logo_500500._V323939215_-e1536167552323.png");
     }
+    if (props.companyName == "Google") {
+      setImage("https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg");
+    }
   }
+  
   useEffect(() => {
     handleImage();
     console.log(props)
@@ -116,7 +120,7 @@ export default function JobPostComponent(props) {
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-            {props.jobName} <h6 style={{color:"#7e685a",display: "inline"}}> at {props.companyName}</h6></Typography>
+  {props.jobName} <h6 style={{color:"#7e685a",display: "inline"}}> at {props.companyName}</h6></Typography>
             {props.skillName.map((skill, i) => (
               <Tooltip title="This skill is required">
                 <Chip style={{marginRight:'1%'}} label={skill} color="secondary" />

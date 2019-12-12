@@ -65,6 +65,7 @@ function Dashboard() {
         console.log(res.data);
         if (res.data.matchedJobs != null) {
           setJobs(res.data.matchedJobs);
+          console.log(res.data.matchedJobs)
           setSearchRes(true);
         } else {
           setSearchRes(false);

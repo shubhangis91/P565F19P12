@@ -180,15 +180,8 @@ export default function ExpandedJob(props) {
                   </Tooltip>
                 ))}
               <br />
-              {props.description}
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
-              imperdiet, nulla et dictum interdum, nisi lorem egestas odio,
-              vitae scelerisque enim ligula venenatis dolor. Maecenas nisl est,
-              ultrices nec congue eget, auctor vitae massa. Fusce luctus
-              vestibulum augue ut aliquet. Mauris ante ligula, facilisis sed
-              ornare eu, lobortis in odio. Praesent convallis urna a lacus
-              interdum ut hendrerit risus congue. Nunc sagittis dictum nisi, sed
-              ullamcorper ipsum dignissim ac...
+              {props.description+". "}
+                {props.companyName} engineers have always focused on one person when they build software — the person who will use it. Working with them, you’ll see why every {props.companyName} product and service feels intuitive and simple, and why every aspect of this group’s work is built around a respect for the customer’s needs
             </Typography>
           </Col>
           <Col
