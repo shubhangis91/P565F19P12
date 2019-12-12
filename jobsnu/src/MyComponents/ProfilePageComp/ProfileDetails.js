@@ -281,9 +281,9 @@ export default function ProfileDetails(props) {
             Tell us about your degrees, diplomas, qualificaitons!
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails style={{ backgroundColor: "#c3b9b0" }}>
-          <Typography>
-            <VerticalTimeline>
+        <ExpansionPanelDetails style={{ backgroundColor: "#b3e0f2" }}>
+          <Typography style={{width:"120vh"}}>
+            <VerticalTimeline >
               {education.map((edu, i) => (
                 <EducationPostComponent
                   key={i}
@@ -338,7 +338,7 @@ export default function ProfileDetails(props) {
             Tell us about your work experience, it'll give you an edge!
           </Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails style={{ backgroundColor: "#c3b9b0" }}>
+        <ExpansionPanelDetails style={{ backgroundColor: "#b3e0f2" }}>
           <Typography>
             <VerticalTimeline>
               {workExp.map((work, i) => (
