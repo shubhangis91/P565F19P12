@@ -26,7 +26,7 @@ class LogIn extends React.Component {
     this.state = {
       email: "",
       password: "",
-      otp: Math.floor(100000 + Math.random() * 900000),
+      otp: '111111',
       showOTPbox: false,
       passwordValid: false,
       emailValid: false,
