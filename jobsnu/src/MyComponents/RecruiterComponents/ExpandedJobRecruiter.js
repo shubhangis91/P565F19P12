@@ -28,7 +28,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: "5%",
     marginRight: "5%",
     background: "#F4F4F4",
-    borderRadius: "4%"
+    borderRadius: "4%",
+    backgroundColor:"#fff0f2"
   },
   media: {
     height: "15%",
@@ -150,7 +151,7 @@ export default function ExpandedJobRecruiter(props) {
     handleOpenCompany();
   } 
   return (
-    <Card className={classes.card}>
+    <Card className={classes.card} style={{backgroundColor:"#fff0f2"}}>
       <CardContent>
         <Row>
           <Col xs="auto">
@@ -192,7 +193,7 @@ export default function ExpandedJobRecruiter(props) {
                   andleChange={props.handleChange} value={props.value}
                 />
               ))}
-              <ApplicantsListComponent
+              {/* <ApplicantsListComponent
                 applicantId="{us1er.applicantId}"
                 applicantName="{us1er.applicantName}"
                 appliedOn="{user.a1ppliedOn}"
@@ -212,7 +213,7 @@ export default function ExpandedJobRecruiter(props) {
                 appliedOn="{user.appliedO3n}"
                 applicantEmail="{user.appl3icantEmail}"
                 showUserDetails={showUserDetails}
-              />
+              /> */}
             </OverflowScrolling>
           </Col>
           <Col

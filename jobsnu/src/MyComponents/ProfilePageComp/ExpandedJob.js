@@ -25,8 +25,8 @@ const useStyles = makeStyles(theme => ({
     display: "flex",
     marginBottom: "5%",
     marginRight: "5%",
-    background: "#F4F4F4",
-    borderRadius: "4%"
+    backgroundColor:"#fff0f2",
+      borderRadius: "4%"
   },
   media: {
     height: "15%",
@@ -127,7 +127,7 @@ export default function ExpandedJob(props) {
   const [openFail, setOpenFail] = React.useState(false);
 
   return (
-    <Card className={classes.card}>
+    <Card className={classes.card} >
       <CardContent>
         <Row>
           <Col xs="auto">
@@ -169,10 +169,7 @@ export default function ExpandedJob(props) {
               fontWeight="fontWeightMedium"
               component="h2"
             >
-              <OverflowScrolling
-                className="overflow-scrolling"
-                style={{ height: "4.5vh" }}
-              >
+  
                 {props.skillName.map((skill, i) => (
                   <Tooltip title="This skill is required">
                     <Chip
@@ -182,7 +179,6 @@ export default function ExpandedJob(props) {
                     />
                   </Tooltip>
                 ))}
-              </OverflowScrolling>
               <br />
               {props.description}
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
@@ -211,10 +207,6 @@ export default function ExpandedJob(props) {
               </Typography>
               <Typography gutterBottom variant="body1" component="h2">
                 Job Type: {props.jobType}
-              </Typography>
-              <Typography gutterBottom variant="body1" component="h2">
-                Job Type:
-                {props.jobType}
               </Typography>
             </div>
           </Col>

@@ -22,7 +22,7 @@ export default function ApplicantsListComponent(props) {
   };
   return (
     <div style={{marginBottom:"3vh", marginTop:"3vh"}}>
-      <Card style={{borderRadius:"2vh"}}>
+      <Card style={{borderRadius:"2vh",backgroundColor:"#c5df9b"}}>
         <CardActionArea onClick={show}>
           <CardContent>
             <p>{props.applicantName}</p>

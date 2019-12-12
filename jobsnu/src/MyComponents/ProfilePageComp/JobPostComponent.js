@@ -17,6 +17,8 @@ import Fade from "@material-ui/core/Fade";
 import Chip from "@material-ui/core/Chip";
 import Tooltip from "@material-ui/core/Tooltip";
 import OverflowScrolling from "react-overflow-scrolling";
+import images from "../../img/images";
+
 const useStyles = makeStyles(theme => ({
   card: {
     display: "flex",
@@ -87,30 +89,40 @@ export default function JobPostComponent(props) {
   const learnMore = () => {
     props.handleExpand(props);
   };
+  const [image, setImage] = React.useState('https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg');
+
+  const handleImage = () => {
+    if(props.companyId == "Walmart") {
+      setImage('https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg');
+      //console.log("wall")
+    }
+    if (props.companyId == "Facebook") {
+      setImage("https://www.ebusinessweekly.co.zw/wp-content/uploads/sites/23/2018/09/amazon_logo_500500._V323939215_-e1536167552323.png");
+    }
+  }
+  useEffect(() => {
+    handleImage();
+  }, []);
   return (
-    <Card className={classes.card} style={{minWidth:"40vh"}}>
+    <Card className={classes.card} style={{minWidth:"40vh",backgroundColor:"#fff0f2"}}>
       <CardActionArea onClick={learnMore}>
         <CardMedia
           className={classes.media}
           component="img"
           alt="Company logo {props.companyName}"
-          image="https://5qevh96ime-flywheel.netdna-ssl.com/wp-content/uploads/2018/12/Walmart-Logo.jpg"
+          image={image}
           title="{props.companyName}"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
             {props.jobName}
             <br/>
-            <OverflowScrolling
-                  className="overflow-scrolling"
-                  style={{ height: "4.5vh" }}
-                >
+
             {props.skillName.map((skill, i) => (
               <Tooltip title="This skill is required">
                 <Chip style={{marginRight:'1%'}} label={skill} color="secondary" />
               </Tooltip>
             ))}
-            </OverflowScrolling>
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
             <LocationOnIcon /> {props.city}, {props.state}, {props.country}

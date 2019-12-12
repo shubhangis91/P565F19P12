@@ -47,13 +47,13 @@ export default function ProfilePage(props) {
     <div>
       <Card style={{ borderRadius: "4vh" }}>
         {/* <CardActionArea onClick={show}> */}
-        <CardContent style={{ backgroundColor: "#F4F4F4" }}>
-          <p>
-            {props.user.firstName} {props.user.lastName}
-          </p>
-          <p>
-            {props.user.primaryContact} {props.user.secondaryContact}
-          </p>
+        <CardContent style={{ backgroundColor: "#F4F4F4", color:"#7E685A" }}>
+          <h3 style={{ display: "block", textAlign: "center" }}>
+            Name:{props.user.firstName} {props.user.lastName}
+          </h3>
+          <h3 style={{ display: "block", textAlign: "center" }}>
+            Contact Number:{props.user.primaryContact}
+          </h3>
           <Tabs
             orientation="vertical"
             variant="scrollable"
@@ -68,9 +68,9 @@ export default function ProfilePage(props) {
               label="Message"
               {...a11yProps(2)}
               onClick={props.handleClosePerson}
+              style={{backgroundColor:"#e7717d", borderRadius:"1vh",width:"10vh",marginLeft:"120vh" ,color:"black" }}
             />
           </Tabs>
-          <ChatIcon /> Message
           <br />
           <br />
           <div style={{ display: "block", textAlign: "center" }}>
@@ -83,7 +83,7 @@ export default function ProfilePage(props) {
             className="overflow-scrolling"
             style={{
               height: "70vh",
-              backgroundColor: "#c3b9b0",
+              backgroundColor: "#b3e0f2",
               borderRadius: "4vh"
             }}
           >
