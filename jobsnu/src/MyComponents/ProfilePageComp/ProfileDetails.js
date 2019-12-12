@@ -27,6 +27,8 @@ import NewWorkPostComponent from "./NewWorkPostComponent";
 import WorkPostComponent from "./WorkPostComponent";
 import PaymentComponent from "./PaymentComponent";
 import ModeChanger from "./ModeChanger"
+import { useHistory } from "react-router-dom";
+
 //import SkillsComponent from "./skill"
 import {
   VerticalTimeline,
@@ -76,6 +78,8 @@ export default function ProfileDetails(props) {
   const toggleDonateModal = () => {
     setPaid(true)
     console.log(paid)
+    this.router.history.push("/homeDarkMode")
+
   }
   const handleExpand = panel => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
