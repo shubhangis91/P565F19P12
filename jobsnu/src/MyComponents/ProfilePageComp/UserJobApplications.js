@@ -11,13 +11,13 @@ function UserJobApplications() {
         var str3 = cookies['userId'];
         var Appn = strJob.concat(str2,str3)
         axios
-            .get("/jobPosts?userId="+cookies["userId"])
+            .get("/jobSeekerApplications?userId="+cookies["userId"])
             .then(res => {
                 //console.log(Appn)
                 //console.log(res.data) 
                 //console.log(res.data.jobPosts)
-                if(res.data.jobPosts!=null){
-                setJobs(res.data.jobPosts)}
+                if(res.data.jsApplications!=null){
+                setJobs(res.data.jsApplications)}
             })
     }
 useEffect(() => {handleLoad()},[])
@@ -26,7 +26,8 @@ useEffect(() => {handleLoad()},[])
             <div>
                     {jobs.map((job,i) => <JobPostComponent 
                         city={job.city}
-                        companyId={job.companyName}
+                        companyName={job.companyName}
+                        companyId={job.companyId}
                         country={job.country}
                         description={job.description}
                         domain={job.domain}

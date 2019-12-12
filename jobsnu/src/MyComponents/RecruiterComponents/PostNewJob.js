@@ -71,7 +71,7 @@ const useStyles = makeStyles(theme => ({
       country:'',
       jobType:'',
       skills:'',
-      userId:3,
+      userId:cookies['userId'],
     });
 
 const handleChange = (name) => event => {
@@ -84,6 +84,12 @@ const handleSubmit = () => {
     .then(res => {
       console.log(res) 
       console.log(res.data)
+      if(res.data.jobAdded==1){
+        alert("Your job was posted!");
+        window.location.reload(false);
+
+
+      }
   })
 }
       return(
