@@ -965,6 +965,19 @@ app.get('/getUserChats', function (request,response) {
         });
 
 })
+app.get('/getUserName', function (request,response) {
+    let userId = request.query.userId;
+    chatkit.getUser({
+        id: userId,
+      })
+      .then((res) => {
+        response.send(res)
+      console.log(res);
+    }).catch((err) => {
+        console.log(err);
+        response.status(400).send("")
+    });
+})
 
 app.get('/companyDetails', function (request,response) {
     let companyId = request.query.companyId;

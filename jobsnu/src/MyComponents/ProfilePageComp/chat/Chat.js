@@ -48,11 +48,6 @@ function Chat(props) {
   return (
     <div className="Chat">
       <div className="Chat__titlebar">
-        <img
-          src={defaultAvatar}
-          className="Chat__titlebar__avatar"
-          alt="avatar"
-        />
         <div className="Chat__titlebar__details">
           {/*TODO: Get other user's name from Chatkit */}
           <span>{props.chatkit.isLoading

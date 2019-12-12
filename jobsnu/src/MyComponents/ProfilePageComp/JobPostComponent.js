@@ -76,8 +76,8 @@ export default function JobPostComponent(props) {
     };
     console.log(user);
     axios.post("/applyJob", { user }).then(res => {
-      console.log(res);
-      console.log(res.data);
+      // console.log(res);
+      // console.log(res.data);
       if (res.data.jobApplied == "1") {
         handleOpenSucc();
       }
