@@ -1,7 +1,6 @@
 var mysql  = require('mysql');
 var express = require('express');
 var nodemailer = require('nodemailer');
-// var session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
 var dateFormat = require('dateformat');
@@ -10,7 +9,7 @@ const Chatkit = require('@pusher/chatkit-server');
 const chatkit = new Chatkit.default({
     instanceLocator: 'v1:us1:37bc05a7-986f-45ba-ab7e-8ad47510f2f2',
     key: '57961704-54db-4473-9ec3-97f14f13fbea:k1hpe0uC7RnY/RDd8hxAF6loRSVPjE3+aLn3W7rniEg=',
-  })
+})
 const dotenv = require('dotenv');
 dotenv.config();
 console.log(`Your port is ${process.env.PORT}`); // 8626
@@ -555,11 +554,11 @@ app.post('/mfaLogin', function (req,res) {
                     "</div>" +
                     "<div style=\" font-size: 1px; position:absolute;left:352px;top:700px; width:600px; height:40px; background-color:#7E685A \"> " +
                     "*Terms & conditions apply."
-                    "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
-                    "</div>" +
-                    "</div>" +
-                    "</body>" +
-                    "</html>";
+                "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
+                "</div>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
                 let otpMessage = createMessage(htmlMessageString, jobsnuEmail, email, otpEmailSubject);
                 sendMessage(otpMessage);
 
@@ -630,7 +629,7 @@ app.post('/register', function (req, res) {
         "primaryContact": primaryContact,
         "secondaryContact": secondaryContact
     };
-   
+
     // should show profile saved message/saved profile details
     console.log(response);
     res.send(JSON.stringify(response));
@@ -675,8 +674,6 @@ app.post('/setEducation', function (req, res) {
 
 app.post('/setMfa', function (request,response) {
     let mfaEnabled = req.body.user.mfa;
-    // let userId = request.body.user.userId;
-    // let userId = request.session.userId;
 
     updateSql = "update login set mfa_enabled = " + mfaEnabled;
     pool.query(v, function (updateErr, updateResult, updateFields) {
@@ -922,8 +919,8 @@ app.post('/verify', function (req, res) {
             "                   Kindly use the code below to complete your registration process on Jobsnu.<p>" +
             "</div>" +
             "<div style=\" font-size: 1px; position:absolute;left:352px;top:700px; width:600px; height:40px; background-color:#7E685A \"> " +
-                "*Terms & conditions apply."+
-                "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
+            "*Terms & conditions apply."+
+            "Do not share your the OTP or other personal details, such as user ID/password, with anyone, either over phone or through email." +
             "</div>" +
             "</div>" +
             "</body>" +
@@ -955,25 +952,26 @@ app.get('/getUserChats', function (request,response) {
     console.log("Chat user Id is"+userId)
     chatkit.getUserRooms({
         userId: userId,
-      })
+    })
         .then((res) => {
             response.send(res)
-          console.log(res);
+            console.log(res);
         }).catch((err) => {
-            console.log(err);
-            response.status(400).send([])
-        });
+        console.log(err);
+        response.status(400).send([])
+    });
 
 })
+
 app.get('/getUserName', function (request,response) {
     let userId = request.query.userId;
     chatkit.getUser({
         id: userId,
-      })
-      .then((res) => {
-        response.send(res)
-      console.log(res);
-    }).catch((err) => {
+    })
+        .then((res) => {
+            response.send(res)
+            console.log(res);
+        }).catch((err) => {
         console.log(err);
         response.status(400).send("")
     });
@@ -1755,6 +1753,7 @@ app.get('/searchJobSeeker', function (request,response) {
         }
         else
         {
+            var jobPostsMap = new Map();
             for(var i = 0; i < selectResult.length; i++)
             {
                 var jobId = selectResult[i].id;
@@ -1765,27 +1764,31 @@ app.get('/searchJobSeeker', function (request,response) {
                 var postedByUserId = selectResult[i].posted_by_id
                 var jobType = (selectResult[i].job_type='F')? "Full-Time":"Internship";
                 var postedByUserId = selectResult[i].posted_by_id;
-
-                var jsonObj = {
-                    "jobId" : jobId,
-                    "jobName" : jobName,
-                    "postedById": postedByUserId,
-                    "companyId" : companyId,
-                    "companyName" : companyName,
-                    "domain" : domain,
-                    "industry": selectResult[i].industry,
-                    "city": selectResult[i].city,
-                    "state" : selectResult[i].state,
-                    "country" : selectResult[i].country,
-                    "function": selectResult[i].function,
-                    "description": selectResult[i].description,
-                    "jobType": jobType,
-                    "isActive": selectResult[i].is_active,
-                    "skillName" : selectResult[i].skill_name
+                if (jobPostsMap.has(jobId))
+                    jobPostsMap.get(jobId).skillName.push(selectResult[i].skill_name);
+                else {
+                    var jsonObj = {
+                        "jobId": jobId,
+                        "jobName": jobName,
+                        "postedById": postedByUserId,
+                        "companyId": companyId,
+                        "companyName": companyName,
+                        "domain": domain,
+                        "industry": selectResult[i].industry,
+                        "city": selectResult[i].city,
+                        "state": selectResult[i].state,
+                        "country": selectResult[i].country,
+                        "function": selectResult[i].function,
+                        "description": selectResult[i].description,
+                        "jobType": jobType,
+                        "isActive": selectResult[i].is_active,
+                        "skillName": [selectResult[i].skill_name]
+                    }
+                    jobPostsMap.set(jobId, jsonObj);
                 }
-                jobsArr.push(jsonObj);
             }
 
+            jobsArr = Array.from(jobPostsMap.values());
             var responseJson = {
                 "dbError" : 0,
                 "userId" : userId,
@@ -1797,7 +1800,6 @@ app.get('/searchJobSeeker', function (request,response) {
             return;
         }
     });
-
 });
 
 app.get('/showEducation', function (request,response) {
@@ -1957,8 +1959,6 @@ app.get('/userDetails', function (request,response) {
             response.send(JSON.stringify(loginResponse));
         }
         else {
-            // console.log("-----------SESSION DETAILS-----------\n" + request.session.loggedIn + "\n" + request.session.id + "\n" + request.session.username);
-
             var loginResponse = {
                 "dbError" : 0,
                 "userId": selectResult[0].id,
