@@ -8,6 +8,7 @@ import { instanceOf } from "prop-types";
 import { withRouter } from "react-router-dom";
 //import { GoogleLogin } from "react-google-login";
 import { GoogleAPI, GoogleLogin, GoogleLogout } from "react-google-oauth";
+import { Tooltip } from "@material-ui/core";
 
 const responseGoogle = response => {
   console.log(response);
@@ -33,7 +34,8 @@ class LogIn extends React.Component {
       credentials: "",
       userIdCookies: cookies.get("userId"),
       userEmailCookies: cookies.get("userEmail"),
-      isNotActive: cookies.get("isNotActive")
+      isNotActive: cookies.get("isNotActive"),
+      guestLogin: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -41,6 +43,7 @@ class LogIn extends React.Component {
     this.validatePassword = this.validatePassword.bind(this);
     this.checkIsActive = this.checkIsActive.bind(this);
     this.pushToForgotPassword = this.pushToForgotPassword.bind(this);
+    this.handleSubmitGuest = this.handleSubmitGuest.bind(this)
   }
 
   handleChange = event => {
@@ -99,11 +102,12 @@ class LogIn extends React.Component {
     this.setState({
       showOTPbox: true
     });
-    event.preventDefault();
+    // event.preventDefault();
     const user = {
       email: this.state.email,
       password: this.state.password,
-      otp: this.state.otp
+      otp: this.state.otp,
+      guestLogin:this.state.guestLogin,
     };
     console.log(user);
     axios.post("/mfaLogin", { user }).then(res => {
@@ -134,6 +138,14 @@ class LogIn extends React.Component {
   }
   pushToForgotPassword() {
     this.props.history.push("/forgotPassword");
+  }
+  handleSubmitGuest(){
+    this.setState({
+      email:'risabgajra@gmail.com',
+      password:'Abc11111',
+      guestLogin:true,
+    },this.handleSubmit)
+    console.log(this.state.email)
   }
   render() {
     return (
@@ -206,18 +218,20 @@ class LogIn extends React.Component {
           >
             Register Me!
           </Button>
-          <GoogleAPI
+
+          
+          {/* <GoogleAPI
             clientId="69721391201-skpelns354dcip3jnm7nfrb99vgeklbe.apps.googleusercontent.com"
             // onUpdateSigninStatus={CALLBACK}
             //   onInitFailure={CALLBACK}
           >
-            <div>
-              <div>
+            <div> */}
+              {/* <div>
                 <br/>
                 <GoogleLogin />
               </div>
             </div>
-          </GoogleAPI>
+          </GoogleAPI> */}
           {/* <GoogleLogin
               clientId="69721391201-skpelns354dcip3jnm7nfrb99vgeklbe.apps.googleusercontent.com"
               render={renderProps => (
@@ -233,7 +247,23 @@ class LogIn extends React.Component {
               onFailure={responseGoogle}
               cookiePolicy={"single_host_origin"}
             /> */}
+            
           <div style={{ marginTop: "2.5%" }}>
+          <Tooltip title="Click here to try out the job seeker and recruiter views">
+          <h4
+              style={{
+                color: "#7E685A",
+                cursor: "pointer",
+                textDecoration: "underline",
+                fontSize:"20px,"
+              }}
+              onClick={this.handleSubmitGuest}
+            >
+              {" "}
+              Click here to try all the features of the website
+            </h4>
+            </Tooltip>
+            <br/>
             <img
               src="https://icon-library.net/images/forgot-icon/forgot-icon-11.jpg"
               style={{ width: "20px" }}

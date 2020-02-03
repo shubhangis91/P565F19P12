@@ -15,7 +15,7 @@ class OTPbox extends React.Component {
         super(props);
         const { cookies } = props;
         this.state={
-            otpvalue: "",
+            otpvalue: "111111",
             otpvalid: true,
         }
         this.handleChange=this.handleChange.bind(this)
@@ -26,6 +26,7 @@ class OTPbox extends React.Component {
             [event.target.name]: event.target.value 
         })
     }
+    
     handleSubmit(){
         const { cookies } = this.props;
         if(this.state.otpvalue==this.props.otp) {
@@ -65,18 +66,23 @@ class OTPbox extends React.Component {
             })
         }
         console.log(this.state.otpvalue,this.props.otp)
+        
 
+    }
+    close(props){
+        props.fade = !props.fade;
+        console.log(props.fade)
     }
     render()    {
         return(
-            <Modal show={this.props.fade}>
-                <Modal.Header closeButton>
+            <Modal show={this.props.fade} handleHide={()=>this.close(this.props)}>
+                <Modal.Header closeButton onClick={()=>this.close(this.props)}>
                     Please enter the 6 digit code emailed to you below 
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
                         <Form.Group controlId="checkOTP">
-                            <Form.Control type="password" placeholder="OTP" name="otpvalue" onChange={this.handleChange} required />
+                            <Form.Control type="password" placeholder="enter 111111 for trial" name="otpvalue" onChange={this.handleChange} required />
                         </Form.Group>
                     </Form>
                 </Modal.Body>
